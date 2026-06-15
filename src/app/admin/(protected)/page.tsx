@@ -1,6 +1,7 @@
-import { FolderKanban, Star, Timer } from "lucide-react";
+import { FolderKanban, Plus, Star, Timer } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { ButtonLink } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { listProjects } from "@/lib/projects";
 
@@ -31,17 +32,23 @@ export default async function AdminPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <Badge className="mb-4 border-teal-200 bg-teal-50 text-teal-800 dark:border-teal-900 dark:bg-teal-950 dark:text-teal-200">
-          Protected area
-        </Badge>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-950 dark:text-white">
-          Admin dashboard
-        </h1>
-        <p className="mt-3 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-300">
-          This area is protected by a signed session cookie. Project editing UI
-          will be added in the next phase.
-        </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <Badge className="mb-4 border-teal-200 bg-teal-50 text-teal-800 dark:border-teal-900 dark:bg-teal-950 dark:text-teal-200">
+            Protected area
+          </Badge>
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-950 dark:text-white">
+            Admin dashboard
+          </h1>
+          <p className="mt-3 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-300">
+            Manage your portfolio projects, update content, and control what
+            visitors see on your public site.
+          </p>
+        </div>
+        <ButtonLink href="/admin/projects/new" size="md">
+          <Plus aria-hidden="true" size={18} />
+          New project
+        </ButtonLink>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -65,14 +72,23 @@ export default async function AdminPage() {
       <Card>
         <CardHeader>
           <h2 className="text-lg font-bold text-zinc-950 dark:text-white">
-            Next step
+            Quick actions
           </h2>
         </CardHeader>
         <CardContent>
-          <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-            Phase 6 will add the projects table, create/edit forms, delete
-            confirmation, featured toggles, and validation feedback.
-          </p>
+          <div className="flex flex-wrap gap-3">
+            <ButtonLink href="/admin/projects" size="sm" variant="secondary">
+              <FolderKanban aria-hidden="true" size={16} />
+              Manage projects
+            </ButtonLink>
+            <ButtonLink href="/admin/projects/new" size="sm" variant="secondary">
+              <Plus aria-hidden="true" size={16} />
+              Create project
+            </ButtonLink>
+            <ButtonLink href="/" size="sm" variant="ghost">
+              View public site
+            </ButtonLink>
+          </div>
         </CardContent>
       </Card>
     </div>
