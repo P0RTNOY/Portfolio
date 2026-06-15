@@ -1,5 +1,6 @@
 import * as React from "react";
 import { type VariantProps, cva } from "class-variance-authority";
+import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 
@@ -52,11 +53,26 @@ type ButtonLinkProps = React.ComponentProps<"a"> &
 
 export function ButtonLink({
   className,
+  href,
   variant,
   size,
   ...props
 }: ButtonLinkProps) {
+  if (typeof href === "string" && href.startsWith("/")) {
+    return (
+      <Link
+        className={cn(buttonVariants({ variant, size }), className)}
+        href={href}
+        {...props}
+      />
+    );
+  }
+
   return (
-    <a className={cn(buttonVariants({ variant, size }), className)} {...props} />
+    <a
+      className={cn(buttonVariants({ variant, size }), className)}
+      href={href}
+      {...props}
+    />
   );
 }

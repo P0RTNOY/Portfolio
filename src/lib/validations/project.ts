@@ -24,10 +24,9 @@ const optionalTextSchema = z
 
 const stringListSchema = z
   .array(z.string().trim().min(1).max(80))
-  .max(20)
-  .default([]);
+  .max(20);
 
-export const projectBaseSchema = z.object({
+const projectFields = {
   title: z.string().trim().min(2, "Title is required.").max(120),
   slug: z
     .string()
@@ -43,23 +42,33 @@ export const projectBaseSchema = z.object({
     .trim()
     .min(10, "Short description is required.")
     .max(240),
-  fullDescription: z.string().trim().max(5000).default(""),
+  fullDescription: z.string().trim().max(5000),
   techStack: stringListSchema,
   githubUrl: optionalUrlSchema,
   liveUrl: optionalUrlSchema,
   imageUrl: optionalUrlSchema,
-  status: projectStatusSchema.default("planned"),
-  featured: z.boolean().default(false),
+  status: projectStatusSchema,
+  featured: z.boolean(),
   role: optionalTextSchema,
   highlights: stringListSchema,
   problemSolved: optionalTextSchema,
   technicalChallenges: optionalTextSchema,
-  displayOrder: z.coerce.number().int().min(0).max(9999).default(0),
+  displayOrder: z.coerce.number().int().min(0).max(9999),
+};
+
+export const projectBaseSchema = z.object(projectFields);
+
+export const projectCreateSchema = z.object({
+  ...projectFields,
+  fullDescription: projectFields.fullDescription.default(""),
+  techStack: projectFields.techStack.default([]),
+  status: projectFields.status.default("planned"),
+  featured: projectFields.featured.default(false),
+  highlights: projectFields.highlights.default([]),
+  displayOrder: projectFields.displayOrder.default(0),
 });
 
-export const projectCreateSchema = projectBaseSchema;
-
-export const projectUpdateSchema = projectBaseSchema.partial().refine(
+export const projectUpdateSchema = z.object(projectFields).partial().refine(
   (value) => Object.keys(value).length > 0,
   {
     message: "At least one project field is required.",

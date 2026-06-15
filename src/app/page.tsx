@@ -1,11 +1,13 @@
 import { ArrowRight, Database, Layers, ShieldCheck } from "lucide-react";
 
+import { ProjectsGrid } from "@/components/projects/projects-grid";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { SectionHeading } from "@/components/site/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { listProjects } from "@/lib/projects";
 
 const skillGroups = [
   "Frontend",
@@ -16,7 +18,14 @@ const skillGroups = [
   "Deployment",
 ];
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const projects = await listProjects();
+  const featuredProjects = projects.filter((project) => project.featured);
+  const homepageProjects =
+    featuredProjects.length > 0 ? featuredProjects : projects.slice(0, 3);
+
   return (
     <div className="min-h-dvh">
       <SiteHeader />
@@ -35,11 +44,11 @@ export default function Home() {
                 outcomes, and collaborations this portfolio will represent.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <ButtonLink href="#projects" size="lg">
+                <ButtonLink href="/projects" size="lg">
                   View Projects
                   <ArrowRight aria-hidden="true" size={18} />
                 </ButtonLink>
-                <ButtonLink href="#contact" size="lg" variant="secondary">
+                <ButtonLink href="/#contact" size="lg" variant="secondary">
                   Contact Me
                 </ButtonLink>
               </div>
@@ -55,7 +64,7 @@ export default function Home() {
                   {
                     icon: Database,
                     title: "Selected work",
-                    text: "Published projects will appear as polished cards and detail pages.",
+                    text: `${projects.length} editable project entries are currently stored in the database.`,
                   },
                   {
                     icon: ShieldCheck,
@@ -108,17 +117,15 @@ export default function Home() {
               title="Selected projects."
               description="Published work will appear here with descriptions, links, status, and technologies."
             />
-            <Card className="mt-8 border-dashed">
-              <CardContent className="py-10">
-                <p className="text-base font-semibold text-zinc-950 dark:text-white">
-                  No published projects yet
-                </p>
-                <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-                  Published project cards will appear here when content is
-                  available.
-                </p>
-              </CardContent>
-            </Card>
+            <div className="mt-8">
+              <ProjectsGrid projects={homepageProjects} />
+            </div>
+            <div className="mt-8">
+              <ButtonLink href="/projects" variant="secondary">
+                Browse all projects
+                <ArrowRight aria-hidden="true" size={16} />
+              </ButtonLink>
+            </div>
           </div>
         </section>
 
