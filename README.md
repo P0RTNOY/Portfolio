@@ -34,3 +34,13 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Hugging Face AI Foundation
+
+The app includes a server-side-only Hugging Face foundation for future admin AI features. Configure `HF_TOKEN` and `HF_MODEL` in your local environment to enable it.
+
+- Tokens are read only on the server.
+- The public frontend does not receive `HF_TOKEN`.
+- If `HF_TOKEN` or `HF_MODEL` is missing, AI helpers return a disabled state instead of breaking the app.
+- Future features can build on `src/lib/huggingface.ts` and `src/services/ai-project-assistant.ts`.
+- Admin-only AI configuration status is available at `GET /api/ai/status`.
