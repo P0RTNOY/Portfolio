@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { FolderKanban, Plus, Star, Timer } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { listProjects } from "@/lib/projects";
+
+export const metadata: Metadata = {
+  title: "Admin Dashboard | Generic Portfolio",
+};
 
 export default async function AdminPage() {
   const projects = await listProjects();

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -10,6 +11,17 @@ import { getProjectById } from "@/lib/projects";
 type EditProjectPageProps = {
   params: Promise<{ id: string }>;
 };
+
+export async function generateMetadata({ params }: EditProjectPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const project = await getProjectById(id);
+
+  if (!project) {
+    return { title: "Project Not Found | Admin | Generic Portfolio" };
+  }
+
+  return { title: `Edit ${project.title} | Admin | Generic Portfolio` };
+}
 
 export default async function EditProjectPage({ params }: EditProjectPageProps) {
   const { id } = await params;

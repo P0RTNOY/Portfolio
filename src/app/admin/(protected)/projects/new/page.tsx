@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 import { createProjectAction } from "@/app/admin/(protected)/projects/actions";
 import { ProjectForm } from "@/components/admin/project-form";
 import { Card, CardContent } from "@/components/ui/card";
+
+export const metadata: Metadata = {
+  title: "Create Project | Admin | Generic Portfolio",
+};
 
 export default function NewProjectPage() {
   return (

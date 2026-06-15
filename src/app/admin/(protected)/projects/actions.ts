@@ -45,13 +45,10 @@ function formDataToProjectInput(formData: FormData) {
     githubUrl: (formData.get("githubUrl") as string) || "",
     liveUrl: (formData.get("liveUrl") as string) || "",
     imageUrl: (formData.get("imageUrl") as string) || "",
-    status:
-      (formData.get("status") as string) || "planned",
+    status: (formData.get("status") as string) || "planned",
     featured: formData.get("featured") === "on",
     role: (formData.get("role") as string) || "",
-    highlights: parseStringList(
-      (formData.get("highlights") as string) || "",
-    ),
+    highlights: parseStringList((formData.get("highlights") as string) || ""),
     problemSolved: (formData.get("problemSolved") as string) || "",
     technicalChallenges:
       (formData.get("technicalChallenges") as string) || "",
@@ -109,7 +106,7 @@ export async function createProjectAction(
 
   revalidatePath("/admin/projects");
   revalidatePath("/projects");
-  redirect("/admin/projects");
+  redirect("/admin/projects?success=created");
 }
 
 export async function updateProjectAction(
@@ -170,7 +167,7 @@ export async function updateProjectAction(
   revalidatePath("/admin/projects");
   revalidatePath("/projects");
   revalidatePath(`/projects/${existing.slug}`);
-  redirect("/admin/projects");
+  redirect("/admin/projects?success=updated");
 }
 
 export async function deleteProjectAction(id: string): Promise<void> {
@@ -180,7 +177,7 @@ export async function deleteProjectAction(id: string): Promise<void> {
 
   revalidatePath("/admin/projects");
   revalidatePath("/projects");
-  redirect("/admin/projects");
+  redirect("/admin/projects?success=deleted");
 }
 
 export async function toggleFeaturedAction(
@@ -195,7 +192,11 @@ export async function toggleFeaturedAction(
     revalidatePath("/projects");
     return { ...emptyState, success: true };
   } catch {
-    return { error: "Failed to update featured status.", fieldErrors: {}, success: false };
+    return {
+      error: "Failed to update featured status.",
+      fieldErrors: {},
+      success: false,
+    };
   }
 }
 
@@ -221,6 +222,10 @@ export async function updateStatusAction(
     revalidatePath("/projects");
     return { ...emptyState, success: true };
   } catch {
-    return { error: "Failed to update status.", fieldErrors: {}, success: false };
+    return {
+      error: "Failed to update status.",
+      fieldErrors: {},
+      success: false,
+    };
   }
 }

@@ -29,9 +29,10 @@ export default async function Home() {
   return (
     <div className="min-h-dvh">
       <SiteHeader />
-      <main id="top">
-        <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-          <div className="mx-auto grid w-full max-w-6xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-28">
+      <main id="main-content">
+        <section className="relative overflow-hidden border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(20,184,166,0.08),transparent_50%),radial-gradient(ellipse_at_bottom_left,rgba(245,158,11,0.08),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_right,rgba(20,184,166,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_left,rgba(245,158,11,0.12),transparent_50%)]" />
+          <div className="relative mx-auto grid w-full max-w-6xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-28">
             <div className="flex flex-col justify-center">
               <Badge className="mb-6 w-fit border-teal-200 bg-teal-50 text-teal-800 dark:border-teal-900 dark:bg-teal-950 dark:text-teal-200">
                 Generic portfolio
@@ -99,7 +100,10 @@ export default async function Home() {
           </div>
         </section>
 
-        <section id="about" className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+        <section
+          id="about"
+          className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8"
+        >
           <SectionHeading
             eyebrow="About"
             title="A concise professional summary will live here."
@@ -129,7 +133,10 @@ export default async function Home() {
           </div>
         </section>
 
-        <section id="skills" className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+        <section
+          id="skills"
+          className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8"
+        >
           <SectionHeading
             eyebrow="Skills"
             title="Editable skill categories."
@@ -152,7 +159,11 @@ export default async function Home() {
               title="Generic contact details."
               description="Add preferred email, social links, or a contact form once the editable content model is in place."
             />
-            <ButtonLink href="mailto:hello@example.com" size="lg" variant="secondary">
+            <ButtonLink
+              href="mailto:hello@example.com"
+              size="lg"
+              variant="secondary"
+            >
               hello@example.com
             </ButtonLink>
           </div>

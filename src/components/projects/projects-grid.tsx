@@ -1,5 +1,7 @@
+import { FolderKanban } from "lucide-react";
+
 import { ProjectCard } from "@/components/projects/project-card";
-import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { Project } from "@/lib/projects";
 
 type ProjectsGridProps = {
@@ -9,16 +11,11 @@ type ProjectsGridProps = {
 export function ProjectsGrid({ projects }: ProjectsGridProps) {
   if (projects.length === 0) {
     return (
-      <Card className="border-dashed">
-        <CardContent className="py-10">
-          <p className="text-base font-semibold text-zinc-950 dark:text-white">
-            No published projects yet
-          </p>
-          <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-            Published project cards will appear here when content is available.
-          </p>
-        </CardContent>
-      </Card>
+      <EmptyState
+        description="Published project cards will appear here when content is available."
+        icon={FolderKanban}
+        title="No published projects yet"
+      />
     );
   }
 

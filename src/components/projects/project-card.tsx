@@ -13,7 +13,7 @@ type ProjectCardProps = {
 
 export function ProjectCard({ project }: ProjectCardProps) {
   return (
-    <Card className="group flex h-full flex-col overflow-hidden transition-colors hover:border-zinc-300 dark:hover:border-zinc-700">
+    <Card className="group flex h-full flex-col overflow-hidden transition-colors duration-200 hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-950/5 motion-safe:transition-transform motion-safe:hover:-translate-y-1 dark:hover:border-zinc-700 dark:hover:shadow-black/20">
       <ProjectVisual title={project.title} imageUrl={project.imageUrl} />
       <CardContent className="flex flex-1 flex-col gap-5 p-5">
         <div className="flex flex-wrap items-center gap-2">
@@ -46,7 +46,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
         </div>
 
         <div className="mt-auto flex flex-wrap gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
-            <Link
+          <Link
             className="inline-flex min-h-11 items-center gap-2 rounded-md text-sm font-semibold text-zinc-700 transition-colors hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500 dark:text-zinc-300 dark:hover:text-white"
             href={`/projects/${project.slug}`}
           >

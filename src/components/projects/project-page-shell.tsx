@@ -9,7 +9,7 @@ export function ProjectPageShell({ children }: ProjectPageShellProps) {
   return (
     <div className="min-h-dvh">
       <SiteHeader />
-      <main>{children}</main>
+      <main id="main-content">{children}</main>
       <SiteFooter />
     </div>
   );

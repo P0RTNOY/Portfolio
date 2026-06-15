@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { FolderKanban, Plus } from "lucide-react";
 
 import { ProjectsTable } from "@/components/admin/projects-table";
 import { ButtonLink } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { listProjects } from "@/lib/projects";
+
+export const metadata: Metadata = {
+  title: "Manage Projects | Admin | Generic Portfolio",
+};
 
 export default async function AdminProjectsPage() {
   const projects = await listProjects();

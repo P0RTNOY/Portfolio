@@ -17,7 +17,7 @@ const buttonVariants = cva(
           "text-zinc-700 hover:bg-zinc-100 hover:text-zinc-950 focus-visible:outline-zinc-500 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:text-white",
       },
       size: {
-        sm: "min-h-10 px-3 text-sm",
+        sm: "min-h-11 px-3 text-sm",
         md: "min-h-11 px-4",
         lg: "min-h-12 px-5 text-base",
       },

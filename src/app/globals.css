@@ -57,6 +57,30 @@ html {
   }
 }
 
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toast-slide-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   @keyframes dialog-fade-in {
     from {
@@ -65,6 +89,22 @@ html {
 
     to {
       opacity: 1;
+    }
+  }
+
+  @keyframes toast-slide-in {
+    from,
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes toast-slide-out {
+    from,
+    to {
+      opacity: 0;
+      transform: none;
     }
   }
 }

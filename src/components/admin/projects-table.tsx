@@ -99,7 +99,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
                   <td className="px-4 py-3.5">
                     <div className="flex items-center justify-end gap-1">
                       <Link
-                        className="inline-flex min-h-9 items-center gap-1.5 rounded-md px-2.5 text-sm font-semibold text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:text-white"
+                        className="inline-flex min-h-11 items-center gap-1.5 rounded-md px-2.5 text-sm font-semibold text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:text-white"
                         href={`/admin/projects/${project.id}/edit`}
                       >
                         <Pencil aria-hidden="true" size={14} />
@@ -159,7 +159,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
               />
               <div className="flex items-center gap-1">
                 <Link
-                  className="inline-flex min-h-9 items-center gap-1.5 rounded-md px-2.5 text-sm font-semibold text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:text-white"
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-md px-2.5 text-sm font-semibold text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:text-white"
                   href={`/admin/projects/${project.id}/edit`}
                 >
                   <Pencil aria-hidden="true" size={14} />

@@ -64,7 +64,7 @@ export function Dialog({ children, onClose, open, title }: DialogProps) {
         </h2>
         <button
           aria-label="Close dialog"
-          className="flex size-9 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-950 dark:hover:bg-zinc-900 dark:hover:text-white dark:focus-visible:outline-white"
+          className="flex size-11 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-950 dark:hover:bg-zinc-900 dark:hover:text-white dark:focus-visible:outline-white"
           onClick={onClose}
           type="button"
         >
