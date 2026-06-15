@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 
 import { apiError, apiJson, handleApiError } from "@/lib/api/response";
+import { getAdminSessionFromRequest } from "@/lib/auth";
 import {
   createProject,
   getProjectBySlug,
@@ -42,6 +43,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!getAdminSessionFromRequest(request)) {
+      return apiError("UNAUTHORIZED", "Admin authentication is required.", 401);
+    }
+
     const payload = await request.json();
     const project = await createProject(payload);
 

@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 
 import { apiError, apiJson, handleApiError } from "@/lib/api/response";
+import { getAdminSessionFromRequest } from "@/lib/auth";
 import { deleteProject, getProjectById, updateProject } from "@/lib/projects";
 
 type ProjectRouteContext = {
@@ -26,6 +27,10 @@ export async function GET(_request: NextRequest, context: ProjectRouteContext) {
 
 export async function PUT(request: NextRequest, context: ProjectRouteContext) {
   try {
+    if (!getAdminSessionFromRequest(request)) {
+      return apiError("UNAUTHORIZED", "Admin authentication is required.", 401);
+    }
+
     const { id } = await context.params;
     const payload = await request.json();
     const project = await updateProject(id, payload);
@@ -41,6 +46,10 @@ export async function DELETE(
   context: ProjectRouteContext,
 ) {
   try {
+    if (!getAdminSessionFromRequest(_request)) {
+      return apiError("UNAUTHORIZED", "Admin authentication is required.", 401);
+    }
+
     const { id } = await context.params;
     await deleteProject(id);
 
