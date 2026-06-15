@@ -1,46 +1,215 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Generic Portfolio Platform
 
-## Getting Started
+A modern, reusable personal portfolio system built with Next.js. Public project pages are database-backed, and projects can be managed from a protected admin dashboard instead of being hardcoded into the site.
 
-First, run the development server:
+The project is intentionally generic. Seed data uses placeholder examples only, so real projects, work history, and personal background can be added later from the admin area.
+
+## Tech Stack
+
+- Next.js App Router
+- React
+- TypeScript
+- Tailwind CSS
+- Prisma ORM
+- SQLite for local development
+- Zod validation
+- Signed cookie admin sessions
+- Hugging Face server-side AI foundation
+
+## Features
+
+- Responsive public portfolio homepage
+- Dynamic project listing from SQLite
+- Project detail pages by slug
+- Admin login and logout
+- Protected admin dashboard
+- Project CRUD: create, read, update, delete
+- Featured project toggle
+- Project status editing
+- Admin success toasts and confirmation dialog for deletes
+- Server-side validation and API error handling
+- Server-only Hugging Face foundation for future AI features
+
+## Public Routes
+
+- `/` - Portfolio homepage with hero, about, projects, skills, and contact sections
+- `/projects` - All database-backed projects
+- `/projects/[slug]` - Project detail page
+
+## Admin Routes
+
+- `/admin/login` - Admin login
+- `/admin` - Protected dashboard overview
+- `/admin/projects` - Protected project management table
+- `/admin/projects/new` - Create project
+- `/admin/projects/[id]/edit` - Edit project
+
+## API Routes
+
+- `GET /api/projects` - List projects
+- `GET /api/projects?featured=true` - List featured projects
+- `GET /api/projects?status=completed` - Filter by status
+- `GET /api/projects?slug=example-web-app` - Get by slug
+- `POST /api/projects` - Create project, admin only
+- `GET /api/projects/[id]` - Get project by id
+- `PUT /api/projects/[id]` - Update project, admin only
+- `DELETE /api/projects/[id]` - Delete project, admin only
+- `GET /api/ai/status` - Admin-only AI configuration status
+
+## Environment Variables
+
+Create `.env` from `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+Required for local development:
+
+```bash
+DATABASE_URL="file:./dev.db"
+ADMIN_USERNAME="admin"
+ADMIN_PASSWORD="change-me"
+AUTH_SECRET="replace-with-a-long-random-secret"
+HF_TOKEN="your_huggingface_token_here"
+HF_MODEL=""
+```
+
+Change `ADMIN_PASSWORD` and `AUTH_SECRET` before any real deployment. `AUTH_SECRET` should be a long random string.
+
+## Database Setup
+
+Generate the Prisma client and create the local SQLite database:
+
+```bash
+npm run prisma:generate
+npm run db:push
+```
+
+Seed minimal placeholder projects:
+
+```bash
+npm run db:seed
+```
+
+The local SQLite database is stored under `prisma/dev.db` and is ignored by Git.
+
+## Development
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The dev script uses webpack intentionally:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+next dev --webpack
+```
 
-## Learn More
+This avoids the local Turbopack refresh loop that appeared during development.
 
-To learn more about Next.js, take a look at the following resources:
+## Build And Start
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Run validation:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run lint
+npm audit --omit=dev
+```
 
-## Deploy on Vercel
+Create a production build:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run build
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Start the production server:
+
+```bash
+npm run start
+```
+
+## Admin Usage
+
+1. Set `ADMIN_USERNAME`, `ADMIN_PASSWORD`, and `AUTH_SECRET` in `.env`.
+2. Visit `/admin/login`.
+3. Sign in with the configured admin credentials.
+4. Manage projects at `/admin/projects`.
+5. Use logout from the admin shell when finished.
+
+Production guardrails reject placeholder credentials, so update `ADMIN_PASSWORD` and `AUTH_SECRET` before deployment.
+
+## Project Model
+
+Projects include:
+
+- `id`
+- `title`
+- `slug`
+- `shortDescription`
+- `fullDescription`
+- `techStack`
+- `githubUrl`
+- `liveUrl`
+- `imageUrl`
+- `status`: `planned`, `in-progress`, `completed`, or `archived`
+- `featured`
+- `role`
+- `highlights`
+- `problemSolved`
+- `technicalChallenges`
+- `displayOrder`
+- `createdAt`
+- `updatedAt`
+
+`techStack` and `highlights` are stored as JSON strings in SQLite and converted to string arrays in the data access layer.
 
 ## Hugging Face AI Foundation
 
-The app includes a server-side-only Hugging Face foundation for future admin AI features. Configure `HF_TOKEN` and `HF_MODEL` in your local environment to enable it.
+The app includes a server-side-only Hugging Face foundation for future admin AI features.
 
-- Tokens are read only on the server.
-- The public frontend does not receive `HF_TOKEN`.
+- `HF_TOKEN` is read only on the server.
+- The public frontend never receives `HF_TOKEN`.
 - If `HF_TOKEN` or `HF_MODEL` is missing, AI helpers return a disabled state instead of breaking the app.
-- Future features can build on `src/lib/huggingface.ts` and `src/services/ai-project-assistant.ts`.
-- Admin-only AI configuration status is available at `GET /api/ai/status`.
+- `src/lib/huggingface.ts` contains the server-only API wrapper.
+- `src/services/ai-project-assistant.ts` exposes future project-assistant entry points.
+- `src/services/project-description-generator.ts` contains a draft project-description generator service.
+- `GET /api/ai/status` reports AI availability for authenticated admins only.
+
+To disable AI features, leave `HF_TOKEN` or `HF_MODEL` empty. Never commit a real Hugging Face token.
+
+## Deployment Notes
+
+- Set all environment variables in the deployment provider.
+- Use a production-safe `AUTH_SECRET`.
+- Replace the placeholder admin password.
+- SQLite works for simple deployments, but a hosted database is recommended if you need multi-device editing, backups, or higher reliability.
+- Run `npm run build` before deployment.
+- If moving away from SQLite later, update `DATABASE_URL`, `prisma/schema.prisma`, and the deployment database setup.
+
+## Design Notes
+
+UI/UX Pro Max Skill was used to guide spacing, hierarchy, responsiveness, accessibility, admin workflow polish, touch targets, and reduced-motion-safe interactions.
+
+21st.dev Magic MCP was configured in the environment, but a callable Magic tool was not exposed in this Codex session. The implementation still follows the intended component-quality direction: reusable cards, forms, tables, empty states, protected admin shell, and polished public project views.
+
+## Future Improvements
+
+- Add editable profile/about/skills/contact content models
+- Add admin project image upload instead of image URL only
+- Add filters/search for public projects
+- Add AI-assisted project description generation in the admin form
+- Add AI tech-stack extraction from descriptions
+- Add stronger auth with a dedicated auth provider if multiple admins are needed
+- Add automated tests for data access, API auth, and form actions
+- Add deployment database migration workflow
