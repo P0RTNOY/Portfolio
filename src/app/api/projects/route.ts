@@ -43,7 +43,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    if (!getAdminSessionFromRequest(request)) {
+    const session = await getAdminSessionFromRequest(request);
+
+    if (!session) {
       return apiError("UNAUTHORIZED", "Admin authentication is required.", 401);
     }
 

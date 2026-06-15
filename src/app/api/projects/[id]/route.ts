@@ -27,7 +27,9 @@ export async function GET(_request: NextRequest, context: ProjectRouteContext) {
 
 export async function PUT(request: NextRequest, context: ProjectRouteContext) {
   try {
-    if (!getAdminSessionFromRequest(request)) {
+    const session = await getAdminSessionFromRequest(request);
+
+    if (!session) {
       return apiError("UNAUTHORIZED", "Admin authentication is required.", 401);
     }
 
@@ -46,7 +48,9 @@ export async function DELETE(
   context: ProjectRouteContext,
 ) {
   try {
-    if (!getAdminSessionFromRequest(_request)) {
+    const session = await getAdminSessionFromRequest(_request);
+
+    if (!session) {
       return apiError("UNAUTHORIZED", "Admin authentication is required.", 401);
     }
 
