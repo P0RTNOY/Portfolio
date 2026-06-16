@@ -67,10 +67,12 @@ cp .env.example .env
 Required for local development:
 
 ```bash
-# Supabase Postgres.
-# Use direct/session pooler URLs for persistent servers.
-# For transaction pooler URLs on port 6543, add ?pgbouncer=true&connection_limit=1.
-DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres"
+# Supabase Postgres runtime connection.
+# Use transaction pooler URLs on port 6543 for serverless/runtime Prisma queries.
+DATABASE_URL="postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
+
+# Supabase Postgres direct/session connection for Prisma migrations.
+DIRECT_URL="postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[REGION].pooler.supabase.com:5432/postgres"
 ADMIN_USERNAME="admin"
 ADMIN_PASSWORD="change-me"
 AUTH_SECRET="replace-with-a-long-random-secret"
@@ -86,8 +88,8 @@ This app uses Supabase Postgres through Prisma. In the Supabase dashboard, open 
 
 Recommended options:
 
-- Persistent server or local development: use the direct connection string, or the Supavisor session pooler string on port `5432`.
-- Serverless deployment: use the Supavisor transaction pooler string on port `6543` and add `?pgbouncer=true&connection_limit=1`.
+- `DATABASE_URL`: use the Supavisor transaction pooler string on port `6543` and add `?pgbouncer=true&connection_limit=1`.
+- `DIRECT_URL`: use the Supavisor session pooler string on port `5432`, or the direct database string if your environment supports it.
 
 Supabase also recommends creating a dedicated Prisma database user instead of using the default `postgres` user for application access. The current `.env.example` keeps the simpler default-user shape so setup is obvious, but a dedicated role is better before production.
 
