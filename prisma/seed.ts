@@ -59,7 +59,45 @@ const demoProjects = [
   },
 ];
 
+const demoSiteSettings = {
+  id: "default",
+  siteName: "Portfolio",
+  heroEyebrow: "Generic portfolio",
+  heroTitle: "Your Name, professional title, and selected work.",
+  heroIntro:
+    "A concise introduction placeholder for the kind of work, outcomes, and collaborations this portfolio will represent.",
+  primaryCtaLabel: "View Projects",
+  secondaryCtaLabel: "Contact Me",
+  aboutTitle: "A concise professional summary will live here.",
+  aboutSummary:
+    "Use this space for a short editable introduction. Keep it focused on the type of work, values, and outcomes you want the portfolio to communicate.",
+  skillsTitle: "Editable skill categories.",
+  skillsSummary:
+    "These categories are generic for now and can be edited from the admin dashboard.",
+  skills: JSON.stringify([
+    "Frontend",
+    "Backend",
+    "Design Systems",
+    "Automation",
+    "AI Integrations",
+    "Deployment",
+  ]),
+  contactTitle: "Generic contact details.",
+  contactSummary:
+    "Add preferred email, social links, or a contact form once you are ready to personalize the portfolio.",
+  contactEmail: "hello@example.com",
+  githubUrl: null,
+  linkedinUrl: null,
+  resumeUrl: null,
+};
+
 async function main() {
+  await prisma.siteSettings.upsert({
+    where: { id: demoSiteSettings.id },
+    update: demoSiteSettings,
+    create: demoSiteSettings,
+  });
+
   for (const project of demoProjects) {
     await prisma.project.upsert({
       where: { slug: project.slug },

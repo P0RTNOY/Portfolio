@@ -1,6 +1,10 @@
 import Link from "next/link";
 
-export function SiteFooter() {
+type SiteFooterProps = {
+  siteName?: string;
+};
+
+export function SiteFooter({ siteName = "Generic Portfolio" }: SiteFooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -8,7 +12,7 @@ export function SiteFooter() {
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
         <div className="flex flex-col gap-1">
           <p className="text-sm font-semibold text-zinc-950 dark:text-white">
-            Generic Portfolio
+            {siteName}
           </p>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
             &copy; {currentYear} &mdash; Built with Next.js & Tailwind CSS

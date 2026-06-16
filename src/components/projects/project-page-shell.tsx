@@ -3,14 +3,15 @@ import { SiteHeader } from "@/components/site/site-header";
 
 type ProjectPageShellProps = {
   children: React.ReactNode;
+  siteName?: string;
 };
 
-export function ProjectPageShell({ children }: ProjectPageShellProps) {
+export function ProjectPageShell({ children, siteName }: ProjectPageShellProps) {
   return (
     <div className="min-h-dvh">
-      <SiteHeader />
+      <SiteHeader siteName={siteName} />
       <main id="main-content">{children}</main>
-      <SiteFooter />
+      <SiteFooter siteName={siteName} />
     </div>
   );
 }

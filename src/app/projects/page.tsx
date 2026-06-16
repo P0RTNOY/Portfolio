@@ -5,6 +5,7 @@ import { ProjectsGrid } from "@/components/projects/projects-grid";
 import { SectionHeading } from "@/components/site/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { listProjects } from "@/lib/projects";
+import { getSiteSettings } from "@/lib/site-settings";
 
 export const dynamic = "force-dynamic";
 
@@ -14,14 +15,17 @@ export const metadata: Metadata = {
 };
 
 export default async function ProjectsPage() {
-  const projects = await listProjects();
+  const [projects, settings] = await Promise.all([
+    listProjects(),
+    getSiteSettings(),
+  ]);
   const featuredCount = projects.filter((project) => project.featured).length;
   const completedCount = projects.filter(
     (project) => project.status === "completed",
   ).length;
 
   return (
-    <ProjectPageShell>
+    <ProjectPageShell siteName={settings.siteName}>
       <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
         <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
           <SectionHeading

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { FolderKanban, Plus, Star, Timer } from "lucide-react";
+import { FolderKanban, Globe2, Plus, Star, Timer } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
@@ -89,6 +89,10 @@ export default async function AdminPage() {
             <ButtonLink href="/admin/projects/new" size="sm" variant="secondary">
               <Plus aria-hidden="true" size={16} />
               Create project
+            </ButtonLink>
+            <ButtonLink href="/admin/settings" size="sm" variant="secondary">
+              <Globe2 aria-hidden="true" size={16} />
+              Edit site content
             </ButtonLink>
             <ButtonLink href="/" size="sm" variant="ghost">
               View public site

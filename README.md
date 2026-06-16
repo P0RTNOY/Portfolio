@@ -24,6 +24,7 @@ The project is intentionally generic. Seed data uses placeholder examples only, 
 - Admin login and logout
 - Protected admin dashboard
 - Project CRUD: create, read, update, delete
+- Editable homepage/site content
 - Featured project toggle
 - Project status editing
 - Admin success toasts and confirmation dialog for deletes
@@ -43,6 +44,7 @@ The project is intentionally generic. Seed data uses placeholder examples only, 
 - `/admin/projects` - Protected project management table
 - `/admin/projects/new` - Create project
 - `/admin/projects/[id]/edit` - Edit project
+- `/admin/settings` - Edit public hero, about, skills, and contact content
 
 ## API Routes
 
@@ -188,6 +190,20 @@ Projects include:
 
 `techStack` and `highlights` are stored as JSON strings in Postgres text columns and converted to string arrays in the data access layer.
 
+## Site Settings Model
+
+The homepage content is stored in a singleton `site_settings` row and can be edited at `/admin/settings`.
+
+Editable fields include:
+
+- Site name
+- Hero eyebrow, headline, intro, and CTA labels
+- About title and summary
+- Skills title, summary, and comma-separated skill list
+- Contact title, summary, email, GitHub URL, LinkedIn URL, and resume URL
+
+Seed data remains generic placeholder content.
+
 ## Hugging Face AI Foundation
 
 The app includes a server-side-only Hugging Face foundation for future admin AI features.
@@ -220,7 +236,6 @@ UI/UX Pro Max Skill was used to guide spacing, hierarchy, responsiveness, access
 
 ## Future Improvements
 
-- Add editable profile/about/skills/contact content models
 - Add admin project image upload instead of image URL only
 - Add filters/search for public projects
 - Add AI-assisted project description generation in the admin form

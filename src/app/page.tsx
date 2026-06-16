@@ -8,49 +8,43 @@ import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { listProjects } from "@/lib/projects";
-
-const skillGroups = [
-  "Frontend",
-  "Backend",
-  "Design Systems",
-  "Automation",
-  "AI Integrations",
-  "Deployment",
-];
+import { getSiteSettings } from "@/lib/site-settings";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const projects = await listProjects();
+  const [projects, settings] = await Promise.all([
+    listProjects(),
+    getSiteSettings(),
+  ]);
   const featuredProjects = projects.filter((project) => project.featured);
   const homepageProjects =
     featuredProjects.length > 0 ? featuredProjects : projects.slice(0, 3);
 
   return (
     <div className="min-h-dvh">
-      <SiteHeader />
+      <SiteHeader siteName={settings.siteName} />
       <main id="main-content">
         <section className="relative overflow-hidden border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(20,184,166,0.08),transparent_50%),radial-gradient(ellipse_at_bottom_left,rgba(245,158,11,0.08),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_right,rgba(20,184,166,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_left,rgba(245,158,11,0.12),transparent_50%)]" />
           <div className="relative mx-auto grid w-full max-w-6xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-28">
             <div className="flex flex-col justify-center">
               <Badge className="mb-6 w-fit border-teal-200 bg-teal-50 text-teal-800 dark:border-teal-900 dark:bg-teal-950 dark:text-teal-200">
-                Generic portfolio
+                {settings.heroEyebrow}
               </Badge>
               <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-zinc-950 dark:text-white sm:text-5xl lg:text-6xl">
-                Your Name, professional title, and selected work.
+                {settings.heroTitle}
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-300">
-                A concise introduction placeholder for the kind of work,
-                outcomes, and collaborations this portfolio will represent.
+                {settings.heroIntro}
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <ButtonLink href="/projects" size="lg">
-                  View Projects
+                  {settings.primaryCtaLabel}
                   <ArrowRight aria-hidden="true" size={18} />
                 </ButtonLink>
                 <ButtonLink href="/#contact" size="lg" variant="secondary">
-                  Contact Me
+                  {settings.secondaryCtaLabel}
                 </ButtonLink>
               </div>
             </div>
@@ -106,8 +100,8 @@ export default async function Home() {
         >
           <SectionHeading
             eyebrow="About"
-            title="A concise professional summary will live here."
-            description="Use this space for a short editable introduction. Keep it focused on the type of work, values, and outcomes you want the portfolio to communicate."
+            title={settings.aboutTitle}
+            description={settings.aboutSummary}
           />
         </section>
 
@@ -139,11 +133,11 @@ export default async function Home() {
         >
           <SectionHeading
             eyebrow="Skills"
-            title="Editable skill categories."
-            description="These categories are generic for now and can become database-backed content later."
+            title={settings.skillsTitle}
+            description={settings.skillsSummary}
           />
           <div className="mt-8 flex flex-wrap gap-3">
-            {skillGroups.map((skill) => (
+            {settings.skills.map((skill) => (
               <Badge key={skill}>{skill}</Badge>
             ))}
           </div>
@@ -156,20 +150,52 @@ export default async function Home() {
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-16 sm:px-6 lg:flex-row lg:items-end lg:justify-between lg:px-8">
             <SectionHeading
               eyebrow="Contact"
-              title="Generic contact details."
-              description="Add preferred email, social links, or a contact form once the editable content model is in place."
+              title={settings.contactTitle}
+              description={settings.contactSummary}
             />
-            <ButtonLink
-              href="mailto:hello@example.com"
-              size="lg"
-              variant="secondary"
-            >
-              hello@example.com
-            </ButtonLink>
+            <div className="flex flex-wrap gap-3">
+              <ButtonLink
+                href={`mailto:${settings.contactEmail}`}
+                size="lg"
+                variant="secondary"
+              >
+                {settings.contactEmail}
+              </ButtonLink>
+              {settings.githubUrl ? (
+                <ButtonLink
+                  href={settings.githubUrl}
+                  rel="noreferrer"
+                  target="_blank"
+                  variant="ghost"
+                >
+                  GitHub
+                </ButtonLink>
+              ) : null}
+              {settings.linkedinUrl ? (
+                <ButtonLink
+                  href={settings.linkedinUrl}
+                  rel="noreferrer"
+                  target="_blank"
+                  variant="ghost"
+                >
+                  LinkedIn
+                </ButtonLink>
+              ) : null}
+              {settings.resumeUrl ? (
+                <ButtonLink
+                  href={settings.resumeUrl}
+                  rel="noreferrer"
+                  target="_blank"
+                  variant="ghost"
+                >
+                  Resume
+                </ButtonLink>
+              ) : null}
+            </div>
           </div>
         </section>
       </main>
-      <SiteFooter />
+      <SiteFooter siteName={settings.siteName} />
     </div>
   );
 }

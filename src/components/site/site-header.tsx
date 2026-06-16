@@ -11,7 +11,11 @@ const navItems = [
   { label: "Contact", href: "/#contact" },
 ];
 
-export function SiteHeader() {
+type SiteHeaderProps = {
+  siteName?: string;
+};
+
+export function SiteHeader({ siteName = "Portfolio" }: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-zinc-200/80 bg-background/90 backdrop-blur dark:border-zinc-800/80">
       <a
@@ -25,7 +29,7 @@ export function SiteHeader() {
           className="text-sm font-bold tracking-wide text-zinc-950 dark:text-white"
           href="/"
         >
-          Portfolio
+          {siteName}
         </Link>
         <nav
           aria-label="Main navigation"
