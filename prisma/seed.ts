@@ -29,7 +29,7 @@ const demoProjects = [
     shortDescription: "A placeholder backend or API project entry.",
     fullDescription:
       "Use this demo item to verify list, detail, and admin editing flows before adding real portfolio work.",
-    techStack: JSON.stringify(["Node.js", "Prisma", "SQLite"]),
+    techStack: JSON.stringify(["Node.js", "Prisma", "PostgreSQL"]),
     githubUrl: "https://github.com/example/example-api-project",
     liveUrl: null,
     status: "in-progress",

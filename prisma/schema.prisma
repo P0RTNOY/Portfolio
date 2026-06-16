@@ -3,31 +3,32 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model Project {
-  id                  String   @id @default(cuid())
-  title               String
-  slug                String   @unique
-  shortDescription    String
-  fullDescription     String   @default("")
-  techStack           String   @default("[]")
-  githubUrl           String?
-  liveUrl             String?
-  imageUrl            String?
-  status              String   @default("planned")
+  id                  String   @id @default(cuid()) @db.Text
+  title               String   @db.Text
+  slug                String   @unique @db.Text
+  shortDescription    String   @map("short_description") @db.Text
+  fullDescription     String   @default("") @map("full_description") @db.Text
+  techStack           String   @default("[]") @map("tech_stack") @db.Text
+  githubUrl           String?  @map("github_url") @db.Text
+  liveUrl             String?  @map("live_url") @db.Text
+  imageUrl            String?  @map("image_url") @db.Text
+  status              String   @default("planned") @db.Text
   featured            Boolean  @default(false)
-  role                String?
-  highlights          String   @default("[]")
-  problemSolved       String?
-  technicalChallenges String?
-  displayOrder        Int      @default(0)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  role                String?  @db.Text
+  highlights          String   @default("[]") @db.Text
+  problemSolved       String?  @map("problem_solved") @db.Text
+  technicalChallenges String?  @map("technical_challenges") @db.Text
+  displayOrder        Int      @default(0) @map("display_order")
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@index([featured, displayOrder])
   @@index([status])
   @@index([createdAt])
+  @@map("projects")
 }

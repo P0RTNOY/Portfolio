@@ -11,7 +11,7 @@ The project is intentionally generic. Seed data uses placeholder examples only, 
 - TypeScript
 - Tailwind CSS
 - Prisma ORM
-- SQLite for local development
+- Supabase Postgres
 - Zod validation
 - Signed cookie admin sessions
 - Hugging Face server-side AI foundation
@@ -19,7 +19,7 @@ The project is intentionally generic. Seed data uses placeholder examples only, 
 ## Features
 
 - Responsive public portfolio homepage
-- Dynamic project listing from SQLite
+- Dynamic project listing from Supabase Postgres
 - Project detail pages by slug
 - Admin login and logout
 - Protected admin dashboard
@@ -67,7 +67,10 @@ cp .env.example .env
 Required for local development:
 
 ```bash
-DATABASE_URL="file:./dev.db"
+# Supabase Postgres.
+# Use direct/session pooler URLs for persistent servers.
+# For transaction pooler URLs on port 6543, add ?pgbouncer=true&connection_limit=1.
+DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres"
 ADMIN_USERNAME="admin"
 ADMIN_PASSWORD="change-me"
 AUTH_SECRET="replace-with-a-long-random-secret"
@@ -77,13 +80,22 @@ HF_MODEL=""
 
 Change `ADMIN_PASSWORD` and `AUTH_SECRET` before any real deployment. `AUTH_SECRET` should be a long random string.
 
-## Database Setup
+## Supabase Database Setup
 
-Generate the Prisma client and create the local SQLite database:
+This app uses Supabase Postgres through Prisma. In the Supabase dashboard, open the project, click **Connect**, and copy a Postgres connection string.
+
+Recommended options:
+
+- Persistent server or local development: use the direct connection string, or the Supavisor session pooler string on port `5432`.
+- Serverless deployment: use the Supavisor transaction pooler string on port `6543` and add `?pgbouncer=true&connection_limit=1`.
+
+Supabase also recommends creating a dedicated Prisma database user instead of using the default `postgres` user for application access. The current `.env.example` keeps the simpler default-user shape so setup is obvious, but a dedicated role is better before production.
+
+Generate the Prisma client and apply migrations:
 
 ```bash
 npm run prisma:generate
-npm run db:push
+npm run db:migrate
 ```
 
 Seed minimal placeholder projects:
@@ -92,7 +104,7 @@ Seed minimal placeholder projects:
 npm run db:seed
 ```
 
-The local SQLite database is stored under `prisma/dev.db` and is ignored by Git.
+For quick local iteration against a disposable database, `npm run db:push` is also available. Prefer `npm run db:migrate` for shared Supabase environments.
 
 ## Development
 
@@ -172,7 +184,7 @@ Projects include:
 - `createdAt`
 - `updatedAt`
 
-`techStack` and `highlights` are stored as JSON strings in SQLite and converted to string arrays in the data access layer.
+`techStack` and `highlights` are stored as JSON strings in Postgres text columns and converted to string arrays in the data access layer.
 
 ## Hugging Face AI Foundation
 
@@ -193,9 +205,10 @@ To disable AI features, leave `HF_TOKEN` or `HF_MODEL` empty. Never commit a rea
 - Set all environment variables in the deployment provider.
 - Use a production-safe `AUTH_SECRET`.
 - Replace the placeholder admin password.
-- SQLite works for simple deployments, but a hosted database is recommended if you need multi-device editing, backups, or higher reliability.
+- Supabase Postgres is now the expected production database.
 - Run `npm run build` before deployment.
-- If moving away from SQLite later, update `DATABASE_URL`, `prisma/schema.prisma`, and the deployment database setup.
+- Run `npm run db:migrate` against the deployment database before starting the production app.
+- If using the transaction pooler, keep `pgbouncer=true` in `DATABASE_URL` to avoid prepared-statement errors.
 
 ## Design Notes
 

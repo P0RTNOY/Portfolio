@@ -27,7 +27,7 @@ export default async function ProjectsPage() {
           <SectionHeading
             eyebrow="Projects"
             title="Database-backed project library."
-            description="These entries come from the local SQLite database and can be edited from the admin dashboard."
+            description="These entries come from Supabase Postgres and can be edited from the admin dashboard."
           />
           <div className="mt-8 flex flex-wrap gap-3">
             <Badge>{projects.length} total</Badge>
