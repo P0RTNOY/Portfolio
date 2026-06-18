@@ -1,6 +1,7 @@
 import "server-only";
 
-const HF_API_BASE_URL = "https://api-inference.huggingface.co/models";
+const HF_CHAT_COMPLETIONS_URL =
+  "https://router.huggingface.co/v1/chat/completions";
 const PLACEHOLDER_TOKEN = "your_huggingface_token_here";
 
 type HuggingFaceSettings = {
@@ -14,6 +15,8 @@ type GenerateTextOptions = {
   maxNewTokens?: number;
   model?: string;
   prompt: string;
+  responseFormat?: unknown;
+  systemPrompt?: string;
   temperature?: number;
   topP?: number;
 };
@@ -33,11 +36,17 @@ type GenerateTextResult =
       ok: false;
     };
 
-type HuggingFaceGeneratedText = {
-  generated_text?: unknown;
+type HuggingFaceError = {
+  error?: unknown;
+  message?: unknown;
 };
 
-type HuggingFaceError = {
+type HuggingFaceChatCompletion = {
+  choices?: Array<{
+    message?: {
+      content?: unknown;
+    };
+  }>;
   error?: unknown;
 };
 
@@ -55,21 +64,11 @@ function getModel() {
   return process.env.HF_MODEL?.trim() || null;
 }
 
-function modelToUrlPath(model: string) {
-  return model.split("/").map(encodeURIComponent).join("/");
-}
-
 function extractGeneratedText(payload: unknown) {
-  if (Array.isArray(payload)) {
-    const first = payload[0] as HuggingFaceGeneratedText | undefined;
-    return typeof first?.generated_text === "string"
-      ? first.generated_text
-      : null;
-  }
-
   if (payload && typeof payload === "object") {
-    const generated = (payload as HuggingFaceGeneratedText).generated_text;
-    return typeof generated === "string" ? generated : null;
+    const completion = payload as HuggingFaceChatCompletion;
+    const content = completion.choices?.[0]?.message?.content;
+    return typeof content === "string" ? content : null;
   }
 
   return null;
@@ -77,8 +76,19 @@ function extractGeneratedText(payload: unknown) {
 
 function extractErrorMessage(payload: unknown) {
   if (payload && typeof payload === "object") {
-    const error = (payload as HuggingFaceError).error;
-    return typeof error === "string" ? error : null;
+    const { error, message } = payload as HuggingFaceError;
+    if (typeof error === "string") {
+      return error;
+    }
+
+    if (error && typeof error === "object" && "message" in error) {
+      const nestedMessage = (error as { message?: unknown }).message;
+      if (typeof nestedMessage === "string") {
+        return nestedMessage;
+      }
+    }
+
+    return typeof message === "string" ? message : null;
   }
 
   return null;
@@ -117,6 +127,8 @@ export async function generateHuggingFaceText({
   maxNewTokens = 360,
   model,
   prompt,
+  responseFormat,
+  systemPrompt = "You are a concise writing assistant.",
   temperature = 0.7,
   topP = 0.9,
 }: GenerateTextOptions): Promise<GenerateTextResult> {
@@ -134,25 +146,25 @@ export async function generateHuggingFaceText({
     };
   }
 
-  const response = await fetch(
-    `${HF_API_BASE_URL}/${modelToUrlPath(selectedModel)}`,
-    {
-      body: JSON.stringify({
-        inputs: prompt,
-        parameters: {
-          max_new_tokens: maxNewTokens,
-          return_full_text: false,
-          temperature,
-          top_p: topP,
-        },
-      }),
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      method: "POST",
+  const response = await fetch(HF_CHAT_COMPLETIONS_URL, {
+    body: JSON.stringify({
+      max_tokens: maxNewTokens,
+      messages: [
+        { content: systemPrompt, role: "system" },
+        { content: prompt, role: "user" },
+      ],
+      model: selectedModel,
+      response_format: responseFormat,
+      stream: false,
+      temperature,
+      top_p: topP,
+    }),
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     },
-  );
+    method: "POST",
+  });
 
   const payload: unknown = await response.json().catch(() => null);
 

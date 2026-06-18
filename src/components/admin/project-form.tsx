@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useActionState } from "react";
-import { Save } from "lucide-react";
+import { Loader2, Save, Sparkles } from "lucide-react";
 
 import type { FormState } from "@/app/admin/(protected)/projects/actions";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,16 @@ const statusLabels: Record<string, string> = {
   archived: "Archived",
 };
 
+type AiSuggestionResponse = {
+  error?: {
+    message?: string;
+  };
+  suggestion?: {
+    fullDescription?: string;
+    highlights?: string[];
+  };
+};
+
 function FieldError({ errors }: { errors?: string[] }) {
   if (!errors || errors.length === 0) return null;
 
@@ -40,6 +50,31 @@ function FieldError({ errors }: { errors?: string[] }) {
   );
 }
 
+function parseStringList(value: FormDataEntryValue | null): string[] {
+  return typeof value === "string"
+    ? value
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean)
+    : [];
+}
+
+function setFormFieldValue(
+  form: HTMLFormElement,
+  name: string,
+  value: string,
+) {
+  const field = form.elements.namedItem(name);
+
+  if (
+    field instanceof HTMLInputElement ||
+    field instanceof HTMLTextAreaElement
+  ) {
+    field.value = value;
+    field.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+}
+
 export function ProjectForm({
   action,
   defaultValues,
@@ -52,9 +87,83 @@ export function ProjectForm({
   };
 
   const [state, formAction, pending] = useActionState(action, initialState);
+  const [aiError, setAiError] = React.useState<string | null>(null);
+  const [aiMessage, setAiMessage] = React.useState<string | null>(null);
+  const [aiPending, setAiPending] = React.useState(false);
+  const formRef = React.useRef<HTMLFormElement>(null);
+
+  async function handleGenerateDescription() {
+    const form = formRef.current;
+
+    if (!form) {
+      return;
+    }
+
+    const formData = new FormData(form);
+    const title = formData.get("title");
+
+    setAiError(null);
+    setAiMessage(null);
+
+    if (typeof title !== "string" || title.trim().length < 2) {
+      setAiError("Add a project title before generating a draft.");
+      return;
+    }
+
+    setAiPending(true);
+
+    try {
+      const response = await fetch("/api/ai/project-description", {
+        body: JSON.stringify({
+          problemSolved: formData.get("problemSolved"),
+          role: formData.get("role"),
+          shortDescription: formData.get("shortDescription"),
+          techStack: parseStringList(formData.get("techStack")),
+          technicalChallenges: formData.get("technicalChallenges"),
+          title,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      });
+
+      const payload = (await response.json().catch(() => ({}))) as
+        | AiSuggestionResponse
+        | undefined;
+
+      if (!response.ok) {
+        setAiError(
+          payload?.error?.message ??
+            "The AI draft could not be generated right now.",
+        );
+        return;
+      }
+
+      const fullDescription = payload?.suggestion?.fullDescription?.trim();
+      const highlights = payload?.suggestion?.highlights ?? [];
+
+      if (!fullDescription) {
+        setAiError("The AI response did not include a usable draft.");
+        return;
+      }
+
+      setFormFieldValue(form, "fullDescription", fullDescription);
+
+      if (highlights.length > 0) {
+        setFormFieldValue(form, "highlights", highlights.join(", "));
+      }
+
+      setAiMessage("AI draft added. Review it before saving.");
+    } catch {
+      setAiError("The AI draft request failed. Please try again.");
+    } finally {
+      setAiPending(false);
+    }
+  }
 
   return (
-    <form action={formAction} className="space-y-8">
+    <form action={formAction} className="space-y-8" ref={formRef}>
       {/* General error */}
       {state.error ? (
         <div
@@ -122,7 +231,27 @@ export function ProjectForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="fullDescription">Full Description</Label>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <Label htmlFor="fullDescription">Full Description</Label>
+            <Button
+              aria-describedby="ai-draft-feedback"
+              disabled={aiPending || pending}
+              onClick={handleGenerateDescription}
+              type="button"
+              variant="secondary"
+            >
+              {aiPending ? (
+                <Loader2
+                  aria-hidden="true"
+                  className="animate-spin"
+                  size={16}
+                />
+              ) : (
+                <Sparkles aria-hidden="true" size={16} />
+              )}
+              {aiPending ? "Generating..." : "Generate with AI"}
+            </Button>
+          </div>
           <Textarea
             defaultValue={defaultValues?.fullDescription}
             id="fullDescription"
@@ -131,6 +260,18 @@ export function ProjectForm({
             placeholder="Detailed description of the project, what it does, and why it matters..."
             rows={6}
           />
+          <div aria-live="polite" id="ai-draft-feedback">
+            {aiMessage ? (
+              <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                {aiMessage}
+              </p>
+            ) : null}
+            {aiError ? (
+              <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                {aiError}
+              </p>
+            ) : null}
+          </div>
           <FieldError errors={state.fieldErrors.fullDescription} />
         </div>
       </fieldset>

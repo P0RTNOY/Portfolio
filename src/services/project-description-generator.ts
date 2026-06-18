@@ -14,6 +14,7 @@ export type ProjectDescriptionDraftInput = {
 type ProjectDescriptionDraftResult =
   | {
       draft: string;
+      highlights: string[];
       ok: true;
     }
   | {
@@ -21,6 +22,32 @@ type ProjectDescriptionDraftResult =
       error: string;
       ok: false;
     };
+
+const projectDescriptionResponseFormat = {
+  json_schema: {
+    name: "ProjectDescriptionSuggestion",
+    schema: {
+      additionalProperties: false,
+      properties: {
+        fullDescription: {
+          type: "string",
+        },
+        highlights: {
+          items: {
+            type: "string",
+          },
+          maxItems: 5,
+          minItems: 3,
+          type: "array",
+        },
+      },
+      required: ["fullDescription", "highlights"],
+      type: "object",
+    },
+    strict: true,
+  },
+  type: "json_schema",
+};
 
 function compactLine(label: string, value?: string | string[] | null) {
   if (Array.isArray(value)) {
@@ -41,21 +68,63 @@ function buildProjectDescriptionPrompt(input: ProjectDescriptionDraftInput) {
   ].filter(Boolean);
 
   return [
-    "You help write concise portfolio project descriptions.",
-    "Keep the output generic, honest, and editable. Do not invent metrics, employers, clients, or personal history.",
-    "Write 2 short paragraphs and 3 bullet highlights.",
+    "Create editable portfolio project copy from the context below.",
+    "Keep it generic, honest, and professional. Do not invent metrics, employers, clients, timelines, awards, or personal history.",
+    "Return valid JSON only, with this exact shape:",
+    "{\"fullDescription\":\"Two concise paragraphs as one string.\",\"highlights\":[\"Highlight one\",\"Highlight two\",\"Highlight three\"]}",
+    "Each highlight must be short and grounded in the provided context.",
     "",
     "Project context:",
     ...contextLines,
   ].join("\n");
 }
 
+function parseJsonSuggestion(text: string) {
+  const trimmed = text.trim();
+  const jsonStart = trimmed.indexOf("{");
+  const jsonEnd = trimmed.lastIndexOf("}");
+
+  if (jsonStart === -1 || jsonEnd === -1 || jsonEnd <= jsonStart) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(trimmed.slice(jsonStart, jsonEnd + 1));
+
+    if (!parsed || typeof parsed !== "object") {
+      return null;
+    }
+
+    const fullDescription = (parsed as { fullDescription?: unknown })
+      .fullDescription;
+    const highlights = (parsed as { highlights?: unknown }).highlights;
+
+    if (typeof fullDescription !== "string" || !Array.isArray(highlights)) {
+      return null;
+    }
+
+    return {
+      fullDescription: fullDescription.trim(),
+      highlights: highlights
+        .filter((highlight): highlight is string => typeof highlight === "string")
+        .map((highlight) => highlight.trim())
+        .filter(Boolean)
+        .slice(0, 5),
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function generateProjectDescriptionDraft(
   input: ProjectDescriptionDraftInput,
 ): Promise<ProjectDescriptionDraftResult> {
   const result = await generateHuggingFaceText({
-    maxNewTokens: 420,
+    maxNewTokens: 1000,
     prompt: buildProjectDescriptionPrompt(input),
+    responseFormat: projectDescriptionResponseFormat,
+    systemPrompt:
+      "You write grounded portfolio project copy and return only valid JSON.",
     temperature: 0.65,
   });
 
@@ -70,8 +139,19 @@ export async function generateProjectDescriptionDraft(
     };
   }
 
+  const suggestion = parseJsonSuggestion(result.text);
+
+  if (!suggestion?.fullDescription) {
+    return {
+      code: "AI_GENERATION_FAILED",
+      error: "The AI response could not be converted into a project draft.",
+      ok: false,
+    };
+  }
+
   return {
-    draft: result.text,
+    draft: suggestion.fullDescription,
+    highlights: suggestion.highlights,
     ok: true,
   };
 }

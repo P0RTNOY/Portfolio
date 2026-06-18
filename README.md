@@ -57,6 +57,7 @@ The project is intentionally generic. Seed data uses placeholder examples only, 
 - `PUT /api/projects/[id]` - Update project, admin only
 - `DELETE /api/projects/[id]` - Delete project, admin only
 - `GET /api/ai/status` - Admin-only AI configuration status
+- `POST /api/ai/project-description` - Admin-only project description generator
 
 ## Environment Variables
 
@@ -79,7 +80,7 @@ ADMIN_USERNAME="admin"
 ADMIN_PASSWORD="change-me"
 AUTH_SECRET="replace-with-a-long-random-secret"
 HF_TOKEN="your_huggingface_token_here"
-HF_MODEL=""
+HF_MODEL="openai/gpt-oss-20b:fastest"
 ```
 
 Change `ADMIN_PASSWORD` and `AUTH_SECRET` before any real deployment. `AUTH_SECRET` should be a long random string.
@@ -213,10 +214,11 @@ The app includes a server-side-only Hugging Face foundation for future admin AI 
 - If `HF_TOKEN` or `HF_MODEL` is missing, AI helpers return a disabled state instead of breaking the app.
 - `src/lib/huggingface.ts` contains the server-only API wrapper.
 - `src/services/ai-project-assistant.ts` exposes future project-assistant entry points.
-- `src/services/project-description-generator.ts` contains a draft project-description generator service.
+- `src/services/project-description-generator.ts` contains the project-description generator service.
 - `GET /api/ai/status` reports AI availability for authenticated admins only.
+- The project create/edit form can generate an editable full description and highlights from the current project context.
 
-To disable AI features, leave `HF_TOKEN` or `HF_MODEL` empty. Never commit a real Hugging Face token.
+To disable AI features, leave `HF_TOKEN` or `HF_MODEL` empty. Never commit a real Hugging Face token. `HF_MODEL` should point to a chat-completion-capable model available through Hugging Face Inference Providers, such as `openai/gpt-oss-20b:fastest`.
 
 ## Deployment Notes
 
