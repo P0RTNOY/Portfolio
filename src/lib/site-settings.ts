@@ -1,6 +1,6 @@
 import type { Prisma, SiteSettings as PrismaSiteSettings } from "@prisma/client";
 
-import { prisma } from "@/lib/prisma";
+import { getPrisma } from "@/lib/prisma";
 import {
   siteSettingsSchema,
   type SiteSettingsInput,
@@ -127,6 +127,7 @@ export function getDefaultSiteSettingsInput() {
 }
 
 export async function getSiteSettings() {
+  const prisma = getPrisma();
   const existing = await prisma.siteSettings.findUnique({
     where: { id: SITE_SETTINGS_ID },
   });
@@ -143,6 +144,7 @@ export async function getSiteSettings() {
 }
 
 export async function updateSiteSettings(input: SiteSettingsInput) {
+  const prisma = getPrisma();
   const data = siteSettingsSchema.parse(input);
   const updated = await prisma.siteSettings.upsert({
     create: toSiteSettingsCreateData(data),

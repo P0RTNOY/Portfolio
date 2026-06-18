@@ -1,6 +1,6 @@
 import type { Prisma, Project as PrismaProject } from "@prisma/client";
 
-import { prisma } from "@/lib/prisma";
+import { getPrisma } from "@/lib/prisma";
 import {
   projectCreateSchema,
   projectStatusSchema,
@@ -97,6 +97,7 @@ function toProjectUpdateData(input: ProjectUpdateInput): Prisma.ProjectUpdateInp
 }
 
 export async function listProjects(options: ProjectListOptions = {}) {
+  const prisma = getPrisma();
   const projects = await prisma.project.findMany({
     where: {
       featured: options.featured,
@@ -109,16 +110,19 @@ export async function listProjects(options: ProjectListOptions = {}) {
 }
 
 export async function getProjectById(id: string) {
+  const prisma = getPrisma();
   const project = await prisma.project.findUnique({ where: { id } });
   return project ? toProject(project) : null;
 }
 
 export async function getProjectBySlug(slug: string) {
+  const prisma = getPrisma();
   const project = await prisma.project.findUnique({ where: { slug } });
   return project ? toProject(project) : null;
 }
 
 export async function createProject(input: ProjectCreateInput) {
+  const prisma = getPrisma();
   const data = projectCreateSchema.parse(input);
   const project = await prisma.project.create({
     data: toProjectCreateData(data),
@@ -128,6 +132,7 @@ export async function createProject(input: ProjectCreateInput) {
 }
 
 export async function updateProject(id: string, input: ProjectUpdateInput) {
+  const prisma = getPrisma();
   const data = projectUpdateSchema.parse(input);
   const project = await prisma.project.update({
     where: { id },
@@ -138,5 +143,6 @@ export async function updateProject(id: string, input: ProjectUpdateInput) {
 }
 
 export async function deleteProject(id: string) {
+  const prisma = getPrisma();
   await prisma.project.delete({ where: { id } });
 }

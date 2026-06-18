@@ -4,6 +4,9 @@ import { apiError, apiJson, handleApiError } from "@/lib/api/response";
 import { getAdminSessionFromRequest } from "@/lib/auth";
 import { deleteProject, getProjectById, updateProject } from "@/lib/projects";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 type ProjectRouteContext = {
   params: Promise<{
     id: string;
