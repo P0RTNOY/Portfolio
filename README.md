@@ -58,6 +58,7 @@ The project is intentionally generic. Seed data uses placeholder examples only, 
 - `DELETE /api/projects/[id]` - Delete project, admin only
 - `GET /api/ai/status` - Admin-only AI configuration status
 - `POST /api/ai/project-description` - Admin-only project description generator
+- `POST /api/ai/github-project` - Admin-only GitHub repository project-field suggester
 
 ## Environment Variables
 
@@ -81,6 +82,7 @@ ADMIN_PASSWORD="change-me"
 AUTH_SECRET="replace-with-a-long-random-secret"
 HF_TOKEN="your_huggingface_token_here"
 HF_MODEL="openai/gpt-oss-20b:fastest"
+GITHUB_TOKEN=""
 ```
 
 Change `ADMIN_PASSWORD` and `AUTH_SECRET` before any real deployment. `AUTH_SECRET` should be a long random string.
@@ -215,10 +217,12 @@ The app includes a server-side-only Hugging Face foundation for future admin AI 
 - `src/lib/huggingface.ts` contains the server-only API wrapper.
 - `src/services/ai-project-assistant.ts` exposes future project-assistant entry points.
 - `src/services/project-description-generator.ts` contains the project-description generator service.
+- `src/services/github-project-suggester.ts` turns GitHub repository context into suggested project fields.
 - `GET /api/ai/status` reports AI availability for authenticated admins only.
 - The project create/edit form can generate an editable full description and highlights from the current project context.
+- The project create/edit form can also analyze a GitHub repository URL and suggest title, slug, descriptions, tech stack, links, status, role, highlights, problem solved, and technical challenges.
 
-To disable AI features, leave `HF_TOKEN` or `HF_MODEL` empty. Never commit a real Hugging Face token. `HF_MODEL` should point to a chat-completion-capable model available through Hugging Face Inference Providers, such as `openai/gpt-oss-20b:fastest`.
+To disable AI features, leave `HF_TOKEN` or `HF_MODEL` empty. Never commit a real Hugging Face token. `HF_MODEL` should point to a chat-completion-capable model available through Hugging Face Inference Providers, such as `openai/gpt-oss-20b:fastest`. `GITHUB_TOKEN` is optional for public repositories, but can be set server-side to increase GitHub API limits.
 
 ## Deployment Notes
 

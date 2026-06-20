@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useActionState } from "react";
-import { Loader2, Save, Sparkles } from "lucide-react";
+import { Check, GitBranch, Loader2, Save, Sparkles } from "lucide-react";
 
 import type { FormState } from "@/app/admin/(protected)/projects/actions";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,51 @@ type AiSuggestionResponse = {
   };
 };
 
+type GithubProjectSuggestion = {
+  fullDescription: string;
+  githubUrl: string;
+  highlights: string[];
+  liveUrl: string | null;
+  problemSolved: string | null;
+  role: string | null;
+  shortDescription: string;
+  slug: string;
+  status: string;
+  techStack: string[];
+  technicalChallenges: string | null;
+  title: string;
+};
+
+type GithubProjectResponse = {
+  error?: {
+    message?: string;
+  };
+  repo?: {
+    fullName: string;
+    languages: string[];
+    readmeFound: boolean;
+  };
+  suggestion?: GithubProjectSuggestion;
+};
+
+const suggestionFieldLabels: Array<{
+  label: string;
+  name: keyof GithubProjectSuggestion;
+}> = [
+  { label: "Title", name: "title" },
+  { label: "Slug", name: "slug" },
+  { label: "Short Description", name: "shortDescription" },
+  { label: "Full Description", name: "fullDescription" },
+  { label: "Tech Stack", name: "techStack" },
+  { label: "GitHub URL", name: "githubUrl" },
+  { label: "Live URL", name: "liveUrl" },
+  { label: "Status", name: "status" },
+  { label: "Role", name: "role" },
+  { label: "Highlights", name: "highlights" },
+  { label: "Problem Solved", name: "problemSolved" },
+  { label: "Technical Challenges", name: "technicalChallenges" },
+];
+
 function FieldError({ errors }: { errors?: string[] }) {
   if (!errors || errors.length === 0) return null;
 
@@ -68,11 +113,28 @@ function setFormFieldValue(
 
   if (
     field instanceof HTMLInputElement ||
-    field instanceof HTMLTextAreaElement
+    field instanceof HTMLTextAreaElement ||
+    field instanceof HTMLSelectElement
   ) {
     field.value = value;
     field.dispatchEvent(new Event("input", { bubbles: true }));
+    field.dispatchEvent(new Event("change", { bubbles: true }));
   }
+}
+
+function suggestionValueToString(value: GithubProjectSuggestion[keyof GithubProjectSuggestion]) {
+  if (Array.isArray(value)) {
+    return value.join(", ");
+  }
+
+  return value ?? "";
+}
+
+function compactSuggestionPreview(
+  value: GithubProjectSuggestion[keyof GithubProjectSuggestion],
+) {
+  const text = suggestionValueToString(value);
+  return text.length > 220 ? `${text.slice(0, 220).trim()}...` : text;
 }
 
 export function ProjectForm({
@@ -90,6 +152,17 @@ export function ProjectForm({
   const [aiError, setAiError] = React.useState<string | null>(null);
   const [aiMessage, setAiMessage] = React.useState<string | null>(null);
   const [aiPending, setAiPending] = React.useState(false);
+  const [githubError, setGithubError] = React.useState<string | null>(null);
+  const [githubMessage, setGithubMessage] = React.useState<string | null>(null);
+  const [githubPending, setGithubPending] = React.useState(false);
+  const [githubRepoUrl, setGithubRepoUrl] = React.useState(
+    defaultValues?.githubUrl ?? "",
+  );
+  const [githubRepoName, setGithubRepoName] = React.useState<string | null>(
+    null,
+  );
+  const [githubSuggestion, setGithubSuggestion] =
+    React.useState<GithubProjectSuggestion | null>(null);
   const formRef = React.useRef<HTMLFormElement>(null);
 
   async function handleGenerateDescription() {
@@ -162,6 +235,82 @@ export function ProjectForm({
     }
   }
 
+  async function handleAnalyzeGithubRepo() {
+    const repoUrl = githubRepoUrl.trim();
+
+    setGithubError(null);
+    setGithubMessage(null);
+    setGithubSuggestion(null);
+    setGithubRepoName(null);
+
+    if (!repoUrl) {
+      setGithubError("Enter a GitHub repository URL.");
+      return;
+    }
+
+    setGithubPending(true);
+
+    try {
+      const response = await fetch("/api/ai/github-project", {
+        body: JSON.stringify({ repoUrl }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      });
+
+      const payload = (await response.json().catch(() => ({}))) as
+        | GithubProjectResponse
+        | undefined;
+
+      if (!response.ok) {
+        setGithubError(
+          payload?.error?.message ??
+            "The GitHub repository could not be analyzed right now.",
+        );
+        return;
+      }
+
+      if (!payload?.suggestion) {
+        setGithubError("The AI response did not include usable project fields.");
+        return;
+      }
+
+      setGithubRepoName(payload.repo?.fullName ?? null);
+      setGithubSuggestion(payload.suggestion);
+      setGithubMessage("Suggestions ready. Apply the fields you want to use.");
+    } catch {
+      setGithubError("The GitHub import request failed. Please try again.");
+    } finally {
+      setGithubPending(false);
+    }
+  }
+
+  function applyGithubSuggestionField(name: keyof GithubProjectSuggestion) {
+    const form = formRef.current;
+
+    if (!form || !githubSuggestion) {
+      return;
+    }
+
+    setFormFieldValue(form, name, suggestionValueToString(githubSuggestion[name]));
+    setGithubMessage(`${suggestionFieldLabels.find((field) => field.name === name)?.label ?? "Field"} applied.`);
+  }
+
+  function applyAllGithubSuggestions() {
+    const form = formRef.current;
+
+    if (!form || !githubSuggestion) {
+      return;
+    }
+
+    for (const { name } of suggestionFieldLabels) {
+      setFormFieldValue(form, name, suggestionValueToString(githubSuggestion[name]));
+    }
+
+    setGithubMessage("All GitHub suggestions applied. Review before saving.");
+  }
+
   return (
     <form action={formAction} className="space-y-8" ref={formRef}>
       {/* General error */}
@@ -173,6 +322,121 @@ export function ProjectForm({
           {state.error}
         </div>
       ) : null}
+
+      <section
+        aria-labelledby="github-import-title"
+        className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-950/60 sm:p-5"
+      >
+        <h2
+          className="text-base font-bold text-zinc-950 dark:text-white"
+          id="github-import-title"
+        >
+          GitHub Import
+        </h2>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
+          <div className="mt-4 min-w-0 flex-1 space-y-2">
+            <Label htmlFor="githubRepoImportUrl">Repository URL</Label>
+            <Input
+              id="githubRepoImportUrl"
+              onChange={(event) => setGithubRepoUrl(event.target.value)}
+              placeholder="https://github.com/owner/repo"
+              type="url"
+              value={githubRepoUrl}
+            />
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Suggestions are generated from repository metadata, README, languages, and manifests.
+            </p>
+          </div>
+          <Button
+            aria-describedby="github-import-feedback"
+            disabled={githubPending || pending}
+            onClick={handleAnalyzeGithubRepo}
+            type="button"
+            variant="secondary"
+          >
+            {githubPending ? (
+              <Loader2 aria-hidden="true" className="animate-spin" size={16} />
+            ) : (
+              <GitBranch aria-hidden="true" size={16} />
+            )}
+            {githubPending ? "Analyzing..." : "Analyze Repo"}
+          </Button>
+        </div>
+
+        <div aria-live="polite" className="mt-3" id="github-import-feedback">
+          {githubMessage ? (
+            <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+              {githubMessage}
+            </p>
+          ) : null}
+          {githubError ? (
+            <p className="text-sm font-medium text-red-600 dark:text-red-400">
+              {githubError}
+            </p>
+          ) : null}
+        </div>
+
+        {githubSuggestion ? (
+          <div className="mt-5 space-y-4">
+            <div className="flex flex-col gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2
+                  className="text-sm font-bold text-zinc-950 dark:text-white"
+                >
+                  Suggested fields
+                </h2>
+                {githubRepoName ? (
+                  <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                    Source: {githubRepoName}
+                  </p>
+                ) : null}
+              </div>
+              <Button
+                onClick={applyAllGithubSuggestions}
+                size="sm"
+                type="button"
+              >
+                <Check aria-hidden="true" size={16} />
+                Apply all
+              </Button>
+            </div>
+
+            <div className="grid gap-3">
+              {suggestionFieldLabels.map((field) => {
+                const preview = compactSuggestionPreview(
+                  githubSuggestion[field.name],
+                );
+
+                if (!preview) {
+                  return null;
+                }
+
+                return (
+                  <div
+                    className="grid gap-3 rounded-md border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950 sm:grid-cols-[150px_1fr_auto] sm:items-start"
+                    key={field.name}
+                  >
+                    <p className="text-sm font-semibold text-zinc-950 dark:text-white">
+                      {field.label}
+                    </p>
+                    <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                      {preview}
+                    </p>
+                    <Button
+                      onClick={() => applyGithubSuggestionField(field.name)}
+                      size="sm"
+                      type="button"
+                      variant="ghost"
+                    >
+                      Apply
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+      </section>
 
       {/* Basic Information */}
       <fieldset className="space-y-5">

@@ -1,6 +1,8 @@
 import "server-only";
 
 import { getHuggingFaceSettings } from "@/lib/huggingface";
+import type { GithubRepoContext } from "@/lib/github-repo";
+import { generateGithubProjectSuggestion } from "@/services/github-project-suggester";
 import {
   generateProjectDescriptionDraft,
   type ProjectDescriptionDraftInput,
@@ -20,4 +22,8 @@ export async function createProjectDescriptionSuggestion(
   input: ProjectDescriptionDraftInput,
 ) {
   return generateProjectDescriptionDraft(input);
+}
+
+export async function createGithubProjectSuggestion(repo: GithubRepoContext) {
+  return generateGithubProjectSuggestion(repo);
 }
