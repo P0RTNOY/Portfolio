@@ -98,7 +98,7 @@ function FieldError({ errors }: { errors?: string[] }) {
 function parseStringList(value: FormDataEntryValue | null): string[] {
   return typeof value === "string"
     ? value
-        .split(",")
+        .split(/[,\n]/)
         .map((item) => item.trim())
         .filter(Boolean)
     : [];
@@ -573,7 +573,7 @@ export function ProjectForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="imageUrl">Image URL</Label>
+          <Label htmlFor="imageUrl">Thumbnail Image URL</Label>
           <Input
             defaultValue={defaultValues?.imageUrl ?? ""}
             id="imageUrl"
@@ -581,7 +581,26 @@ export function ProjectForm({
             placeholder="https://example.com/screenshot.png"
             type="url"
           />
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Used on project cards and the hero image. If left empty, the first screenshot is used.
+          </p>
           <FieldError errors={state.fieldErrors.imageUrl} />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="screenshots">Screenshots / Gallery Images</Label>
+          <Textarea
+            className="min-h-28"
+            defaultValue={defaultValues?.screenshots?.join("\n") ?? ""}
+            id="screenshots"
+            name="screenshots"
+            placeholder="https://example.com/screen-1.png&#10;https://example.com/screen-2.png"
+            rows={4}
+          />
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Add one image URL per line, or separate URLs with commas. These appear as a gallery on the project page.
+          </p>
+          <FieldError errors={state.fieldErrors.screenshots} />
         </div>
       </fieldset>
 

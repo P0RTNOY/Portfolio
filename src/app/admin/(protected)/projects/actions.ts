@@ -30,12 +30,15 @@ const emptyState: FormState = {
 
 function parseStringList(value: string): string[] {
   return value
-    .split(",")
+    .split(/[,\n]/)
     .map((item) => item.trim())
     .filter(Boolean);
 }
 
 function formDataToProjectInput(formData: FormData) {
+  const screenshots = parseStringList((formData.get("screenshots") as string) || "");
+  const imageUrl = (formData.get("imageUrl") as string) || screenshots[0] || "";
+
   return {
     title: formData.get("title") as string,
     slug: formData.get("slug") as string,
@@ -44,7 +47,8 @@ function formDataToProjectInput(formData: FormData) {
     techStack: parseStringList((formData.get("techStack") as string) || ""),
     githubUrl: (formData.get("githubUrl") as string) || "",
     liveUrl: (formData.get("liveUrl") as string) || "",
-    imageUrl: (formData.get("imageUrl") as string) || "",
+    imageUrl,
+    screenshots,
     status: (formData.get("status") as string) || "planned",
     featured: formData.get("featured") === "on",
     role: (formData.get("role") as string) || "",

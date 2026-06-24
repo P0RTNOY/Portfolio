@@ -181,6 +181,7 @@ Projects include:
 - `githubUrl`
 - `liveUrl`
 - `imageUrl`
+- `screenshots`
 - `status`: `planned`, `in-progress`, `completed`, or `archived`
 - `featured`
 - `role`
@@ -191,7 +192,7 @@ Projects include:
 - `createdAt`
 - `updatedAt`
 
-`techStack` and `highlights` are stored as JSON strings in Postgres text columns and converted to string arrays in the data access layer.
+`techStack`, `highlights`, and `screenshots` are stored as JSON strings in Postgres text columns and converted to string arrays in the data access layer.
 
 ## Site Settings Model
 

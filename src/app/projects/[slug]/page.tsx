@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, GitBranch } from "lucide-react";
 
 import { ProjectPageShell } from "@/components/projects/project-page-shell";
+import { ProjectGallery } from "@/components/projects/project-gallery";
 import { ProjectVisual } from "@/components/projects/project-visual";
 import { StatusBadge } from "@/components/projects/status-badge";
 import { Badge } from "@/components/ui/badge";
@@ -105,6 +106,8 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
           </div>
         </div>
       </section>
+
+      <ProjectGallery images={project.screenshots} title={project.title} />
 
       <section className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_320px] lg:px-8">
         <div className="space-y-8">

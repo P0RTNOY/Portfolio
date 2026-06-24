@@ -12,9 +12,10 @@ import {
 
 export type Project = Omit<
   PrismaProject,
-  "highlights" | "status" | "techStack"
+  "highlights" | "screenshots" | "status" | "techStack"
 > & {
   highlights: string[];
+  screenshots: string[];
   status: ProjectStatus;
   techStack: string[];
 };
@@ -51,6 +52,7 @@ function toProject(project: PrismaProject): Project {
   return {
     ...project,
     highlights: parseStringArray(project.highlights),
+    screenshots: parseStringArray(project.screenshots),
     status: projectStatusSchema.catch("planned").parse(project.status),
     techStack: parseStringArray(project.techStack),
   };
@@ -70,6 +72,7 @@ function toProjectCreateData(input: ProjectCreateInput): Prisma.ProjectCreateInp
     role: cleanOptionalString(input.role),
     status: input.status ?? "planned",
     featured: input.featured ?? false,
+    screenshots: serializeStringArray(input.screenshots) ?? "[]",
     techStack: serializeStringArray(input.techStack) ?? "[]",
     technicalChallenges: cleanOptionalString(input.technicalChallenges),
     displayOrder: input.displayOrder ?? 0,
@@ -90,6 +93,7 @@ function toProjectUpdateData(input: ProjectUpdateInput): Prisma.ProjectUpdateInp
     role: cleanOptionalString(input.role),
     status: input.status,
     featured: input.featured,
+    screenshots: serializeStringArray(input.screenshots),
     techStack: serializeStringArray(input.techStack),
     technicalChallenges: cleanOptionalString(input.technicalChallenges),
     displayOrder: input.displayOrder,

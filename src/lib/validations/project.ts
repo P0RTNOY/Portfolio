@@ -26,6 +26,10 @@ const stringListSchema = z
   .array(z.string().trim().min(1).max(80))
   .max(20);
 
+const urlListSchema = z
+  .array(z.string().trim().url("Enter valid screenshot URLs."))
+  .max(12, "Add up to 12 screenshots.");
+
 const projectFields = {
   title: z.string().trim().min(2, "Title is required.").max(120),
   slug: z
@@ -47,6 +51,7 @@ const projectFields = {
   githubUrl: optionalUrlSchema,
   liveUrl: optionalUrlSchema,
   imageUrl: optionalUrlSchema,
+  screenshots: urlListSchema,
   status: projectStatusSchema,
   featured: z.boolean(),
   role: optionalTextSchema,
@@ -65,6 +70,7 @@ export const projectCreateSchema = z.object({
   status: projectFields.status.default("planned"),
   featured: projectFields.featured.default(false),
   highlights: projectFields.highlights.default([]),
+  screenshots: projectFields.screenshots.default([]),
   displayOrder: projectFields.displayOrder.default(0),
 });
 
