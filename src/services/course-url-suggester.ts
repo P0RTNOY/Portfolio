@@ -60,6 +60,26 @@ function normalizeCourseTitle(value: string) {
   return truncate(title.replace(/[.!?]+$/, ""), 120);
 }
 
+function removeTitlePredicate(value: string) {
+  const normalized = normalizeCourseTitle(value);
+  const [beforePredicate] = normalized.split(
+    /\s+(?:is|are|was|were|covers|includes|prepares|validates|teaches|helps|learns)\b/i,
+  );
+
+  if (
+    beforePredicate &&
+    beforePredicate.length >= 8 &&
+    beforePredicate.length < normalized.length &&
+    /\b(comptia|security\+|security plus|sy0[-\s]?701)\b/i.test(
+      beforePredicate,
+    )
+  ) {
+    return beforePredicate.trim();
+  }
+
+  return normalized;
+}
+
 function cleanInstructorName(value: string | null) {
   if (!value) {
     return null;
@@ -77,7 +97,7 @@ function looksLikeCourseTitle(value: string | null | undefined) {
     return false;
   }
 
-  return /\b(course|bootcamp|certification|exam|training|masterclass|workshop|comptia|security\+|sy0[-\s]?701)\b/i.test(
+  return /\b(course|bootcamp|certification|exam|training|masterclass|workshop|comptia|security\+|security plus|sy0[-\s]?701)\b/i.test(
     value,
   );
 }
@@ -109,30 +129,48 @@ function chooseBestCourseTitle({
   parsedTitle?: string | null;
   pastedDetails?: string;
 }) {
-  const normalizedParsed = parsedTitle ? normalizeCourseTitle(parsedTitle) : null;
+  const normalizedParsed = parsedTitle ? removeTitlePredicate(parsedTitle) : null;
   const normalizedMetadata = metadataTitle
-    ? normalizeCourseTitle(metadataTitle)
+    ? removeTitlePredicate(metadataTitle)
     : null;
   const pastedTitle = firstMeaningfulLine(pastedDetails);
-  const normalizedPasted = pastedTitle ? normalizeCourseTitle(pastedTitle) : null;
+  const normalizedPasted = pastedTitle ? removeTitlePredicate(pastedTitle) : null;
+  const candidates = [
+    normalizedParsed,
+    normalizedMetadata,
+    normalizedPasted,
+    fallbackTitle,
+  ]
+    .filter((candidate): candidate is string => Boolean(candidate))
+    .filter(
+      (candidate) =>
+        looksLikeCourseTitle(candidate) &&
+        !looksLikeMarketingSentence(candidate),
+    );
 
-  if (
-    normalizedParsed &&
-    looksLikeCourseTitle(normalizedParsed) &&
-    !looksLikeMarketingSentence(normalizedParsed)
-  ) {
-    return normalizedParsed;
-  }
+  const scoredCandidates = candidates.map((candidate) => {
+    let score = 0;
 
-  if (normalizedMetadata && looksLikeCourseTitle(normalizedMetadata)) {
-    return normalizedMetadata;
-  }
+    if (/\bcomptia\b/i.test(candidate)) score += 40;
+    if (/\bsy0[-\s]?701\b/i.test(candidate)) score += 35;
+    if (/security\+/i.test(candidate)) score += 25;
+    if (/\b(course|bootcamp|exam|certification|training)\b/i.test(candidate)) {
+      score += 15;
+    }
+    if (/security plus/i.test(candidate)) score -= 10;
+    if (candidate.length >= 18 && candidate.length <= 90) score += 10;
 
-  if (normalizedPasted && looksLikeCourseTitle(normalizedPasted)) {
-    return normalizedPasted;
-  }
+    return { candidate, score };
+  });
 
-  return normalizedParsed ?? normalizedMetadata ?? normalizedPasted ?? fallbackTitle;
+  return (
+    scoredCandidates.sort((left, right) => right.score - left.score)[0]
+      ?.candidate ??
+    normalizedParsed ??
+    normalizedMetadata ??
+    normalizedPasted ??
+    fallbackTitle
+  );
 }
 
 function cleanString(value: unknown, maxLength: number) {
@@ -343,6 +381,10 @@ function removeMarketingOpening(value: string) {
 
   if (sentences.length > 1 && isMarketingLine(sentences[0])) {
     return sentences.slice(1).join(" ").trim();
+  }
+
+  if (sentences.length === 1 && isMarketingLine(sentences[0])) {
+    return "";
   }
 
   return compactSentence(value);
