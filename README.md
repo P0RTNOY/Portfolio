@@ -1,6 +1,6 @@
 # Generic Portfolio Platform
 
-A modern, reusable personal portfolio system built with Next.js. Public project pages are database-backed, and projects can be managed from a protected admin dashboard instead of being hardcoded into the site.
+A modern, reusable personal portfolio system built with Next.js. Public project and course pages are database-backed, and content can be managed from a protected admin dashboard instead of being hardcoded into the site.
 
 The project is intentionally generic. Seed data uses placeholder examples only, so real projects, work history, and personal background can be added later from the admin area.
 
@@ -21,21 +21,27 @@ The project is intentionally generic. Seed data uses placeholder examples only, 
 - Responsive public portfolio homepage
 - Dynamic project listing from Supabase Postgres
 - Project detail pages by slug
+- Dynamic course listing with progress, credential links, and source links
+- Course detail pages by slug
+- Editable CV/resume link
 - Admin login and logout
 - Protected admin dashboard
 - Project CRUD: create, read, update, delete
+- Course CRUD: create, read, update, delete
 - Editable homepage/site content
 - Featured project toggle
 - Project status editing
 - Admin success toasts and confirmation dialog for deletes
 - Server-side validation and API error handling
-- Server-only Hugging Face foundation for future AI features
+- Server-side Hugging Face project and course suggestion features
 
 ## Public Routes
 
-- `/` - Portfolio homepage with hero, about, projects, skills, and contact sections
+- `/` - Portfolio homepage with hero, about, projects, courses, CV, skills, and contact sections
 - `/projects` - All database-backed projects
 - `/projects/[slug]` - Project detail page
+- `/courses` - All database-backed courses
+- `/courses/[slug]` - Course detail page
 
 ## Admin Routes
 
@@ -44,6 +50,9 @@ The project is intentionally generic. Seed data uses placeholder examples only, 
 - `/admin/projects` - Protected project management table
 - `/admin/projects/new` - Create project
 - `/admin/projects/[id]/edit` - Edit project
+- `/admin/courses` - Protected course management table
+- `/admin/courses/new` - Create course
+- `/admin/courses/[id]/edit` - Edit course
 - `/admin/settings` - Edit public hero, about, skills, and contact content
 
 ## API Routes
@@ -59,6 +68,7 @@ The project is intentionally generic. Seed data uses placeholder examples only, 
 - `GET /api/ai/status` - Admin-only AI configuration status
 - `POST /api/ai/project-description` - Admin-only project description generator
 - `POST /api/ai/github-project` - Admin-only GitHub repository project-field suggester
+- `POST /api/ai/course-url` - Admin-only course URL metadata importer and field suggester
 - `POST /api/admin/uploads/project-images` - Admin-only Supabase Storage project image upload
 
 ## Environment Variables
@@ -169,7 +179,8 @@ npm run start
 2. Visit `/admin/login`.
 3. Sign in with the configured admin credentials.
 4. Manage projects at `/admin/projects`.
-5. Use logout from the admin shell when finished.
+5. Manage courses at `/admin/courses`.
+6. Use logout from the admin shell when finished.
 
 Production guardrails reject placeholder credentials, so update `ADMIN_PASSWORD` and `AUTH_SECRET` before deployment.
 
@@ -199,6 +210,33 @@ Projects include:
 
 `techStack`, `highlights`, and `screenshots` are stored as JSON strings in Postgres text columns and converted to string arrays in the data access layer.
 
+## Course Model
+
+Courses include:
+
+- `id`
+- `title`
+- `slug`
+- `provider`
+- `courseUrl`
+- `imageUrl`
+- `shortDescription`
+- `fullDescription`
+- `skills`
+- `instructor`
+- `status`: `planned`, `in-progress`, `completed`, or `archived`
+- `progress`: `0` to `100`
+- `certificateUrl`
+- `credentialUrl`
+- `startedAt`
+- `completedAt`
+- `featured`
+- `displayOrder`
+- `createdAt`
+- `updatedAt`
+
+`skills` are stored as a JSON string in a Postgres text column and converted to a string array in the data access layer.
+
 ## Site Settings Model
 
 The homepage content is stored in a singleton `site_settings` row and can be edited at `/admin/settings`.
@@ -224,9 +262,13 @@ The app includes a server-side-only Hugging Face foundation for future admin AI 
 - `src/services/ai-project-assistant.ts` exposes future project-assistant entry points.
 - `src/services/project-description-generator.ts` contains the project-description generator service.
 - `src/services/github-project-suggester.ts` turns GitHub repository context into suggested project fields.
+- `src/services/course-url-suggester.ts` turns public course page metadata into suggested course fields.
 - `GET /api/ai/status` reports AI availability for authenticated admins only.
 - The project create/edit form can generate an editable full description and highlights from the current project context.
 - The project create/edit form can also analyze a GitHub repository URL and suggest title, slug, descriptions, tech stack, links, status, role, highlights, problem solved, and technical challenges.
+- The course create/edit form can import public metadata from a course URL and suggest title, slug, provider, image URL, descriptions, skills, and instructor.
+
+Course importing intentionally reads public page metadata only. Some providers, including Udemy in local testing, may block server-side metadata fetches with bot protection. Course progress is private account data on platforms like Udemy, so progress, completion status, and certificate links remain admin-managed fields unless a future authenticated provider integration is added.
 
 To disable AI features, leave `HF_TOKEN` or `HF_MODEL` empty. Never commit a real Hugging Face token. `HF_MODEL` should point to a chat-completion-capable model available through Hugging Face Inference Providers, such as `openai/gpt-oss-20b:fastest`. `GITHUB_TOKEN` is optional for public repositories, but can be set server-side to increase GitHub API limits.
 
@@ -240,6 +282,10 @@ The admin project form supports uploading screenshot images to Supabase Storage.
 - Uploaded public URLs are inserted into the project screenshots field.
 - If the thumbnail field is empty, the first uploaded image is used as the thumbnail.
 - The upload route limits files to 3.5 MB each and 4 MB total per request to stay below Vercel function payload limits.
+
+## CV / Resume
+
+The public homepage includes a CV section. Add or update the resume/CV URL from `/admin/settings` using the existing `resumeUrl` field. The app stores only the link for now; uploading CV files to Supabase Storage can be added later using the same server-side storage pattern as project screenshots.
 
 ## Deployment Notes
 
@@ -261,8 +307,10 @@ UI/UX Pro Max Skill was used to guide spacing, hierarchy, responsiveness, access
 
 - Add delete/reorder controls for uploaded project screenshots
 - Add filters/search for public projects
-- Add AI-assisted project description generation in the admin form
+- Add filters/search for public courses
+- Add Supabase Storage CV upload support
 - Add AI tech-stack extraction from descriptions
+- Add an authenticated learning-provider integration if private course progress should sync automatically
 - Add stronger auth with a dedicated auth provider if multiple admins are needed
 - Add automated tests for data access, API auth, and form actions
 - Add deployment database migration workflow

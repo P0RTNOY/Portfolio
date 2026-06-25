@@ -91,6 +91,51 @@ const demoSiteSettings = {
   resumeUrl: null,
 };
 
+const demoCourses = [
+  {
+    title: "Example Certification Course",
+    slug: "example-certification-course",
+    provider: "Udemy",
+    courseUrl: "https://example.com/course",
+    imageUrl: null,
+    shortDescription:
+      "A placeholder course entry for testing the course layout and admin editing flow.",
+    fullDescription:
+      "This is minimal demo course content. Replace it from the admin dashboard with a real course when you are ready.",
+    skills: JSON.stringify(["Security", "Foundations", "Certification Prep"]),
+    instructor: "Instructor placeholder",
+    status: "completed",
+    progress: 100,
+    certificateUrl: null,
+    credentialUrl: null,
+    startedAt: null,
+    completedAt: null,
+    featured: true,
+    displayOrder: 1,
+  },
+  {
+    title: "Example In-Progress Course",
+    slug: "example-in-progress-course",
+    provider: "Learning Platform",
+    courseUrl: "https://example.com/in-progress-course",
+    imageUrl: null,
+    shortDescription:
+      "A placeholder course for showing in-progress learning with a progress bar.",
+    fullDescription:
+      "Use this demo item to verify progress display and editing before adding real learning records.",
+    skills: JSON.stringify(["Practice", "Labs", "Professional Growth"]),
+    instructor: null,
+    status: "in-progress",
+    progress: 45,
+    certificateUrl: null,
+    credentialUrl: null,
+    startedAt: null,
+    completedAt: null,
+    featured: false,
+    displayOrder: 2,
+  },
+];
+
 async function main() {
   await prisma.siteSettings.upsert({
     where: { id: demoSiteSettings.id },
@@ -103,6 +148,14 @@ async function main() {
       where: { slug: project.slug },
       update: project,
       create: project,
+    });
+  }
+
+  for (const course of demoCourses) {
+    await prisma.course.upsert({
+      where: { slug: course.slug },
+      update: course,
+      create: course,
     });
   }
 }

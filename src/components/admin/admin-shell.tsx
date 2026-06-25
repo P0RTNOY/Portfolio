@@ -15,6 +15,7 @@ type AdminShellProps = {
 const adminNavItems = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/projects", label: "Projects" },
+  { href: "/admin/courses", label: "Courses" },
   { href: "/admin/settings", label: "Site content" },
 ];
 
@@ -33,7 +34,7 @@ export function AdminShell({ children }: AdminShellProps) {
               Portfolio Admin
             </Link>
             <p className="hidden text-xs text-zinc-500 sm:block">
-              Manage project content and publishing state.
+              Manage portfolio content and publishing state.
             </p>
           </div>
           <div className="flex items-center gap-2">

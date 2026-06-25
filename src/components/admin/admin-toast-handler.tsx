@@ -24,9 +24,9 @@ export function AdminToastHandler() {
   if (!success) return null;
 
   let message = "Operation successful.";
-  if (success === "created") message = "Project created successfully.";
-  if (success === "updated") message = "Project updated successfully.";
-  if (success === "deleted") message = "Project deleted successfully.";
+  if (success === "created") message = "Entry created successfully.";
+  if (success === "updated") message = "Entry updated successfully.";
+  if (success === "deleted") message = "Entry deleted successfully.";
   if (success === "settings") message = "Site content updated successfully.";
 
   return <Toast message={message} onDismiss={handleDismiss} />;

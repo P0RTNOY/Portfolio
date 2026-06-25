@@ -2,6 +2,8 @@ import "server-only";
 
 import { getHuggingFaceSettings } from "@/lib/huggingface";
 import type { GithubRepoContext } from "@/lib/github-repo";
+import type { CourseUrlMetadata } from "@/lib/course-metadata";
+import { generateCourseUrlSuggestion } from "@/services/course-url-suggester";
 import { generateGithubProjectSuggestion } from "@/services/github-project-suggester";
 import {
   generateProjectDescriptionDraft,
@@ -26,4 +28,8 @@ export async function createProjectDescriptionSuggestion(
 
 export async function createGithubProjectSuggestion(repo: GithubRepoContext) {
   return generateGithubProjectSuggestion(repo);
+}
+
+export async function createCourseUrlSuggestion(metadata: CourseUrlMetadata) {
+  return generateCourseUrlSuggestion(metadata);
 }

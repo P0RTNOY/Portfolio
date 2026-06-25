@@ -35,6 +35,34 @@ model Project {
   @@map("projects")
 }
 
+model Course {
+  id               String   @id @default(cuid()) @db.Text
+  title            String   @db.Text
+  slug             String   @unique @db.Text
+  provider         String   @default("Udemy") @db.Text
+  courseUrl        String   @map("course_url") @db.Text
+  imageUrl         String?  @map("image_url") @db.Text
+  shortDescription String   @map("short_description") @db.Text
+  fullDescription  String   @default("") @map("full_description") @db.Text
+  skills           String   @default("[]") @db.Text
+  instructor       String?  @db.Text
+  status           String   @default("planned") @db.Text
+  progress         Int      @default(0)
+  certificateUrl   String?  @map("certificate_url") @db.Text
+  credentialUrl    String?  @map("credential_url") @db.Text
+  startedAt        DateTime? @map("started_at") @db.Date
+  completedAt      DateTime? @map("completed_at") @db.Date
+  featured         Boolean  @default(false)
+  displayOrder     Int      @default(0) @map("display_order")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([featured, displayOrder])
+  @@index([status])
+  @@index([createdAt])
+  @@map("courses")
+}
+
 model SiteSettings {
   id                String   @id @default("default") @db.Text
   siteName          String   @default("Portfolio") @map("site_name") @db.Text

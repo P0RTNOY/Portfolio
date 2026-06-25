@@ -1,5 +1,13 @@
-import { ArrowRight, Database, Layers, ShieldCheck } from "lucide-react";
+import {
+  ArrowRight,
+  Database,
+  Download,
+  GraduationCap,
+  Layers,
+  ShieldCheck,
+} from "lucide-react";
 
+import { CoursesGrid } from "@/components/courses/courses-grid";
 import { ProjectsGrid } from "@/components/projects/projects-grid";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
@@ -7,19 +15,24 @@ import { SectionHeading } from "@/components/site/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { listCourses } from "@/lib/courses";
 import { listProjects } from "@/lib/projects";
 import { getSiteSettings } from "@/lib/site-settings";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [projects, settings] = await Promise.all([
+  const [projects, courses, settings] = await Promise.all([
     listProjects(),
+    listCourses(),
     getSiteSettings(),
   ]);
   const featuredProjects = projects.filter((project) => project.featured);
   const homepageProjects =
     featuredProjects.length > 0 ? featuredProjects : projects.slice(0, 3);
+  const featuredCourses = courses.filter((course) => course.featured);
+  const homepageCourses =
+    featuredCourses.length > 0 ? featuredCourses : courses.slice(0, 3);
 
   return (
     <div className="min-h-dvh">
@@ -70,6 +83,11 @@ export default async function Home() {
                     icon: Layers,
                     title: "Reusable structure",
                     text: "The layout stays consistent as new content is added over time.",
+                  },
+                  {
+                    icon: GraduationCap,
+                    title: "Learning records",
+                    text: `${courses.length} course entries can show progress, certificates, and source links.`,
                   },
                 ].map((item) => (
                   <div
@@ -123,6 +141,55 @@ export default async function Home() {
                 Browse all projects
                 <ArrowRight aria-hidden="true" size={16} />
               </ButtonLink>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="courses"
+          className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8"
+        >
+          <SectionHeading
+            eyebrow="Courses"
+            title="Learning records."
+            description="Completed and in-progress courses can be managed from the dashboard and imported from public course pages."
+          />
+          <div className="mt-8">
+            <CoursesGrid courses={homepageCourses} />
+          </div>
+          <div className="mt-8">
+            <ButtonLink href="/courses" variant="secondary">
+              Browse all courses
+              <ArrowRight aria-hidden="true" size={16} />
+            </ButtonLink>
+          </div>
+        </section>
+
+        <section
+          id="cv"
+          className="border-y border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
+        >
+          <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_auto] lg:items-center lg:px-8">
+            <SectionHeading
+              eyebrow="CV"
+              title="Editable CV and resume link."
+              description="Add a resume or CV URL from the admin dashboard when you are ready to publish it."
+            />
+            <div className="flex flex-wrap gap-3 lg:justify-end">
+              {settings.resumeUrl ? (
+                <ButtonLink
+                  href={settings.resumeUrl}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  <Download aria-hidden="true" size={18} />
+                  Open CV
+                </ButtonLink>
+              ) : (
+                <ButtonLink href="/admin/settings" variant="secondary">
+                  Add CV URL
+                </ButtonLink>
+              )}
             </div>
           </div>
         </section>

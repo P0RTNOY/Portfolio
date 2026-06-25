@@ -1,9 +1,18 @@
 import type { Metadata } from "next";
-import { FolderKanban, Globe2, Plus, Star, Timer } from "lucide-react";
+import {
+  BookOpenCheck,
+  FolderKanban,
+  Globe2,
+  GraduationCap,
+  Plus,
+  Star,
+  Timer,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { listCourses } from "@/lib/courses";
 import { listProjects } from "@/lib/projects";
 
 export const metadata: Metadata = {
@@ -11,10 +20,13 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminPage() {
-  const projects = await listProjects();
+  const [projects, courses] = await Promise.all([listProjects(), listCourses()]);
   const featuredCount = projects.filter((project) => project.featured).length;
   const inProgressCount = projects.filter(
     (project) => project.status === "in-progress",
+  ).length;
+  const completedCourses = courses.filter(
+    (course) => course.status === "completed",
   ).length;
 
   const stats = [
@@ -22,6 +34,11 @@ export default async function AdminPage() {
       label: "Projects",
       value: projects.length,
       icon: FolderKanban,
+    },
+    {
+      label: "Courses",
+      value: courses.length,
+      icon: GraduationCap,
     },
     {
       label: "Featured",
@@ -32,6 +49,11 @@ export default async function AdminPage() {
       label: "In progress",
       value: inProgressCount,
       icon: Timer,
+    },
+    {
+      label: "Completed courses",
+      value: completedCourses,
+      icon: BookOpenCheck,
     },
   ];
 
@@ -46,7 +68,7 @@ export default async function AdminPage() {
             Admin dashboard
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-300">
-            Manage your portfolio projects, update content, and control what
+            Manage your portfolio projects, courses, site content, and what
             visitors see on your public site.
           </p>
         </div>
@@ -56,7 +78,7 @@ export default async function AdminPage() {
         </ButtonLink>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
         {stats.map((stat) => (
           <Card key={stat.label}>
             <CardContent className="flex items-center justify-between gap-4 p-5">
@@ -86,9 +108,17 @@ export default async function AdminPage() {
               <FolderKanban aria-hidden="true" size={16} />
               Manage projects
             </ButtonLink>
+            <ButtonLink href="/admin/courses" size="sm" variant="secondary">
+              <GraduationCap aria-hidden="true" size={16} />
+              Manage courses
+            </ButtonLink>
             <ButtonLink href="/admin/projects/new" size="sm" variant="secondary">
               <Plus aria-hidden="true" size={16} />
               Create project
+            </ButtonLink>
+            <ButtonLink href="/admin/courses/new" size="sm" variant="secondary">
+              <Plus aria-hidden="true" size={16} />
+              Add course
             </ButtonLink>
             <ButtonLink href="/admin/settings" size="sm" variant="secondary">
               <Globe2 aria-hidden="true" size={16} />
