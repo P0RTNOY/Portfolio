@@ -145,9 +145,13 @@ function parseAiSuggestion(text: string, metadata: CourseUrlMetadata) {
 }
 
 function buildCoursePrompt(metadata: CourseUrlMetadata) {
+  const hasSparseMetadata = !metadata.title && !metadata.description;
+
   return [
     "Convert this public course page metadata into editable fields for a portfolio course form.",
     "Use only the metadata provided. Do not invent personal completion status, grades, certificates, employment history, or claims about the student.",
+    "If metadata is sparse because a provider blocked crawling, infer conservative course fields from the URL and provider only.",
+    "Do not invent an instructor or image URL when not provided.",
     "The title should be concise and human-readable.",
     "The slug must be lowercase words separated by hyphens.",
     "The shortDescription must be 10-280 characters.",
@@ -160,6 +164,7 @@ function buildCoursePrompt(metadata: CourseUrlMetadata) {
     `Instructor: ${metadata.instructor ?? "Not provided"}`,
     `Description: ${metadata.description ?? "Not provided"}`,
     `Image URL: ${metadata.imageUrl ?? "Not provided"}`,
+    `Metadata quality: ${hasSparseMetadata ? "Sparse URL-only fallback" : "Fetched page metadata"}`,
   ].join("\n");
 }
 
@@ -198,4 +203,3 @@ export async function generateCourseUrlSuggestion(
     suggestion,
   };
 }
-

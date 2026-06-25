@@ -168,6 +168,40 @@ function getProviderFromUrl(url: URL) {
     ?.replace(/^\w/, (letter) => letter.toUpperCase()) ?? null;
 }
 
+function titleFromCourseUrl(url: URL) {
+  const pathParts = url.pathname
+    .split("/")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const rawSlug =
+    pathParts[pathParts[0] === "course" && pathParts.length > 1 ? 1 : pathParts.length - 1];
+
+  if (!rawSlug) {
+    return null;
+  }
+
+  return decodeURIComponent(rawSlug)
+    .replace(/securityplus/gi, "security plus")
+    .replace(/sy0[-_]?701/gi, "SY0-701")
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+export function getFallbackCourseUrlMetadata(courseUrl: string): CourseUrlMetadata {
+  const url = new URL(courseUrl);
+
+  return {
+    canonicalUrl: url.toString(),
+    description: null,
+    imageUrl: null,
+    instructor: null,
+    provider: getProviderFromUrl(url),
+    title: titleFromCourseUrl(url),
+  };
+}
+
 export async function getCourseUrlMetadata(
   courseUrl: string,
 ): Promise<CourseUrlMetadata> {

@@ -5,6 +5,7 @@ import { apiError, apiJson } from "@/lib/api/response";
 import { getAdminSessionFromRequest } from "@/lib/auth";
 import {
   CourseMetadataError,
+  getFallbackCourseUrlMetadata,
   getCourseUrlMetadata,
 } from "@/lib/course-metadata";
 import { createCourseUrlSuggestion } from "@/services/ai-project-assistant";
@@ -15,6 +16,10 @@ export const runtime = "nodejs";
 const courseUrlRequestSchema = z.object({
   courseUrl: z.string().trim().url("Enter a valid course URL.").max(800),
 });
+
+function canUseFallback(error: CourseMetadataError) {
+  return error.code === "COURSE_METADATA_FETCH_FAILED";
+}
 
 export async function POST(request: NextRequest) {
   const session = await getAdminSessionFromRequest(request);
@@ -46,6 +51,17 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     if (error instanceof CourseMetadataError) {
+      if (canUseFallback(error)) {
+        const metadata = getFallbackCourseUrlMetadata(parsed.data.courseUrl);
+        const result = await createCourseUrlSuggestion(metadata);
+
+        return apiJson({
+          aiWarning: `${error.message} Hugging Face used URL-only fallback suggestions. Review carefully before saving.`,
+          metadata,
+          suggestion: result.suggestion,
+        });
+      }
+
       return apiError(error.code, error.message, 400);
     }
 
@@ -57,4 +73,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
