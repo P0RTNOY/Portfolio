@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useActionState } from "react";
-import { Save } from "lucide-react";
+import { FileText, Loader2, Save, Upload } from "lucide-react";
 
 import type { SiteSettingsFormState } from "@/app/admin/(protected)/settings/actions";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,16 @@ const initialState: SiteSettingsFormState = {
   success: false,
 };
 
+type ResumeUploadResponse = {
+  error?: {
+    message?: string;
+  };
+  upload?: {
+    path: string;
+    url: string;
+  };
+};
+
 function FieldError({ errors }: { errors?: string[] }) {
   if (!errors || errors.length === 0) return null;
 
@@ -44,9 +54,76 @@ export function SiteSettingsForm({
   settings,
 }: SiteSettingsFormProps) {
   const [state, formAction, pending] = useActionState(action, initialState);
+  const [selectedResumeFile, setSelectedResumeFile] =
+    React.useState<File | null>(null);
+  const [uploadError, setUploadError] = React.useState<string | null>(null);
+  const [uploadMessage, setUploadMessage] = React.useState<string | null>(null);
+  const [uploadPending, setUploadPending] = React.useState(false);
+  const formRef = React.useRef<HTMLFormElement>(null);
+  const resumeInputRef = React.useRef<HTMLInputElement>(null);
+
+  function setResumeUrl(value: string) {
+    const field = formRef.current?.elements.namedItem("resumeUrl");
+
+    if (field instanceof HTMLInputElement) {
+      field.value = value;
+      field.dispatchEvent(new Event("input", { bubbles: true }));
+      field.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  }
+
+  async function handleUploadResume() {
+    setUploadError(null);
+    setUploadMessage(null);
+
+    if (!selectedResumeFile) {
+      setUploadError("Choose a PDF resume to upload.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", selectedResumeFile);
+    setUploadPending(true);
+
+    try {
+      const response = await fetch("/api/admin/uploads/resume", {
+        body: formData,
+        method: "POST",
+      });
+      const payload = (await response.json().catch(() => ({}))) as
+        | ResumeUploadResponse
+        | undefined;
+
+      if (!response.ok) {
+        setUploadError(
+          payload?.error?.message ?? "Resume could not be uploaded right now.",
+        );
+        return;
+      }
+
+      const url = payload?.upload?.url;
+
+      if (!url) {
+        setUploadError("Upload completed, but no resume URL was returned.");
+        return;
+      }
+
+      setResumeUrl(url);
+      setUploadMessage("Resume uploaded. Save site content to publish it.");
+      setSelectedResumeFile(null);
+
+      if (resumeInputRef.current) {
+        resumeInputRef.current.value = "";
+      }
+    } catch {
+      setUploadError("The resume upload request failed. Please try again.");
+    } finally {
+      setUploadPending(false);
+    }
+  }
 
   return (
-    <form action={formAction} className="space-y-8">
+    <form action={formAction} className="space-y-8" ref={formRef}>
       {state.error ? (
         <div
           className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200"
@@ -320,8 +397,77 @@ export function SiteSettingsForm({
             <FieldError errors={state.fieldErrors.linkedinUrl} />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 sm:col-span-3">
             <Label htmlFor="resumeUrl">Resume URL</Label>
+            <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-950/60">
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+                <label
+                  className="flex min-h-24 flex-1 cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-zinc-300 bg-white px-4 py-5 text-center transition-colors hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-950 dark:hover:border-zinc-600"
+                  htmlFor="resumeUpload"
+                >
+                  <FileText
+                    aria-hidden="true"
+                    className="mb-2 text-zinc-500 dark:text-zinc-400"
+                    size={24}
+                  />
+                  <span className="text-sm font-semibold text-zinc-950 dark:text-white">
+                    Choose PDF resume
+                  </span>
+                  <span className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                    PDF only. Max 4 MB.
+                  </span>
+                </label>
+                <input
+                  accept="application/pdf,.pdf"
+                  className="sr-only"
+                  id="resumeUpload"
+                  onChange={(event) =>
+                    setSelectedResumeFile(event.currentTarget.files?.[0] ?? null)
+                  }
+                  ref={resumeInputRef}
+                  type="file"
+                />
+                <Button
+                  aria-describedby="resume-upload-feedback"
+                  disabled={uploadPending || pending}
+                  onClick={handleUploadResume}
+                  type="button"
+                  variant="secondary"
+                >
+                  {uploadPending ? (
+                    <Loader2
+                      aria-hidden="true"
+                      className="animate-spin"
+                      size={16}
+                    />
+                  ) : (
+                    <Upload aria-hidden="true" size={16} />
+                  )}
+                  {uploadPending ? "Uploading..." : "Upload PDF"}
+                </Button>
+              </div>
+              <div
+                aria-live="polite"
+                className="mt-3"
+                id="resume-upload-feedback"
+              >
+                {selectedResumeFile ? (
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Selected: {selectedResumeFile.name}
+                  </p>
+                ) : null}
+                {uploadMessage ? (
+                  <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                    {uploadMessage}
+                  </p>
+                ) : null}
+                {uploadError ? (
+                  <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                    {uploadError}
+                  </p>
+                ) : null}
+              </div>
+            </div>
             <Input
               defaultValue={settings.resumeUrl ?? ""}
               id="resumeUrl"
@@ -329,6 +475,9 @@ export function SiteSettingsForm({
               placeholder="https://example.com/resume.pdf"
               type="url"
             />
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Uploading fills this URL. Save site content afterward to publish it.
+            </p>
             <FieldError errors={state.fieldErrors.resumeUrl} />
           </div>
         </div>

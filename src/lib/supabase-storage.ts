@@ -3,16 +3,18 @@ import "server-only";
 import { createClient } from "@supabase/supabase-js";
 
 const DEFAULT_PROJECT_IMAGES_BUCKET = "project-images";
+const DEFAULT_RESUME_BUCKET = "portfolio-documents";
 const PLACEHOLDER_SERVICE_ROLE_KEY = "your_supabase_service_role_key_here";
 const PLACEHOLDER_URL = "https://your-project-ref.supabase.co";
 
 type SupabaseStorageConfig = {
-  bucket: string;
+  projectImagesBucket: string;
+  resumeBucket: string;
   serviceRoleKey: string;
   url: string;
 };
 
-let projectImagesBucketReady = false;
+const readyBuckets = new Set<string>();
 
 export class SupabaseStorageError extends Error {
   constructor(
@@ -46,9 +48,11 @@ function getSupabaseStorageConfig(): SupabaseStorageConfig {
   }
 
   return {
-    bucket:
+    projectImagesBucket:
       process.env.SUPABASE_PROJECT_IMAGES_BUCKET?.trim() ||
       DEFAULT_PROJECT_IMAGES_BUCKET,
+    resumeBucket:
+      process.env.SUPABASE_RESUME_BUCKET?.trim() || DEFAULT_RESUME_BUCKET,
     serviceRoleKey,
     url,
   };
@@ -58,29 +62,33 @@ function getSupabaseStorageClient() {
   const config = getSupabaseStorageConfig();
 
   return {
-    bucket: config.bucket,
     client: createClient(config.url, config.serviceRoleKey, {
       auth: {
         persistSession: false,
       },
     }),
+    projectImagesBucket: config.projectImagesBucket,
+    resumeBucket: config.resumeBucket,
   };
 }
 
-async function ensureProjectImagesBucket() {
-  if (projectImagesBucketReady) {
-    return getSupabaseStorageClient();
+async function ensurePublicBucket(bucket: string) {
+  if (readyBuckets.has(bucket)) {
+    return {
+      bucket,
+      client: getSupabaseStorageClient().client,
+    };
   }
 
   const storage = getSupabaseStorageClient();
   const { data, error } = await storage.client.storage.getBucket(
-    storage.bucket,
+    bucket,
   );
 
   if (data && !error) {
     if (!data.public) {
       const { error: updateError } =
-        await storage.client.storage.updateBucket(storage.bucket, {
+        await storage.client.storage.updateBucket(bucket, {
           public: true,
         });
 
@@ -92,12 +100,15 @@ async function ensureProjectImagesBucket() {
       }
     }
 
-    projectImagesBucketReady = true;
-    return storage;
+    readyBuckets.add(bucket);
+    return {
+      bucket,
+      client: storage.client,
+    };
   }
 
   const { error: createError } = await storage.client.storage.createBucket(
-    storage.bucket,
+    bucket,
     {
       public: true,
     },
@@ -110,8 +121,21 @@ async function ensureProjectImagesBucket() {
     );
   }
 
-  projectImagesBucketReady = true;
-  return storage;
+  readyBuckets.add(bucket);
+  return {
+    bucket,
+    client: storage.client,
+  };
+}
+
+async function ensureProjectImagesBucket() {
+  const storage = getSupabaseStorageClient();
+  return ensurePublicBucket(storage.projectImagesBucket);
+}
+
+async function ensureResumeBucket() {
+  const storage = getSupabaseStorageClient();
+  return ensurePublicBucket(storage.resumeBucket);
 }
 
 export async function uploadProjectImage(file: File) {
@@ -129,6 +153,37 @@ export async function uploadProjectImage(file: File) {
     .upload(objectPath, buffer, {
       cacheControl: "31536000",
       contentType: file.type,
+      upsert: false,
+    });
+
+  if (error) {
+    throw new SupabaseStorageError(error.message, "SUPABASE_UPLOAD_FAILED");
+  }
+
+  const { data } = storage.client.storage
+    .from(storage.bucket)
+    .getPublicUrl(objectPath);
+
+  return {
+    path: objectPath,
+    url: data.publicUrl,
+  };
+}
+
+export async function uploadResumePdf(file: File) {
+  const storage = await ensureResumeBucket();
+  const objectPath = [
+    "resumes",
+    new Date().toISOString().slice(0, 10),
+    `resume-${crypto.randomUUID()}.pdf`,
+  ].join("/");
+  const buffer = Buffer.from(await file.arrayBuffer());
+
+  const { error } = await storage.client.storage
+    .from(storage.bucket)
+    .upload(objectPath, buffer, {
+      cacheControl: "3600",
+      contentType: "application/pdf",
       upsert: false,
     });
 

@@ -70,6 +70,7 @@ The project is intentionally generic. Seed data uses placeholder examples only, 
 - `POST /api/ai/github-project` - Admin-only GitHub repository project-field suggester
 - `POST /api/ai/course-url` - Admin-only course URL metadata importer and field suggester
 - `POST /api/admin/uploads/project-images` - Admin-only Supabase Storage project image upload
+- `POST /api/admin/uploads/resume` - Admin-only Supabase Storage resume PDF upload
 
 ## Environment Variables
 
@@ -97,6 +98,7 @@ GITHUB_TOKEN=""
 SUPABASE_URL="https://your-project-ref.supabase.co"
 SUPABASE_SERVICE_ROLE_KEY="your_supabase_service_role_key_here"
 SUPABASE_PROJECT_IMAGES_BUCKET="project-images"
+SUPABASE_RESUME_BUCKET="portfolio-documents"
 ```
 
 Change `ADMIN_PASSWORD` and `AUTH_SECRET` before any real deployment. `AUTH_SECRET` should be a long random string.
@@ -276,16 +278,19 @@ To disable AI features, leave `HF_TOKEN` or `HF_MODEL` empty. Never commit a rea
 
 The admin project form supports uploading screenshot images to Supabase Storage. Uploaded images are stored in the bucket configured by `SUPABASE_PROJECT_IMAGES_BUCKET`, defaulting to `project-images`.
 
+The admin site settings form supports uploading a resume/CV PDF. Uploaded PDFs are stored in the bucket configured by `SUPABASE_RESUME_BUCKET`, defaulting to `portfolio-documents`.
+
 - The upload API route is admin-protected.
 - The Supabase service role key is read server-side only.
 - The bucket is created or updated as public on first upload.
 - Uploaded public URLs are inserted into the project screenshots field.
 - If the thumbnail field is empty, the first uploaded image is used as the thumbnail.
-- The upload route limits files to 3.5 MB each and 4 MB total per request to stay below Vercel function payload limits.
+- Resume uploads fill the existing Resume URL field. Save site content afterward to publish the new CV link.
+- Project image uploads are limited to 3.5 MB each and 4 MB total per request. Resume PDF uploads are limited to 4 MB. These limits keep uploads below Vercel function payload limits.
 
 ## CV / Resume
 
-The public homepage includes a CV section. Add or update the resume/CV URL from `/admin/settings` using the existing `resumeUrl` field. The app stores only the link for now; uploading CV files to Supabase Storage can be added later using the same server-side storage pattern as project screenshots.
+The public homepage includes a CV section. Upload a PDF from `/admin/settings`, then save site content to publish the generated resume URL. You can also paste an external resume/CV URL manually into the existing `resumeUrl` field.
 
 ## Deployment Notes
 
@@ -308,7 +313,7 @@ UI/UX Pro Max Skill was used to guide spacing, hierarchy, responsiveness, access
 - Add delete/reorder controls for uploaded project screenshots
 - Add filters/search for public projects
 - Add filters/search for public courses
-- Add Supabase Storage CV upload support
+- Add delete/replace management for old uploaded CV files
 - Add AI tech-stack extraction from descriptions
 - Add an authenticated learning-provider integration if private course progress should sync automatically
 - Add stronger auth with a dedicated auth provider if multiple admins are needed
