@@ -492,7 +492,7 @@ Do not paste only "Who this course is for".`}
 
         <div className="grid gap-5 sm:grid-cols-3">
           <div className="space-y-2">
-            <Label htmlFor="status" required>
+            <Label htmlFor="status">
               Status
             </Label>
             <Select
@@ -510,33 +510,39 @@ Do not paste only "Who this course is for".`}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="progress" required>
+            <Label htmlFor="progress">
               Progress
             </Label>
             <Input
-              defaultValue={defaultValues?.progress ?? 0}
+              defaultValue={defaultValues?.progress ?? ""}
               id="progress"
               max={100}
               min={0}
               name="progress"
-              required
+              placeholder="Auto"
               type="number"
             />
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Optional. Blank saves as 100% for completed courses, otherwise 0%.
+            </p>
             <FieldError errors={state.fieldErrors.progress} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="displayOrder" required>
+            <Label htmlFor="displayOrder">
               Display Order
             </Label>
             <Input
-              defaultValue={defaultValues?.displayOrder ?? 0}
+              defaultValue={defaultValues?.displayOrder ?? ""}
               id="displayOrder"
               min={0}
               name="displayOrder"
-              required
+              placeholder="Auto"
               type="number"
             />
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Optional. Lower numbers appear first.
+            </p>
             <FieldError errors={state.fieldErrors.displayOrder} />
           </div>
         </div>

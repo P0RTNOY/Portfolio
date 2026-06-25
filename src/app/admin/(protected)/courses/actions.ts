@@ -35,7 +35,15 @@ function parseStringList(value: string): string[] {
     .filter(Boolean);
 }
 
+function optionalNumberValue(value: FormDataEntryValue | null) {
+  const normalized = value?.toString().trim();
+  return normalized ? Number(normalized) : undefined;
+}
+
 function formDataToCourseInput(formData: FormData) {
+  const status = (formData.get("status") as string) || "planned";
+  const progress = optionalNumberValue(formData.get("progress"));
+
   return {
     title: (formData.get("title") as string) || "",
     slug: (formData.get("slug") as string) || "",
@@ -46,14 +54,14 @@ function formDataToCourseInput(formData: FormData) {
     fullDescription: (formData.get("fullDescription") as string) || "",
     skills: parseStringList((formData.get("skills") as string) || ""),
     instructor: (formData.get("instructor") as string) || "",
-    status: (formData.get("status") as string) || "planned",
-    progress: Number(formData.get("progress") || 0),
+    status,
+    progress: progress ?? (status === "completed" ? 100 : 0),
     certificateUrl: (formData.get("certificateUrl") as string) || "",
     credentialUrl: (formData.get("credentialUrl") as string) || "",
     startedAt: (formData.get("startedAt") as string) || "",
     completedAt: (formData.get("completedAt") as string) || "",
     featured: formData.get("featured") === "on",
-    displayOrder: Number(formData.get("displayOrder") || 0),
+    displayOrder: optionalNumberValue(formData.get("displayOrder")) ?? 0,
   };
 }
 
@@ -215,4 +223,3 @@ export async function updateCourseStatusAction(
     };
   }
 }
-
