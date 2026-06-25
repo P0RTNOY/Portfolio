@@ -22,6 +22,54 @@ function canUseFallback(error: CourseMetadataError) {
   return error.code === "COURSE_METADATA_FETCH_FAILED";
 }
 
+function getPastedDetailsQualityError(value: string | undefined) {
+  const details = value?.trim();
+
+  if (!details) {
+    return "Udemy blocked metadata access. Paste the course title plus the real course description or what-you-will-learn text before importing.";
+  }
+
+  const normalized = details.toLowerCase();
+  const wordCount = details.split(/\s+/).filter(Boolean).length;
+  const hasSentence = /[.!?]/.test(details);
+  const hasLearningSignal =
+    /\b(learn|prepare|covers|understand|apply|build|master|exam|certification|description|what you'?ll learn|what you will learn|course includes)\b/i.test(
+      details,
+    );
+  const audienceOnly =
+    normalized.includes("who this course is for") &&
+    !hasSentence &&
+    !hasLearningSignal;
+
+  if (audienceOnly || wordCount < 35 || !hasLearningSignal) {
+    return "The pasted text does not include enough course content. Paste the Udemy title, instructor, description, and what-you-will-learn bullets. The audience list alone is not enough.";
+  }
+
+  return null;
+}
+
+function getCourseSuggestionWarning({
+  aiWarning,
+  metadataWarning,
+  pastedDetails,
+}: {
+  aiWarning?: string;
+  metadataWarning?: string;
+  pastedDetails?: string;
+}) {
+  if (pastedDetails) {
+    return metadataWarning
+      ? `${metadataWarning} Suggestions were generated from your pasted course details plus URL context. Review carefully before saving.`
+      : "Suggestions were generated from your pasted course details plus page metadata. Review carefully before saving.";
+  }
+
+  if (metadataWarning && aiWarning) {
+    return `${metadataWarning} AI note: ${aiWarning}`;
+  }
+
+  return metadataWarning ?? aiWarning;
+}
+
 export async function POST(request: NextRequest) {
   const session = await getAdminSessionFromRequest(request);
 
@@ -49,7 +97,10 @@ export async function POST(request: NextRequest) {
     );
 
     return apiJson({
-      aiWarning: result.aiWarning,
+      aiWarning: getCourseSuggestionWarning({
+        aiWarning: result.aiWarning,
+        pastedDetails: parsed.data.pastedDetails,
+      }),
       metadata,
       suggestion: result.suggestion,
     });
@@ -57,18 +108,27 @@ export async function POST(request: NextRequest) {
     if (error instanceof CourseMetadataError) {
       if (canUseFallback(error)) {
         const metadata = getFallbackCourseUrlMetadata(parsed.data.courseUrl);
+        const qualityError = getPastedDetailsQualityError(
+          parsed.data.pastedDetails,
+        );
+
+        if (qualityError) {
+          return apiError("COURSE_DETAILS_TOO_THIN", qualityError, 422, {
+            metadataBlocked: true,
+          });
+        }
+
         const result = await createCourseUrlSuggestion(
           metadata,
           parsed.data.pastedDetails,
         );
-        const warning = parsed.data.pastedDetails
-          ? `${error.message} Suggestions were generated from your pasted course details plus URL context. Review carefully before saving.`
-          : `${error.message} Hugging Face used URL-only fallback suggestions. Review carefully before saving.`;
 
         return apiJson({
-          aiWarning: result.aiWarning && !parsed.data.pastedDetails
-            ? `${warning} AI note: ${result.aiWarning}`
-            : warning,
+          aiWarning: getCourseSuggestionWarning({
+            aiWarning: result.aiWarning,
+            metadataWarning: error.message,
+            pastedDetails: parsed.data.pastedDetails,
+          }),
           metadata,
           suggestion: result.suggestion,
         });

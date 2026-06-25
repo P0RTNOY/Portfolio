@@ -298,7 +298,15 @@ export function CourseForm({
             id="coursePastedDetails"
             maxLength={12000}
             onChange={(event) => setPastedDetails(event.target.value)}
-            placeholder="Paste the Udemy course title, instructor, description, and what you'll learn text here. Include more than the audience list for best results."
+            placeholder={`Paste content like:
+CompTIA Security+ (SY0-701) Bootcamp
+Instructor: Jason Dion
+Description: Prepare for the Security+ exam with cybersecurity fundamentals...
+What you'll learn:
+- Threats, vulnerabilities, and mitigations
+- Network security and identity controls
+
+Do not paste only "Who this course is for".`}
             rows={6}
             value={pastedDetails}
           />
