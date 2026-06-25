@@ -62,11 +62,11 @@ export async function POST(request: NextRequest) {
           parsed.data.pastedDetails,
         );
         const warning = parsed.data.pastedDetails
-          ? `${error.message} Hugging Face used your pasted course details plus URL context. Review carefully before saving.`
+          ? `${error.message} Suggestions were generated from your pasted course details plus URL context. Review carefully before saving.`
           : `${error.message} Hugging Face used URL-only fallback suggestions. Review carefully before saving.`;
 
         return apiJson({
-          aiWarning: result.aiWarning
+          aiWarning: result.aiWarning && !parsed.data.pastedDetails
             ? `${warning} AI note: ${result.aiWarning}`
             : warning,
           metadata,

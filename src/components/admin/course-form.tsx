@@ -298,12 +298,12 @@ export function CourseForm({
             id="coursePastedDetails"
             maxLength={12000}
             onChange={(event) => setPastedDetails(event.target.value)}
-            placeholder="Paste the Udemy title, description, what you'll learn, requirements, instructor, or course overview here."
+            placeholder="Paste the Udemy course title, instructor, description, and what you'll learn text here. Include more than the audience list for best results."
             rows={6}
             value={pastedDetails}
           />
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Helpful for Udemy pages that block server-side metadata access. The pasted text is used only server-side for this suggestion request.
+            Helpful for Udemy pages that block server-side metadata access. The model uses this pasted text as the primary source for title, description, instructor, and skills.
           </p>
         </div>
 

@@ -43,6 +43,9 @@ type HuggingFaceError = {
 
 type HuggingFaceChatCompletion = {
   choices?: Array<{
+    delta?: {
+      content?: unknown;
+    };
     message?: {
       content?: unknown;
       reasoning?: unknown;
@@ -50,6 +53,11 @@ type HuggingFaceChatCompletion = {
     text?: unknown;
   }>;
   error?: unknown;
+  content?: unknown;
+  generated_text?: unknown;
+  output_text?: unknown;
+  response?: unknown;
+  text?: unknown;
 };
 
 function getToken() {
@@ -100,13 +108,28 @@ function extractTextContent(content: unknown): string | null {
   return null;
 }
 
-function extractGeneratedText(payload: unknown) {
+function extractGeneratedText(payload: unknown): string | null {
+  if (Array.isArray(payload)) {
+    for (const item of payload) {
+      const text = extractGeneratedText(item);
+      if (text) return text;
+    }
+
+    return null;
+  }
+
   if (payload && typeof payload === "object") {
     const completion = payload as HuggingFaceChatCompletion;
     const choice = completion.choices?.[0];
     return (
       extractTextContent(choice?.message?.content) ??
       extractTextContent(choice?.message?.reasoning) ??
+      extractTextContent(choice?.delta?.content) ??
+      extractTextContent(completion.generated_text) ??
+      extractTextContent(completion.output_text) ??
+      extractTextContent(completion.response) ??
+      extractTextContent(completion.content) ??
+      extractTextContent(completion.text) ??
       extractTextContent(choice?.text)
     );
   }

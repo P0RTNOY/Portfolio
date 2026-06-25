@@ -41,6 +41,14 @@ function truncate(value: string, maxLength: number) {
   return value.length > maxLength ? value.slice(0, maxLength).trim() : value;
 }
 
+function normalizeCourseTitle(value: string) {
+  const trimmed = value.trim();
+  const [beforeDash] = trimmed.split(/\s+-\s+/);
+  const title = beforeDash && beforeDash.length >= 8 ? beforeDash : trimmed;
+
+  return truncate(title.replace(/[.!?]+$/, ""), 120);
+}
+
 function cleanString(value: unknown, maxLength: number) {
   return typeof value === "string" && value.trim()
     ? truncate(value.trim(), maxLength)
@@ -57,6 +65,60 @@ function cleanStringArray(value: unknown, maxItems: number) {
     .map((item) => item.trim())
     .filter(Boolean)
     .slice(0, maxItems);
+}
+
+function normalizePastedDetails(value: string | undefined) {
+  return value?.trim().replace(/\r\n/g, "\n").slice(0, 12000);
+}
+
+function firstMeaningfulLine(text: string | undefined) {
+  if (!text) {
+    return null;
+  }
+
+  const ignoredPrefixes = [
+    "who this course is for",
+    "requirements",
+    "what you'll learn",
+    "what you will learn",
+    "description",
+    "course content",
+  ];
+
+  return (
+    text
+      .split("\n")
+      .map((line) => line.trim())
+      .find((line) => {
+        if (line.length < 8 || line.length > 180) {
+          return false;
+        }
+
+        const normalized = line.toLowerCase().replace(/:$/, "");
+        return !ignoredPrefixes.includes(normalized);
+      }) ?? null
+  );
+}
+
+function extractInstructorFromText(text: string | undefined) {
+  if (!text) {
+    return null;
+  }
+
+  const patterns = [
+    /(?:instructor|created by|taught by)\s*:?\s*([^\n.]+)/i,
+    /by\s+([A-Z][A-Za-z .'-]+)(?:\n|$)/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = text.match(pattern)?.[1]?.trim();
+
+    if (match && match.length <= 120) {
+      return match;
+    }
+  }
+
+  return null;
 }
 
 const skillPatterns: Array<[RegExp, string]> = [
@@ -104,7 +166,12 @@ function fallbackSuggestion(
   metadata: CourseUrlMetadata,
   pastedDetails?: string,
 ): CourseUrlSuggestion {
-  const title = metadata.title ?? "Imported Course";
+  const cleanedPastedDetails = normalizePastedDetails(pastedDetails);
+  const title = normalizeCourseTitle(
+    firstMeaningfulLine(cleanedPastedDetails) ??
+      metadata.title ??
+      "Imported Course",
+  );
   const description = fallbackDescription(metadata, pastedDetails);
 
   return {
@@ -113,12 +180,15 @@ function fallbackSuggestion(
     credentialUrl: null,
     fullDescription: description,
     imageUrl: metadata.imageUrl,
-    instructor: metadata.instructor,
+    instructor:
+      metadata.instructor ?? extractInstructorFromText(cleanedPastedDetails),
     progress: 0,
     provider: metadata.provider ?? "Learning Platform",
     shortDescription: truncate(description, 280),
     skills: inferSkillsFromText(
-      [metadata.title, metadata.description, pastedDetails].filter(Boolean).join("\n"),
+      [metadata.title, metadata.description, cleanedPastedDetails]
+        .filter(Boolean)
+        .join("\n"),
     ),
     slug: slugify(title),
     status: "planned",
@@ -144,16 +214,26 @@ function parseAiSuggestion(
       unknown
     >;
     const fallback = fallbackSuggestion(metadata, pastedDetails);
-    const title = cleanString(parsed.title, 180) ?? fallback.title;
+    const title = normalizeCourseTitle(
+      cleanString(parsed.title, 180) ?? fallback.title,
+    );
     const shortDescription =
       cleanString(parsed.shortDescription, 280) ?? fallback.shortDescription;
+    const parsedSkills = cleanStringArray(parsed.skills, 12);
+    const mergedSkills =
+      parsedSkills.length > 0
+        ? parsedSkills
+        : fallback.skills;
 
     return {
       ...fallback,
       fullDescription:
         cleanString(parsed.fullDescription, 5000) ?? fallback.fullDescription,
       shortDescription,
-      skills: cleanStringArray(parsed.skills, 12),
+      imageUrl: cleanString(parsed.imageUrl, 800) ?? fallback.imageUrl,
+      instructor: cleanString(parsed.instructor, 160) ?? fallback.instructor,
+      provider: cleanString(parsed.provider, 80) ?? fallback.provider,
+      skills: mergedSkills,
       slug: slugify(cleanString(parsed.slug, 180) ?? title),
       title,
     } satisfies CourseUrlSuggestion;
@@ -164,21 +244,23 @@ function parseAiSuggestion(
 
 function buildCoursePrompt(metadata: CourseUrlMetadata, pastedDetails?: string) {
   const hasSparseMetadata = !metadata.title && !metadata.description;
-  const cleanedPastedDetails = pastedDetails?.trim();
+  const cleanedPastedDetails = normalizePastedDetails(pastedDetails);
 
   return [
-    "Convert this public course page metadata into editable fields for a portfolio course form.",
-    "Use only the URL, metadata, and pasted course details provided. Do not invent personal completion status, grades, certificates, employment history, or claims about the student.",
-    "If metadata is sparse because a provider blocked crawling, infer conservative course fields from the URL and provider only.",
-    "Do not invent an instructor or image URL when not provided.",
-    "If pasted course details include a title, instructor, course description, topics, or what-you-will-learn bullets, use them as the strongest source.",
-    "The title should be concise and human-readable.",
-    "The slug must be lowercase words separated by hyphens.",
-    "The shortDescription must be 10-280 characters.",
-    "The fullDescription should summarize what the course covers in professional portfolio language.",
-    "Skills should be concise keywords derived from the course topic.",
-    "Return only a JSON object with these keys: title, slug, shortDescription, fullDescription, skills.",
-    "The skills value must be an array of strings.",
+    "You are an extraction engine for a portfolio admin form.",
+    "Task: read the supplied course URL, page metadata, and pasted course text, then return normalized course fields.",
+    "Use the pasted course text as the highest-priority source. Use metadata second. Use URL only as weak fallback.",
+    "Do not write marketing hype. Do not invent personal completion status, grades, certificates, jobs, employers, awards, or student claims.",
+    "Do not invent an instructor or image URL. Return null if not present.",
+    "Extract concrete technical skills/topics from the description and learning outcomes. Do not use audience labels such as Students, Graduates, IT Professionals, Military Personnel, or Government Employees as skills.",
+    "For this portfolio, titles should be specific, e.g. 'CompTIA Security+ (SY0-701) Bootcamp' instead of 'Security Plus' when the pasted text supports it.",
+    "shortDescription must be 120-220 characters and describe the course content.",
+    "fullDescription must be 2-4 professional sentences summarizing what the course covers.",
+    "slug must be lowercase words separated by hyphens.",
+    "Return ONLY valid JSON. No markdown. No commentary.",
+    "JSON shape:",
+    '{"title":"string","slug":"string","provider":"string","instructor":"string|null","imageUrl":"string|null","shortDescription":"string","fullDescription":"string","skills":["string"]}',
+    "Example skills style: ['CompTIA Security+', 'Cybersecurity', 'Network Security', 'Risk Management', 'Cryptography'].",
     "",
     `Course URL: ${metadata.canonicalUrl}`,
     `Title: ${metadata.title ?? "Not provided"}`,
@@ -206,11 +288,11 @@ export async function generateCourseUrlSuggestion(
   pastedDetails?: string,
 ): Promise<CourseUrlSuggestionResult> {
   const result = await generateHuggingFaceText({
-    maxNewTokens: 1100,
+    maxNewTokens: 1400,
     prompt: buildCoursePrompt(metadata, pastedDetails),
     systemPrompt:
-      "You convert public course metadata into grounded portfolio course form suggestions. Return only valid JSON.",
-    temperature: 0.35,
+      "You are a strict JSON extraction engine. Return only a single valid JSON object.",
+    temperature: 0.15,
   });
 
   if (!result.ok) {
