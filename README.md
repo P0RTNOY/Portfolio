@@ -23,7 +23,7 @@ The project is intentionally generic. Seed data uses placeholder examples only, 
 - Project detail pages by slug
 - Dynamic course listing with progress, credential links, and source links
 - Course detail pages by slug
-- Editable CV/resume link
+- Embedded CV/resume PDF preview and reader page
 - Admin login and logout
 - Protected admin dashboard
 - Project CRUD: create, read, update, delete
@@ -42,6 +42,7 @@ The project is intentionally generic. Seed data uses placeholder examples only, 
 - `/projects/[slug]` - Project detail page
 - `/courses` - All database-backed courses
 - `/courses/[slug]` - Course detail page
+- `/cv` - Embedded CV/resume reader
 
 ## Admin Routes
 
@@ -290,7 +291,7 @@ The admin site settings form supports uploading a resume/CV PDF. Uploaded PDFs a
 
 ## CV / Resume
 
-The public homepage includes a CV section. Upload a PDF from `/admin/settings`, then save site content to publish the generated resume URL. You can also paste an external resume/CV URL manually into the existing `resumeUrl` field.
+The public homepage includes an embedded CV preview section. Upload a PDF from `/admin/settings`, then save site content to publish the generated resume URL. The `/cv` route provides a larger in-site reader, and visitors can still open or download the PDF. You can also paste an external resume/CV URL manually into the existing `resumeUrl` field.
 
 ## Deployment Notes
 

@@ -2,6 +2,7 @@ import {
   ArrowRight,
   Database,
   Download,
+  Eye,
   GraduationCap,
   Layers,
   ShieldCheck,
@@ -11,6 +12,7 @@ import { CoursesGrid } from "@/components/courses/courses-grid";
 import { ProjectsGrid } from "@/components/projects/projects-grid";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
+import { ResumeViewer } from "@/components/site/resume-viewer";
 import { SectionHeading } from "@/components/site/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
@@ -169,28 +171,38 @@ export default async function Home() {
           id="cv"
           className="border-y border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
         >
-          <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_auto] lg:items-center lg:px-8">
-            <SectionHeading
-              eyebrow="CV"
-              title="Editable CV and resume link."
-              description="Add a resume or CV URL from the admin dashboard when you are ready to publish it."
-            />
-            <div className="flex flex-wrap gap-3 lg:justify-end">
-              {settings.resumeUrl ? (
-                <ButtonLink
-                  href={settings.resumeUrl}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  <Download aria-hidden="true" size={18} />
-                  Open CV
-                </ButtonLink>
-              ) : (
-                <ButtonLink href="/admin/settings" variant="secondary">
-                  Add CV URL
-                </ButtonLink>
-              )}
+          <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-start lg:px-8">
+            <div>
+              <SectionHeading
+                eyebrow="CV"
+                title="Embedded CV reader."
+                description="The latest uploaded PDF can be viewed directly here, with a larger in-site reader available for focused reading."
+              />
+              <div className="mt-8 flex flex-wrap gap-3">
+                {settings.resumeUrl ? (
+                  <>
+                    <ButtonLink href="/cv">
+                      <Eye aria-hidden="true" size={18} />
+                      Read CV
+                    </ButtonLink>
+                    <ButtonLink
+                      href={settings.resumeUrl}
+                      rel="noreferrer"
+                      target="_blank"
+                      variant="secondary"
+                    >
+                      <Download aria-hidden="true" size={18} />
+                      Download
+                    </ButtonLink>
+                  </>
+                ) : (
+                  <ButtonLink href="/admin/settings" variant="secondary">
+                    Add CV PDF
+                  </ButtonLink>
+                )}
+              </div>
             </div>
+            <ResumeViewer compact resumeUrl={settings.resumeUrl} />
           </div>
         </section>
 
