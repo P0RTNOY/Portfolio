@@ -143,6 +143,7 @@ export function CourseForm({
   const [courseUrl, setCourseUrl] = React.useState(
     defaultValues?.courseUrl ?? "",
   );
+  const [pastedDetails, setPastedDetails] = React.useState("");
   const [importError, setImportError] = React.useState<string | null>(null);
   const [importMessage, setImportMessage] = React.useState<string | null>(null);
   const [importPending, setImportPending] = React.useState(false);
@@ -168,7 +169,10 @@ export function CourseForm({
 
     try {
       const response = await fetch("/api/ai/course-url", {
-        body: JSON.stringify({ courseUrl: trimmedUrl }),
+        body: JSON.stringify({
+          courseUrl: trimmedUrl,
+          pastedDetails: pastedDetails.trim() || undefined,
+        }),
         headers: {
           "Content-Type": "application/json",
         },
@@ -267,7 +271,7 @@ export function CourseForm({
               value={courseUrl}
             />
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              Pulls public course metadata, then uses Hugging Face for editable field suggestions.
+              Paste a URL, and optionally paste the Udemy course description below for stronger suggestions.
             </p>
           </div>
           <Button
@@ -284,6 +288,23 @@ export function CourseForm({
             )}
             {importPending ? "Importing..." : "Import Course"}
           </Button>
+        </div>
+
+        <div className="mt-4 space-y-2">
+          <Label htmlFor="coursePastedDetails">
+            Course details / description
+          </Label>
+          <Textarea
+            id="coursePastedDetails"
+            maxLength={12000}
+            onChange={(event) => setPastedDetails(event.target.value)}
+            placeholder="Paste the Udemy title, description, what you'll learn, requirements, instructor, or course overview here."
+            rows={6}
+            value={pastedDetails}
+          />
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Helpful for Udemy pages that block server-side metadata access. The pasted text is used only server-side for this suggestion request.
+          </p>
         </div>
 
         <div aria-live="polite" className="mt-3" id="course-import-feedback">

@@ -30,6 +30,9 @@ export async function createGithubProjectSuggestion(repo: GithubRepoContext) {
   return generateGithubProjectSuggestion(repo);
 }
 
-export async function createCourseUrlSuggestion(metadata: CourseUrlMetadata) {
-  return generateCourseUrlSuggestion(metadata);
+export async function createCourseUrlSuggestion(
+  metadata: CourseUrlMetadata,
+  pastedDetails?: string,
+) {
+  return generateCourseUrlSuggestion(metadata, pastedDetails);
 }

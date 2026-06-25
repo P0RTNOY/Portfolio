@@ -45,7 +45,9 @@ type HuggingFaceChatCompletion = {
   choices?: Array<{
     message?: {
       content?: unknown;
+      reasoning?: unknown;
     };
+    text?: unknown;
   }>;
   error?: unknown;
 };
@@ -64,11 +66,49 @@ function getModel() {
   return process.env.HF_MODEL?.trim() || null;
 }
 
+function extractTextContent(content: unknown): string | null {
+  if (typeof content === "string") {
+    return content;
+  }
+
+  if (Array.isArray(content)) {
+    const parts = content
+      .map((item) => {
+        if (typeof item === "string") {
+          return item;
+        }
+
+        if (item && typeof item === "object") {
+          const record = item as Record<string, unknown>;
+          const text = record.text ?? record.content ?? record.value;
+          return typeof text === "string" ? text : "";
+        }
+
+        return "";
+      })
+      .filter(Boolean);
+
+    return parts.length > 0 ? parts.join("\n") : null;
+  }
+
+  if (content && typeof content === "object") {
+    const record = content as Record<string, unknown>;
+    const text = record.text ?? record.content ?? record.value;
+    return typeof text === "string" ? text : null;
+  }
+
+  return null;
+}
+
 function extractGeneratedText(payload: unknown) {
   if (payload && typeof payload === "object") {
     const completion = payload as HuggingFaceChatCompletion;
-    const content = completion.choices?.[0]?.message?.content;
-    return typeof content === "string" ? content : null;
+    const choice = completion.choices?.[0];
+    return (
+      extractTextContent(choice?.message?.content) ??
+      extractTextContent(choice?.message?.reasoning) ??
+      extractTextContent(choice?.text)
+    );
   }
 
   return null;

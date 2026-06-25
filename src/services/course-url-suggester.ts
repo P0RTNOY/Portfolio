@@ -26,36 +26,6 @@ type CourseUrlSuggestionResult = {
   suggestion: CourseUrlSuggestion;
 };
 
-const courseSuggestionResponseFormat = {
-  json_schema: {
-    name: "CourseUrlSuggestion",
-    schema: {
-      additionalProperties: false,
-      properties: {
-        fullDescription: { type: "string" },
-        shortDescription: { type: "string" },
-        skills: {
-          items: { type: "string" },
-          maxItems: 12,
-          type: "array",
-        },
-        slug: { type: "string" },
-        title: { type: "string" },
-      },
-      required: [
-        "fullDescription",
-        "shortDescription",
-        "skills",
-        "slug",
-        "title",
-      ],
-      type: "object",
-    },
-    strict: true,
-  },
-  type: "json_schema",
-};
-
 function slugify(value: string) {
   return (
     value
@@ -89,11 +59,53 @@ function cleanStringArray(value: unknown, maxItems: number) {
     .slice(0, maxItems);
 }
 
-function fallbackSuggestion(metadata: CourseUrlMetadata): CourseUrlSuggestion {
+const skillPatterns: Array<[RegExp, string]> = [
+  [/comptia security\+|security\+|sy0[-\s]?701/i, "CompTIA Security+"],
+  [/cybersecurity|information security/i, "Cybersecurity"],
+  [/network security|networking/i, "Network Security"],
+  [/risk management|risk/i, "Risk Management"],
+  [/identity|access management|iam/i, "Identity and Access Management"],
+  [/cryptography|encryption/i, "Cryptography"],
+  [/security operations|operations/i, "Security Operations"],
+  [/incident response|incident/i, "Incident Response"],
+  [/governance|compliance/i, "Governance and Compliance"],
+  [/threat|threat analysis/i, "Threat Analysis"],
+  [/vulnerability|vulnerabilities/i, "Vulnerability Management"],
+  [/certification|exam/i, "Certification Prep"],
+];
+
+function inferSkillsFromText(text: string | undefined) {
+  if (!text) {
+    return [];
+  }
+
+  return skillPatterns
+    .filter(([pattern]) => pattern.test(text))
+    .map(([, skill]) => skill)
+    .slice(0, 12);
+}
+
+function fallbackDescription(metadata: CourseUrlMetadata, pastedDetails?: string) {
+  if (metadata.description) {
+    return metadata.description;
+  }
+
+  const pastedDescription = pastedDetails?.slice(0, 5000).trim();
+
+  if (!pastedDescription) {
+    return "A course imported from a public course page. Review and personalize this description before publishing.";
+  }
+
+  const firstSentence = pastedDescription.match(/^.{80,280}?[.!?](?:\s|$)/)?.[0];
+  return firstSentence?.trim() || pastedDescription;
+}
+
+function fallbackSuggestion(
+  metadata: CourseUrlMetadata,
+  pastedDetails?: string,
+): CourseUrlSuggestion {
   const title = metadata.title ?? "Imported Course";
-  const description =
-    metadata.description ??
-    "A course imported from a public course page. Review and personalize this description before publishing.";
+  const description = fallbackDescription(metadata, pastedDetails);
 
   return {
     certificateUrl: null,
@@ -105,14 +117,20 @@ function fallbackSuggestion(metadata: CourseUrlMetadata): CourseUrlSuggestion {
     progress: 0,
     provider: metadata.provider ?? "Learning Platform",
     shortDescription: truncate(description, 280),
-    skills: [],
+    skills: inferSkillsFromText(
+      [metadata.title, metadata.description, pastedDetails].filter(Boolean).join("\n"),
+    ),
     slug: slugify(title),
     status: "planned",
     title,
   };
 }
 
-function parseAiSuggestion(text: string, metadata: CourseUrlMetadata) {
+function parseAiSuggestion(
+  text: string,
+  metadata: CourseUrlMetadata,
+  pastedDetails?: string,
+) {
   const jsonStart = text.indexOf("{");
   const jsonEnd = text.lastIndexOf("}");
 
@@ -125,7 +143,7 @@ function parseAiSuggestion(text: string, metadata: CourseUrlMetadata) {
       string,
       unknown
     >;
-    const fallback = fallbackSuggestion(metadata);
+    const fallback = fallbackSuggestion(metadata, pastedDetails);
     const title = cleanString(parsed.title, 180) ?? fallback.title;
     const shortDescription =
       cleanString(parsed.shortDescription, 280) ?? fallback.shortDescription;
@@ -144,19 +162,23 @@ function parseAiSuggestion(text: string, metadata: CourseUrlMetadata) {
   }
 }
 
-function buildCoursePrompt(metadata: CourseUrlMetadata) {
+function buildCoursePrompt(metadata: CourseUrlMetadata, pastedDetails?: string) {
   const hasSparseMetadata = !metadata.title && !metadata.description;
+  const cleanedPastedDetails = pastedDetails?.trim();
 
   return [
     "Convert this public course page metadata into editable fields for a portfolio course form.",
-    "Use only the metadata provided. Do not invent personal completion status, grades, certificates, employment history, or claims about the student.",
+    "Use only the URL, metadata, and pasted course details provided. Do not invent personal completion status, grades, certificates, employment history, or claims about the student.",
     "If metadata is sparse because a provider blocked crawling, infer conservative course fields from the URL and provider only.",
     "Do not invent an instructor or image URL when not provided.",
+    "If pasted course details include a title, instructor, course description, topics, or what-you-will-learn bullets, use them as the strongest source.",
     "The title should be concise and human-readable.",
     "The slug must be lowercase words separated by hyphens.",
     "The shortDescription must be 10-280 characters.",
     "The fullDescription should summarize what the course covers in professional portfolio language.",
     "Skills should be concise keywords derived from the course topic.",
+    "Return only a JSON object with these keys: title, slug, shortDescription, fullDescription, skills.",
+    "The skills value must be an array of strings.",
     "",
     `Course URL: ${metadata.canonicalUrl}`,
     `Title: ${metadata.title ?? "Not provided"}`,
@@ -164,17 +186,28 @@ function buildCoursePrompt(metadata: CourseUrlMetadata) {
     `Instructor: ${metadata.instructor ?? "Not provided"}`,
     `Description: ${metadata.description ?? "Not provided"}`,
     `Image URL: ${metadata.imageUrl ?? "Not provided"}`,
-    `Metadata quality: ${hasSparseMetadata ? "Sparse URL-only fallback" : "Fetched page metadata"}`,
+    `Metadata quality: ${
+      cleanedPastedDetails
+        ? "Pasted course details supplied by admin"
+        : hasSparseMetadata
+          ? "Sparse URL-only fallback"
+          : "Fetched page metadata"
+    }`,
+    "",
+    "Pasted course details:",
+    "```",
+    cleanedPastedDetails || "Not provided",
+    "```",
   ].join("\n");
 }
 
 export async function generateCourseUrlSuggestion(
   metadata: CourseUrlMetadata,
+  pastedDetails?: string,
 ): Promise<CourseUrlSuggestionResult> {
   const result = await generateHuggingFaceText({
-    maxNewTokens: 900,
-    prompt: buildCoursePrompt(metadata),
-    responseFormat: courseSuggestionResponseFormat,
+    maxNewTokens: 1100,
+    prompt: buildCoursePrompt(metadata, pastedDetails),
     systemPrompt:
       "You convert public course metadata into grounded portfolio course form suggestions. Return only valid JSON.",
     temperature: 0.35,
@@ -184,17 +217,17 @@ export async function generateCourseUrlSuggestion(
     return {
       aiWarning: result.error,
       ok: true,
-      suggestion: fallbackSuggestion(metadata),
+      suggestion: fallbackSuggestion(metadata, pastedDetails),
     };
   }
 
-  const suggestion = parseAiSuggestion(result.text, metadata);
+  const suggestion = parseAiSuggestion(result.text, metadata, pastedDetails);
 
   if (!suggestion) {
     return {
       aiWarning: "The AI response could not be converted into course fields.",
       ok: true,
-      suggestion: fallbackSuggestion(metadata),
+      suggestion: fallbackSuggestion(metadata, pastedDetails),
     };
   }
 
