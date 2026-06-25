@@ -59,6 +59,7 @@ The project is intentionally generic. Seed data uses placeholder examples only, 
 - `GET /api/ai/status` - Admin-only AI configuration status
 - `POST /api/ai/project-description` - Admin-only project description generator
 - `POST /api/ai/github-project` - Admin-only GitHub repository project-field suggester
+- `POST /api/admin/uploads/project-images` - Admin-only Supabase Storage project image upload
 
 ## Environment Variables
 
@@ -83,9 +84,13 @@ AUTH_SECRET="replace-with-a-long-random-secret"
 HF_TOKEN="your_huggingface_token_here"
 HF_MODEL="openai/gpt-oss-20b:fastest"
 GITHUB_TOKEN=""
+SUPABASE_URL="https://your-project-ref.supabase.co"
+SUPABASE_SERVICE_ROLE_KEY="your_supabase_service_role_key_here"
+SUPABASE_PROJECT_IMAGES_BUCKET="project-images"
 ```
 
 Change `ADMIN_PASSWORD` and `AUTH_SECRET` before any real deployment. `AUTH_SECRET` should be a long random string.
+`SUPABASE_SERVICE_ROLE_KEY` is used only by protected server-side upload routes and must never be exposed as a `NEXT_PUBLIC_` variable.
 
 ## Supabase Database Setup
 
@@ -225,6 +230,17 @@ The app includes a server-side-only Hugging Face foundation for future admin AI 
 
 To disable AI features, leave `HF_TOKEN` or `HF_MODEL` empty. Never commit a real Hugging Face token. `HF_MODEL` should point to a chat-completion-capable model available through Hugging Face Inference Providers, such as `openai/gpt-oss-20b:fastest`. `GITHUB_TOKEN` is optional for public repositories, but can be set server-side to increase GitHub API limits.
 
+## Supabase Storage Uploads
+
+The admin project form supports uploading screenshot images to Supabase Storage. Uploaded images are stored in the bucket configured by `SUPABASE_PROJECT_IMAGES_BUCKET`, defaulting to `project-images`.
+
+- The upload API route is admin-protected.
+- The Supabase service role key is read server-side only.
+- The bucket is created or updated as public on first upload.
+- Uploaded public URLs are inserted into the project screenshots field.
+- If the thumbnail field is empty, the first uploaded image is used as the thumbnail.
+- The upload route limits files to 3.5 MB each and 4 MB total per request to stay below Vercel function payload limits.
+
 ## Deployment Notes
 
 - Set all environment variables in the deployment provider.
@@ -243,7 +259,7 @@ UI/UX Pro Max Skill was used to guide spacing, hierarchy, responsiveness, access
 
 ## Future Improvements
 
-- Add admin project image upload instead of image URL only
+- Add delete/reorder controls for uploaded project screenshots
 - Add filters/search for public projects
 - Add AI-assisted project description generation in the admin form
 - Add AI tech-stack extraction from descriptions

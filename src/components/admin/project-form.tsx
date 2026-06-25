@@ -2,7 +2,15 @@
 
 import * as React from "react";
 import { useActionState } from "react";
-import { Check, GitBranch, Loader2, Save, Sparkles } from "lucide-react";
+import {
+  Check,
+  GitBranch,
+  ImagePlus,
+  Loader2,
+  Save,
+  Sparkles,
+  Upload,
+} from "lucide-react";
 
 import type { FormState } from "@/app/admin/(protected)/projects/actions";
 import { Button } from "@/components/ui/button";
@@ -61,6 +69,16 @@ type GithubProjectResponse = {
     readmeFound: boolean;
   };
   suggestion?: GithubProjectSuggestion;
+};
+
+type ImageUploadResponse = {
+  error?: {
+    message?: string;
+  };
+  uploads?: Array<{
+    path: string;
+    url: string;
+  }>;
 };
 
 const suggestionFieldLabels: Array<{
@@ -122,7 +140,23 @@ function setFormFieldValue(
   }
 }
 
-function suggestionValueToString(value: GithubProjectSuggestion[keyof GithubProjectSuggestion]) {
+function getFormFieldValue(form: HTMLFormElement, name: string) {
+  const field = form.elements.namedItem(name);
+
+  if (
+    field instanceof HTMLInputElement ||
+    field instanceof HTMLTextAreaElement ||
+    field instanceof HTMLSelectElement
+  ) {
+    return field.value;
+  }
+
+  return "";
+}
+
+function suggestionValueToString(
+  value: GithubProjectSuggestion[keyof GithubProjectSuggestion],
+) {
   if (Array.isArray(value)) {
     return value.join(", ");
   }
@@ -163,7 +197,14 @@ export function ProjectForm({
   );
   const [githubSuggestion, setGithubSuggestion] =
     React.useState<GithubProjectSuggestion | null>(null);
+  const [selectedImageFiles, setSelectedImageFiles] = React.useState<File[]>(
+    [],
+  );
+  const [uploadError, setUploadError] = React.useState<string | null>(null);
+  const [uploadMessage, setUploadMessage] = React.useState<string | null>(null);
+  const [uploadPending, setUploadPending] = React.useState(false);
   const formRef = React.useRef<HTMLFormElement>(null);
+  const imageInputRef = React.useRef<HTMLInputElement>(null);
 
   async function handleGenerateDescription() {
     const form = formRef.current;
@@ -293,8 +334,17 @@ export function ProjectForm({
       return;
     }
 
-    setFormFieldValue(form, name, suggestionValueToString(githubSuggestion[name]));
-    setGithubMessage(`${suggestionFieldLabels.find((field) => field.name === name)?.label ?? "Field"} applied.`);
+    setFormFieldValue(
+      form,
+      name,
+      suggestionValueToString(githubSuggestion[name]),
+    );
+    setGithubMessage(
+      `${
+        suggestionFieldLabels.find((field) => field.name === name)?.label ??
+        "Field"
+      } applied.`,
+    );
   }
 
   function applyAllGithubSuggestions() {
@@ -305,10 +355,90 @@ export function ProjectForm({
     }
 
     for (const { name } of suggestionFieldLabels) {
-      setFormFieldValue(form, name, suggestionValueToString(githubSuggestion[name]));
+      setFormFieldValue(
+        form,
+        name,
+        suggestionValueToString(githubSuggestion[name]),
+      );
     }
 
     setGithubMessage("All GitHub suggestions applied. Review before saving.");
+  }
+
+  function appendScreenshotUrls(urls: string[]) {
+    const form = formRef.current;
+
+    if (!form || urls.length === 0) {
+      return;
+    }
+
+    const existingScreenshots = parseStringList(
+      getFormFieldValue(form, "screenshots"),
+    );
+    const nextScreenshots = Array.from(
+      new Set([...existingScreenshots, ...urls]),
+    );
+
+    setFormFieldValue(form, "screenshots", nextScreenshots.join("\n"));
+
+    if (!getFormFieldValue(form, "imageUrl").trim()) {
+      setFormFieldValue(form, "imageUrl", urls[0]);
+    }
+  }
+
+  async function handleUploadProjectImages() {
+    setUploadError(null);
+    setUploadMessage(null);
+
+    if (selectedImageFiles.length === 0) {
+      setUploadError("Choose one or more images to upload.");
+      return;
+    }
+
+    const formData = new FormData();
+    for (const file of selectedImageFiles) {
+      formData.append("files", file);
+    }
+
+    setUploadPending(true);
+
+    try {
+      const response = await fetch("/api/admin/uploads/project-images", {
+        body: formData,
+        method: "POST",
+      });
+      const payload = (await response.json().catch(() => ({}))) as
+        | ImageUploadResponse
+        | undefined;
+
+      if (!response.ok) {
+        setUploadError(
+          payload?.error?.message ?? "Images could not be uploaded right now.",
+        );
+        return;
+      }
+
+      const urls = payload?.uploads?.map((upload) => upload.url) ?? [];
+
+      if (urls.length === 0) {
+        setUploadError("Upload completed, but no image URLs were returned.");
+        return;
+      }
+
+      appendScreenshotUrls(urls);
+      setUploadMessage(
+        `${urls.length} ${urls.length === 1 ? "image" : "images"} uploaded.`,
+      );
+      setSelectedImageFiles([]);
+
+      if (imageInputRef.current) {
+        imageInputRef.current.value = "";
+      }
+    } catch {
+      setUploadError("The image upload request failed. Please try again.");
+    } finally {
+      setUploadPending(false);
+    }
   }
 
   return (
@@ -589,6 +719,79 @@ export function ProjectForm({
 
         <div className="space-y-2">
           <Label htmlFor="screenshots">Screenshots / Gallery Images</Label>
+          <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-950/60">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+              <label
+                className="flex min-h-28 flex-1 cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-zinc-300 bg-white px-4 py-5 text-center transition-colors hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-950 dark:hover:border-zinc-600"
+                htmlFor="projectImageUploads"
+              >
+                <ImagePlus
+                  aria-hidden="true"
+                  className="mb-2 text-zinc-500 dark:text-zinc-400"
+                  size={24}
+                />
+                <span className="text-sm font-semibold text-zinc-950 dark:text-white">
+                  Choose images
+                </span>
+                <span className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                  PNG, JPG, WebP, GIF, or AVIF. Max 3.5 MB each.
+                </span>
+              </label>
+              <input
+                accept="image/avif,image/gif,image/jpeg,image/png,image/webp"
+                className="sr-only"
+                id="projectImageUploads"
+                multiple
+                onChange={(event) =>
+                  setSelectedImageFiles(
+                    Array.from(event.currentTarget.files ?? []),
+                  )
+                }
+                ref={imageInputRef}
+                type="file"
+              />
+              <Button
+                aria-describedby="image-upload-feedback"
+                disabled={uploadPending || pending}
+                onClick={handleUploadProjectImages}
+                type="button"
+                variant="secondary"
+              >
+                {uploadPending ? (
+                  <Loader2
+                    aria-hidden="true"
+                    className="animate-spin"
+                    size={16}
+                  />
+                ) : (
+                  <Upload aria-hidden="true" size={16} />
+                )}
+                {uploadPending ? "Uploading..." : "Upload"}
+              </Button>
+            </div>
+            <div
+              aria-live="polite"
+              className="mt-3 space-y-1"
+              id="image-upload-feedback"
+            >
+              {selectedImageFiles.length > 0 ? (
+                <p className="text-sm text-zinc-600 dark:text-zinc-300">
+                  {selectedImageFiles.length}{" "}
+                  {selectedImageFiles.length === 1 ? "file" : "files"} selected.
+                </p>
+              ) : null}
+              {uploadMessage ? (
+                <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                  {uploadMessage}
+                </p>
+              ) : null}
+              {uploadError ? (
+                <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                  {uploadError}
+                </p>
+              ) : null}
+            </div>
+          </div>
           <Textarea
             className="min-h-28"
             defaultValue={defaultValues?.screenshots?.join("\n") ?? ""}
