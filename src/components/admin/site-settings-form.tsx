@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useActionState } from "react";
-import { FileText, Loader2, Save, Upload } from "lucide-react";
+import { FileText, Loader2, Save, Sparkles, Upload } from "lucide-react";
 
 import type { SiteSettingsFormState } from "@/app/admin/(protected)/settings/actions";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,53 @@ type ResumeUploadResponse = {
   };
 };
 
+type CvSiteContentSuggestion = {
+  aboutSummary: string;
+  aboutTitle: string;
+  contactEmail: string | null;
+  contactSummary: string;
+  contactTitle: string;
+  githubUrl: string | null;
+  heroEyebrow: string;
+  heroIntro: string;
+  heroTitle: string;
+  linkedinUrl: string | null;
+  primaryCtaLabel: string;
+  secondaryCtaLabel: string;
+  siteName: string;
+  skills: string[];
+  skillsSummary: string;
+  skillsTitle: string;
+};
+
+type CvSiteContentResponse = {
+  aiWarning?: string;
+  error?: {
+    message?: string;
+  };
+  extractedCharacters?: number;
+  suggestion?: CvSiteContentSuggestion;
+};
+
+const cvSuggestionFields: Array<keyof CvSiteContentSuggestion> = [
+  "siteName",
+  "heroEyebrow",
+  "heroTitle",
+  "heroIntro",
+  "primaryCtaLabel",
+  "secondaryCtaLabel",
+  "aboutTitle",
+  "aboutSummary",
+  "skillsTitle",
+  "skillsSummary",
+  "skills",
+  "contactTitle",
+  "contactSummary",
+  "contactEmail",
+  "githubUrl",
+  "linkedinUrl",
+];
+
 function FieldError({ errors }: { errors?: string[] }) {
   if (!errors || errors.length === 0) return null;
 
@@ -59,16 +106,51 @@ export function SiteSettingsForm({
   const [uploadError, setUploadError] = React.useState<string | null>(null);
   const [uploadMessage, setUploadMessage] = React.useState<string | null>(null);
   const [uploadPending, setUploadPending] = React.useState(false);
+  const [cvAiError, setCvAiError] = React.useState<string | null>(null);
+  const [cvAiMessage, setCvAiMessage] = React.useState<string | null>(null);
+  const [cvAiPending, setCvAiPending] = React.useState(false);
   const formRef = React.useRef<HTMLFormElement>(null);
   const resumeInputRef = React.useRef<HTMLInputElement>(null);
 
-  function setResumeUrl(value: string) {
-    const field = formRef.current?.elements.namedItem("resumeUrl");
+  function setFormFieldValue(name: string, value: string) {
+    const field = formRef.current?.elements.namedItem(name);
 
-    if (field instanceof HTMLInputElement) {
+    if (
+      field instanceof HTMLInputElement ||
+      field instanceof HTMLTextAreaElement
+    ) {
       field.value = value;
       field.dispatchEvent(new Event("input", { bubbles: true }));
       field.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  }
+
+  function getFormFieldValue(name: string) {
+    const field = formRef.current?.elements.namedItem(name);
+
+    if (
+      field instanceof HTMLInputElement ||
+      field instanceof HTMLTextAreaElement
+    ) {
+      return field.value.trim();
+    }
+
+    return "";
+  }
+
+  function setResumeUrl(value: string) {
+    setFormFieldValue("resumeUrl", value);
+  }
+
+  function applyCvSuggestion(suggestion: CvSiteContentSuggestion) {
+    for (const field of cvSuggestionFields) {
+      const value = suggestion[field];
+
+      if (Array.isArray(value)) {
+        setFormFieldValue(field, value.join(", "));
+      } else if (typeof value === "string" && value.trim()) {
+        setFormFieldValue(field, value);
+      }
     }
   }
 
@@ -119,6 +201,60 @@ export function SiteSettingsForm({
       setUploadError("The resume upload request failed. Please try again.");
     } finally {
       setUploadPending(false);
+    }
+  }
+
+  async function handleGenerateFromCv() {
+    const resumeUrl = getFormFieldValue("resumeUrl");
+
+    setCvAiError(null);
+    setCvAiMessage(null);
+
+    if (!resumeUrl) {
+      setCvAiError("Upload a PDF resume or paste a resume URL first.");
+      return;
+    }
+
+    setCvAiPending(true);
+
+    try {
+      const response = await fetch("/api/ai/site-content-from-cv", {
+        body: JSON.stringify({ resumeUrl }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      });
+      const payload = (await response.json().catch(() => ({}))) as
+        | CvSiteContentResponse
+        | undefined;
+
+      if (!response.ok) {
+        setCvAiError(
+          payload?.error?.message ??
+            "Site content could not be generated from this resume.",
+        );
+        return;
+      }
+
+      if (!payload?.suggestion) {
+        setCvAiError("The AI response did not include usable site content.");
+        return;
+      }
+
+      applyCvSuggestion(payload.suggestion);
+      const characterCount = payload.extractedCharacters
+        ? `${payload.extractedCharacters.toLocaleString()} extracted characters`
+        : "the uploaded CV";
+      setCvAiMessage(
+        payload.aiWarning
+          ? `Fields filled from CV fallback. AI note: ${payload.aiWarning}`
+          : `Fields filled from ${characterCount}. Review and save site content to publish.`,
+      );
+    } catch {
+      setCvAiError("The CV generation request failed. Please try again.");
+    } finally {
+      setCvAiPending(false);
     }
   }
 
@@ -475,9 +611,41 @@ export function SiteSettingsForm({
               placeholder="https://example.com/resume.pdf"
               type="url"
             />
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              Uploading fills this URL. Save site content afterward to publish it.
-            </p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                Uploading fills this URL. Save site content afterward to publish it.
+              </p>
+              <Button
+                aria-describedby="cv-ai-feedback"
+                disabled={cvAiPending || pending}
+                onClick={handleGenerateFromCv}
+                type="button"
+                variant="secondary"
+              >
+                {cvAiPending ? (
+                  <Loader2
+                    aria-hidden="true"
+                    className="animate-spin"
+                    size={16}
+                  />
+                ) : (
+                  <Sparkles aria-hidden="true" size={16} />
+                )}
+                {cvAiPending ? "Reading CV..." : "Generate from CV"}
+              </Button>
+            </div>
+            <div aria-live="polite" id="cv-ai-feedback">
+              {cvAiMessage ? (
+                <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                  {cvAiMessage}
+                </p>
+              ) : null}
+              {cvAiError ? (
+                <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                  {cvAiError}
+                </p>
+              ) : null}
+            </div>
             <FieldError errors={state.fieldErrors.resumeUrl} />
           </div>
         </div>
