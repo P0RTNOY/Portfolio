@@ -35,6 +35,13 @@ The project is set up as a real portfolio product: homepage identity, learning t
 - Server-side validation and API error handling
 - Server-side Hugging Face project and course suggestion features
 
+## Featured Case Studies
+
+- `Personal Portfolio Platform` - the full-stack portfolio platform in this repository.
+- `AI Pictionary Game` - an early-stage AI game prototype using LLM-generated SVG clues.
+
+More project case studies will be added later.
+
 ## Public Routes
 
 - `/` - Portfolio homepage with hero, about, projects, courses, CV, skills, and contact sections
@@ -61,7 +68,7 @@ The project is set up as a real portfolio product: homepage identity, learning t
 - `GET /api/projects` - List projects
 - `GET /api/projects?featured=true` - List featured projects
 - `GET /api/projects?status=completed` - Filter by status
-- `GET /api/projects?slug=draft-full-stack-product-case-study` - Get by slug
+- `GET /api/projects?slug=personal-portfolio-platform` - Get by slug
 - `POST /api/projects` - Create project, admin only
 - `GET /api/projects/[id]` - Get project by id
 - `PUT /api/projects/[id]` - Update project, admin only

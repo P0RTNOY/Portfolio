@@ -2,60 +2,109 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const demoProjects = [
+const projectCaseStudies = [
   {
-    title: "Draft Full-Stack Product Case Study",
-    slug: "draft-full-stack-product-case-study",
-    shortDescription: "Demo project content for testing the case study layout.",
+    title: "Personal Portfolio Platform",
+    slug: "personal-portfolio-platform",
+    shortDescription:
+      "A full-stack, database-backed personal portfolio platform with project/course CRUD, admin content management, CV support, Supabase storage, and AI-assisted content tooling.",
     fullDescription:
-      "This is demo content for local layout testing. Replace it from the admin dashboard with a real project when you are ready.",
-    techStack: JSON.stringify(["Next.js", "TypeScript", "Tailwind CSS"]),
-    githubUrl: null,
-    liveUrl: null,
-    status: "planned",
-    featured: false,
-    role: "Role to be added",
-    highlights: JSON.stringify([
-      "Reusable interface structure",
-      "Responsive project presentation",
+      "This portfolio is built as a real full-stack product rather than a static collection of hardcoded cards.\n\nThe goal was to create a system that can grow with my work: public project and course pages are backed by Supabase Postgres, content is managed from a protected admin dashboard, CV uploads are handled through Supabase Storage, and server-side AI helper infrastructure supports content workflows without exposing secrets to the frontend.\n\nThe project is ongoing. It gives me a place to present real case studies while also showing how I think about product structure, content modeling, validation, admin workflows, and clean public presentation. As I add more projects, the platform is designed to support richer case studies with architecture notes, screenshots, links, technical challenges, and lessons learned.",
+    techStack: JSON.stringify([
+      "Next.js",
+      "React",
+      "TypeScript",
+      "Tailwind CSS",
+      "Prisma",
+      "Supabase",
+      "PostgreSQL",
+      "Zod",
+      "Hugging Face",
+      "Vercel-ready architecture",
     ]),
-    problemSolved: "Problem statement to be added with the real case study.",
-    technicalChallenges: "Technical notes to be added with the real case study.",
+    githubUrl: "https://github.com/P0RTNOY/Portfolio",
+    liveUrl: null,
+    imageUrl: null,
+    screenshots: JSON.stringify([]),
+    status: "in-progress",
+    featured: true,
+    role: "Full-stack developer",
+    highlights: JSON.stringify([
+      "Database-backed public portfolio",
+      "Protected admin dashboard",
+      "Project CRUD",
+      "Course CRUD",
+      "Editable site settings",
+      "CV/resume support",
+      "Supabase Storage uploads",
+      "Server-side AI assistant foundation",
+      "Responsive and accessible UI",
+    ]),
+    problemSolved:
+      "I did not want a static hardcoded portfolio. I wanted a portfolio that behaves like a real product: database-backed, editable from an admin dashboard, structured around projects, courses, CV, and flexible enough to grow with my work.",
+    technicalChallenges:
+      "Key challenges included designing reusable project and course content models, building protected admin flows, integrating Supabase Postgres through Prisma, handling Supabase Storage uploads for project images and CV files, keeping public pages clean while content remains database-driven, adding AI-assisted admin tooling without exposing secrets to the frontend, and replacing the original generic platform tone with a personal portfolio identity.",
     displayOrder: 1,
   },
   {
-    title: "Draft Backend API Case Study",
-    slug: "draft-backend-api-case-study",
-    shortDescription: "Demo backend/API entry for checking portfolio layout states.",
+    title: "AI Pictionary Game",
+    slug: "ai-pictionary-game",
+    shortDescription:
+      "A turn-based AI guessing game where one player writes a prompt, AI models generate SVG drawings, and the other player tries to guess the original prompt.",
     fullDescription:
-      "Use this demo item to verify list, detail, and admin editing flows before adding real portfolio work.",
-    techStack: JSON.stringify(["Node.js", "Prisma", "PostgreSQL"]),
-    githubUrl: null,
+      "AI Pictionary Game is an early-stage prototype for a playful AI product: one player writes a funny or unusual situation, multiple AI artist tiers generate SVG clues, and the other player tries to guess the original prompt.\n\nThe project explores a game loop where model imperfections become part of the fun. Instead of treating messy AI output as a failure, the concept turns recognizable-but-imperfect SVG drawings into the core guessing mechanic. The backend can use OpenRouter for real model calls, while local development falls back to deterministic mock artists so the flow remains testable without API keys.\n\nThe current implementation includes a FastAPI backend for creating rounds, polling generated sketches, and scoring guesses, plus an Expo React Native mobile app for the create/wait/guess/result loop. It is intentionally a prototype: the core flow, SVG generation pipeline, sanitizer, local scoring fallback, and mobile interface are present, while a production multiplayer account system and persistent database can be added later.",
+    techStack: JSON.stringify([
+      "Python",
+      "FastAPI",
+      "Pydantic",
+      "OpenRouter",
+      "LLMs",
+      "SVG generation",
+      "defusedxml",
+      "Expo",
+      "React Native",
+      "TypeScript",
+      "react-native-svg",
+      "pytest",
+    ]),
+    githubUrl: "https://github.com/P0RTNOY/AI-Pictionary-Game",
     liveUrl: null,
+    imageUrl: null,
+    screenshots: JSON.stringify([]),
     status: "in-progress",
-    featured: false,
-    role: "Role to be added",
-    highlights: JSON.stringify(["Typed data model", "Validation-ready fields"]),
-    problemSolved: "Problem statement to be added with the real case study.",
-    technicalChallenges: null,
+    featured: true,
+    role: "Product concept creator and prototype developer",
+    highlights: JSON.stringify([
+      "Creative AI product concept",
+      "Multi-model SVG generation idea",
+      "Turn-based guessing game mechanic",
+      "Asynchronous two-player flow",
+      "Prompt-to-SVG gameplay",
+      "OpenRouter-backed model experiments",
+      "SVG sanitization for untrusted AI output",
+      "Practical exploration of LLM limitations",
+      "Strong product and game-design angle",
+    ]),
+    problemSolved:
+      "Most AI demos are simple chat interfaces. This project explores a more playful product idea: using LLMs as visual generators inside a multiplayer guessing game. The goal is to turn model limitations and imperfect SVG generation into part of the gameplay.",
+    technicalChallenges:
+      "The visible implementation focuses on generating clean SVG-only responses from LLMs, creating prompts that produce recognizable drawings, comparing low/mid/high artist model outputs, designing an asynchronous turn-based create/wait/guess/result flow, preventing the original prompt from being revealed during guessing, making the game fun even when AI output is imperfect, sanitizing untrusted SVG before rendering, and structuring rounds, prompts, guesses, and generated drawings cleanly in the backend and mobile app.",
     displayOrder: 2,
   },
+];
+
+const demoProjectFilters = [
+  { slug: "example-web-app", title: "Example Web App" },
+  { slug: "example-api-project", title: "Example API Project" },
+  { slug: "example-automation-tool", title: "Example Automation Tool" },
   {
-    title: "Draft Automation Workflow Case Study",
+    slug: "draft-full-stack-product-case-study",
+    title: "Draft Full-Stack Product Case Study",
+  },
+  { slug: "draft-backend-api-case-study", title: "Draft Backend API Case Study" },
+  {
     slug: "draft-automation-workflow-case-study",
-    shortDescription: "Demo automation entry for testing planned project states.",
-    fullDescription:
-      "This draft entry can be deleted or edited from the admin dashboard later.",
-    techStack: JSON.stringify(["TypeScript", "Scripts", "Integrations"]),
-    githubUrl: null,
-    liveUrl: null,
-    status: "planned",
-    featured: false,
-    role: "Role to be added",
-    highlights: JSON.stringify(["Workflow concept", "Integration notes to add"]),
-    problemSolved: null,
-    technicalChallenges: null,
-    displayOrder: 3,
+    title: "Draft Automation Workflow Case Study",
   },
 ];
 
@@ -154,11 +203,7 @@ const demoCourses = [
 async function main() {
   await prisma.project.deleteMany({
     where: {
-      OR: [
-        { slug: "example-web-app", title: "Example Web App" },
-        { slug: "example-api-project", title: "Example API Project" },
-        { slug: "example-automation-tool", title: "Example Automation Tool" },
-      ],
+      OR: demoProjectFilters,
     },
   });
 
@@ -183,7 +228,7 @@ async function main() {
     create: demoSiteSettings,
   });
 
-  for (const project of demoProjects) {
+  for (const project of projectCaseStudies) {
     await prisma.project.upsert({
       where: { slug: project.slug },
       update: project,

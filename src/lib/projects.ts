@@ -25,6 +25,27 @@ type ProjectListOptions = {
   status?: ProjectStatus;
 };
 
+const legacyDemoProjectFilters = [
+  { slug: "example-web-app", title: "Example Web App" },
+  { slug: "example-api-project", title: "Example API Project" },
+  { slug: "example-automation-tool", title: "Example Automation Tool" },
+  {
+    slug: "draft-full-stack-product-case-study",
+    title: "Draft Full-Stack Product Case Study",
+  },
+  { slug: "draft-backend-api-case-study", title: "Draft Backend API Case Study" },
+  {
+    slug: "draft-automation-workflow-case-study",
+    title: "Draft Automation Workflow Case Study",
+  },
+];
+
+function isLegacyDemoProject(project: PrismaProject) {
+  return legacyDemoProjectFilters.some(
+    (filter) => filter.slug === project.slug && filter.title === project.title,
+  );
+}
+
 function parseStringArray(value: string | null): string[] {
   if (!value) {
     return [];
@@ -49,62 +70,13 @@ function cleanOptionalString(value: string | null | undefined) {
 }
 
 function toProject(project: PrismaProject): Project {
-  const normalizedProject: Project = {
+  return {
     ...project,
     highlights: parseStringArray(project.highlights),
     screenshots: parseStringArray(project.screenshots),
     status: projectStatusSchema.catch("planned").parse(project.status),
     techStack: parseStringArray(project.techStack),
   };
-
-  if (project.slug === "example-web-app" && project.title === "Example Web App") {
-    return {
-      ...normalizedProject,
-      title: "Draft Full-Stack Product Case Study",
-      shortDescription: "Demo project content for testing the case study layout.",
-      fullDescription:
-        "This is demo content for local layout testing. Replace it from the admin dashboard with a real project when you are ready.",
-      githubUrl: null,
-      liveUrl: null,
-      status: "planned",
-      featured: false,
-      role: "Role to be added",
-      problemSolved: "Problem statement to be added with the real case study.",
-      technicalChallenges: "Technical notes to be added with the real case study.",
-    };
-  }
-
-  if (
-    project.slug === "example-api-project" &&
-    project.title === "Example API Project"
-  ) {
-    return {
-      ...normalizedProject,
-      title: "Draft Backend API Case Study",
-      shortDescription: "Demo backend/API entry for checking portfolio layout states.",
-      githubUrl: null,
-      role: "Role to be added",
-      problemSolved: "Problem statement to be added with the real case study.",
-    };
-  }
-
-  if (
-    project.slug === "example-automation-tool" &&
-    project.title === "Example Automation Tool"
-  ) {
-    return {
-      ...normalizedProject,
-      title: "Draft Automation Workflow Case Study",
-      shortDescription: "Demo automation entry for testing planned project states.",
-      fullDescription:
-        "This draft entry can be deleted or edited from the admin dashboard later.",
-      githubUrl: null,
-      role: "Role to be added",
-      highlights: ["Workflow concept", "Integration notes to add"],
-    };
-  }
-
-  return normalizedProject;
 }
 
 function toProjectCreateData(input: ProjectCreateInput): Prisma.ProjectCreateInput {
@@ -159,19 +131,19 @@ export async function listProjects(options: ProjectListOptions = {}) {
     orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
   });
 
-  return projects.map(toProject);
+  return projects.filter((project) => !isLegacyDemoProject(project)).map(toProject);
 }
 
 export async function getProjectById(id: string) {
   const prisma = getPrisma();
   const project = await prisma.project.findUnique({ where: { id } });
-  return project ? toProject(project) : null;
+  return project && !isLegacyDemoProject(project) ? toProject(project) : null;
 }
 
 export async function getProjectBySlug(slug: string) {
   const prisma = getPrisma();
   const project = await prisma.project.findUnique({ where: { slug } });
-  return project ? toProject(project) : null;
+  return project && !isLegacyDemoProject(project) ? toProject(project) : null;
 }
 
 export async function createProject(input: ProjectCreateInput) {
