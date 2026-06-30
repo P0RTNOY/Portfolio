@@ -1,8 +1,8 @@
-# Generic Portfolio Platform
+# Omer Portnoy Portfolio
 
-A modern, reusable personal portfolio system built with Next.js. Public project and course pages are database-backed, and content can be managed from a protected admin dashboard instead of being hardcoded into the site.
+Personal portfolio platform for Omer Portnoy, a software engineer building AI-powered products, automation tools, and full-stack systems. Public project and course pages are database-backed, and content can be managed from a protected admin dashboard instead of being hardcoded into the site.
 
-The project is intentionally generic. Seed data uses placeholder examples only, so real projects, work history, and personal background can be added later from the admin area.
+The project is set up as a real portfolio product: homepage identity, learning timeline, CV support, project case-study infrastructure, admin content management, and AI-assisted tooling. Real project case studies can be added later from the admin area.
 
 ## Tech Stack
 
@@ -28,7 +28,7 @@ The project is intentionally generic. Seed data uses placeholder examples only, 
 - Protected admin dashboard
 - Project CRUD: create, read, update, delete
 - Course CRUD: create, read, update, delete
-- Editable homepage/site content
+- Customizable homepage/site content personalized for Omer Portnoy
 - Featured project toggle
 - Project status editing
 - Admin success toasts and confirmation dialog for deletes
@@ -61,7 +61,7 @@ The project is intentionally generic. Seed data uses placeholder examples only, 
 - `GET /api/projects` - List projects
 - `GET /api/projects?featured=true` - List featured projects
 - `GET /api/projects?status=completed` - Filter by status
-- `GET /api/projects?slug=example-web-app` - Get by slug
+- `GET /api/projects?slug=draft-full-stack-product-case-study` - Get by slug
 - `POST /api/projects` - Create project, admin only
 - `GET /api/projects/[id]` - Get project by id
 - `PUT /api/projects/[id]` - Update project, admin only
@@ -123,7 +123,7 @@ npm run prisma:generate
 npm run db:migrate
 ```
 
-Seed minimal placeholder projects:
+Seed demo project and learning records:
 
 ```bash
 npm run db:seed
@@ -185,7 +185,7 @@ npm run start
 5. Manage courses at `/admin/courses`.
 6. Use logout from the admin shell when finished.
 
-Production guardrails reject placeholder credentials, so update `ADMIN_PASSWORD` and `AUTH_SECRET` before deployment.
+Production guardrails reject default credentials, so update `ADMIN_PASSWORD` and `AUTH_SECRET` before deployment.
 
 ## Project Model
 
@@ -244,7 +244,7 @@ Courses include:
 
 The homepage content is stored in a singleton `site_settings` row and can be edited at `/admin/settings`.
 
-Editable fields include:
+Customizable fields include:
 
 - Site name
 - Hero eyebrow, headline, intro, and CTA labels
@@ -252,7 +252,7 @@ Editable fields include:
 - Skills title, summary, and comma-separated skill list
 - Contact title, summary, email, GitHub URL, LinkedIn URL, and resume URL
 
-Seed data remains generic placeholder content.
+Seed data starts with Omer Portnoy's portfolio identity plus clearly labeled draft/demo project and learning records for local layout testing.
 
 ## Hugging Face AI Foundation
 
@@ -297,7 +297,7 @@ The public homepage includes an embedded CV preview section. Upload a PDF from `
 
 - Set all environment variables in the deployment provider.
 - Use a production-safe `AUTH_SECRET`.
-- Replace the placeholder admin password.
+- Replace the default admin password.
 - Supabase Postgres is now the expected production database.
 - Run `npm run build` before deployment.
 - Run `npm run db:migrate` against the deployment database before starting the production app.

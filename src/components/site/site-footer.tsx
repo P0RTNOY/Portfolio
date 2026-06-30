@@ -4,7 +4,7 @@ type SiteFooterProps = {
   siteName?: string;
 };
 
-export function SiteFooter({ siteName = "Generic Portfolio" }: SiteFooterProps) {
+export function SiteFooter({ siteName = "Omer Portnoy" }: SiteFooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (

@@ -48,11 +48,46 @@ function cleanOptionalDate(value: string | null | undefined) {
 }
 
 function toCourse(course: PrismaCourse): Course {
-  return {
+  const normalizedCourse: Course = {
     ...course,
     skills: parseStringArray(course.skills),
     status: courseStatusSchema.catch("planned").parse(course.status),
   };
+
+  if (
+    course.slug === "example-certification-course" &&
+    course.title === "Example Certification Course"
+  ) {
+    return {
+      ...normalizedCourse,
+      title: "Draft Certification Learning Record",
+      provider: "Learning Platform",
+      courseUrl: "https://github.com/P0RTNOY",
+      shortDescription:
+        "Demo learning record for testing the course layout and admin editing flow.",
+      fullDescription:
+        "This is demo course content. Replace it from the admin dashboard with a real course or certification when you are ready.",
+      instructor: null,
+      status: "planned",
+      progress: 0,
+      featured: false,
+    };
+  }
+
+  if (
+    course.slug === "example-in-progress-course" &&
+    course.title === "Example In-Progress Course"
+  ) {
+    return {
+      ...normalizedCourse,
+      title: "Draft In-Progress Learning Record",
+      courseUrl: "https://github.com/P0RTNOY",
+      shortDescription:
+        "Demo learning record for showing in-progress learning with a progress bar.",
+    };
+  }
+
+  return normalizedCourse;
 }
 
 function toCourseCreateData(input: CourseCreateInput): Prisma.CourseCreateInput {
@@ -153,4 +188,3 @@ export async function deleteCourse(id: string) {
   const prisma = getPrisma();
   await prisma.course.delete({ where: { id } });
 }
-

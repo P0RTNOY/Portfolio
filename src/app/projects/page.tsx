@@ -10,8 +10,9 @@ import { getSiteSettings } from "@/lib/site-settings";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Projects | Generic Portfolio",
-  description: "Browse database-backed portfolio projects.",
+  title: "Projects | Omer Portnoy",
+  description:
+    "Project case studies for Omer Portnoy's AI, automation, and full-stack software work.",
 };
 
 export default async function ProjectsPage() {
@@ -30,8 +31,8 @@ export default async function ProjectsPage() {
         <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
           <SectionHeading
             eyebrow="Projects"
-            title="Database-backed project library."
-            description="These entries come from Supabase Postgres and can be edited from the admin dashboard."
+            title="Project case studies."
+            description="This library is designed for real project writeups with context, architecture, links, screenshots, and lessons learned."
           />
           <div className="mt-8 flex flex-wrap gap-3">
             <Badge>{projects.length} total</Badge>

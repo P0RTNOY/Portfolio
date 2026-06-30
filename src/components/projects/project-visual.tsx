@@ -29,7 +29,7 @@ export function ProjectVisual({ imageUrl, title, className }: ProjectVisualProps
 
   return (
     <div
-      aria-label={`${title} placeholder thumbnail`}
+      aria-label={`${title} project thumbnail`}
       className={cn(
         "relative flex aspect-[16/10] items-center justify-center overflow-hidden rounded-md border border-zinc-200 bg-zinc-950 text-white dark:border-zinc-800",
         className,

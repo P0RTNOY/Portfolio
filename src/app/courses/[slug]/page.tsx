@@ -33,12 +33,12 @@ export async function generateMetadata({
 
   if (!course) {
     return {
-      title: "Course not found | Generic Portfolio",
+      title: "Course not found | Omer Portnoy",
     };
   }
 
   return {
-    title: `${course.title} | Generic Portfolio`,
+    title: `${course.title} | Omer Portnoy`,
     description: course.shortDescription,
   };
 }
@@ -207,4 +207,3 @@ export default async function CourseDetailPage({ params }: CourseDetailProps) {
     </ProjectPageShell>
   );
 }
-

@@ -4,55 +4,55 @@ const prisma = new PrismaClient();
 
 const demoProjects = [
   {
-    title: "Example Web App",
-    slug: "example-web-app",
-    shortDescription: "A placeholder web application project for layout testing.",
+    title: "Draft Full-Stack Product Case Study",
+    slug: "draft-full-stack-product-case-study",
+    shortDescription: "Demo project content for testing the case study layout.",
     fullDescription:
-      "This is minimal demo content. Replace it from the admin dashboard with a real project when you are ready.",
+      "This is demo content for local layout testing. Replace it from the admin dashboard with a real project when you are ready.",
     techStack: JSON.stringify(["Next.js", "TypeScript", "Tailwind CSS"]),
-    githubUrl: "https://github.com/example/example-web-app",
-    liveUrl: "https://example.com",
-    status: "completed",
-    featured: true,
-    role: "Project role placeholder",
+    githubUrl: null,
+    liveUrl: null,
+    status: "planned",
+    featured: false,
+    role: "Role to be added",
     highlights: JSON.stringify([
       "Reusable interface structure",
       "Responsive project presentation",
     ]),
-    problemSolved: "Placeholder problem statement for a future project.",
-    technicalChallenges: "Placeholder notes about technical constraints.",
+    problemSolved: "Problem statement to be added with the real case study.",
+    technicalChallenges: "Technical notes to be added with the real case study.",
     displayOrder: 1,
   },
   {
-    title: "Example API Project",
-    slug: "example-api-project",
-    shortDescription: "A placeholder backend or API project entry.",
+    title: "Draft Backend API Case Study",
+    slug: "draft-backend-api-case-study",
+    shortDescription: "Demo backend/API entry for checking portfolio layout states.",
     fullDescription:
       "Use this demo item to verify list, detail, and admin editing flows before adding real portfolio work.",
     techStack: JSON.stringify(["Node.js", "Prisma", "PostgreSQL"]),
-    githubUrl: "https://github.com/example/example-api-project",
+    githubUrl: null,
     liveUrl: null,
     status: "in-progress",
     featured: false,
-    role: "Backend role placeholder",
+    role: "Role to be added",
     highlights: JSON.stringify(["Typed data model", "Validation-ready fields"]),
-    problemSolved: "Placeholder API problem statement.",
+    problemSolved: "Problem statement to be added with the real case study.",
     technicalChallenges: null,
     displayOrder: 2,
   },
   {
-    title: "Example Automation Tool",
-    slug: "example-automation-tool",
-    shortDescription: "A placeholder automation project for future replacement.",
+    title: "Draft Automation Workflow Case Study",
+    slug: "draft-automation-workflow-case-study",
+    shortDescription: "Demo automation entry for testing planned project states.",
     fullDescription:
-      "This project is intentionally generic and can be deleted or edited from the admin dashboard later.",
+      "This draft entry can be deleted or edited from the admin dashboard later.",
     techStack: JSON.stringify(["TypeScript", "Scripts", "Integrations"]),
-    githubUrl: "https://github.com/example/example-automation-tool",
+    githubUrl: null,
     liveUrl: null,
     status: "planned",
     featured: false,
-    role: "Automation role placeholder",
-    highlights: JSON.stringify(["Workflow concept", "Integration placeholder"]),
+    role: "Role to be added",
+    highlights: JSON.stringify(["Workflow concept", "Integration notes to add"]),
     problemSolved: null,
     technicalChallenges: null,
     displayOrder: 3,
@@ -61,66 +61,81 @@ const demoProjects = [
 
 const demoSiteSettings = {
   id: "default",
-  siteName: "Portfolio",
-  heroEyebrow: "Generic portfolio",
-  heroTitle: "Your Name, professional title, and selected work.",
+  siteName: "Omer Portnoy",
+  heroEyebrow: "Software Engineer · AI / Full-Stack / Automation",
+  heroTitle:
+    "I build practical AI-powered software, full-stack products, and automation tools.",
   heroIntro:
-    "A concise introduction placeholder for the kind of work, outcomes, and collaborations this portfolio will represent.",
-  primaryCtaLabel: "View Projects",
-  secondaryCtaLabel: "Contact Me",
-  aboutTitle: "A concise professional summary will live here.",
+    "I'm Omer Portnoy, a software engineering graduate focused on building real working products - from backend systems and admin dashboards to LLM-powered apps, developer tools, and automation workflows.",
+  primaryCtaLabel: "Explore the platform",
+  secondaryCtaLabel: "Contact me",
+  aboutTitle: "Software engineer with a builder mindset.",
   aboutSummary:
-    "Use this space for a short editable introduction. Keep it focused on the type of work, values, and outcomes you want the portfolio to communicate.",
-  skillsTitle: "Editable skill categories.",
+    "I'm a software engineering graduate who likes building practical systems end-to-end: the frontend people use, the backend that powers it, the database that keeps it reliable, and the tooling that makes it easier to maintain. My current focus is AI-powered products, automation, backend/full-stack development, and learning how to ship software that feels useful, not just technically impressive.",
+  skillsTitle: "Technical focus areas.",
   skillsSummary:
-    "These categories are generic for now and can be edited from the admin dashboard.",
+    "The areas I'm actively building and improving across product engineering, backend systems, AI applications, cloud workflows, and software fundamentals.",
   skills: JSON.stringify([
-    "Frontend",
-    "Backend",
-    "Design Systems",
-    "Automation",
+    "Python",
+    "TypeScript",
+    "React",
+    "Next.js",
+    "Node.js",
+    "FastAPI",
+    "Supabase",
+    "PostgreSQL",
+    "Prisma",
+    "Docker",
+    "GCP",
+    "REST APIs",
     "AI Integrations",
-    "Deployment",
+    "LLM Apps",
+    "Hugging Face",
+    "OpenAI",
+    "Automation",
+    "CI/CD",
+    "Data Structures",
+    "Security Fundamentals",
   ]),
-  contactTitle: "Generic contact details.",
+  contactTitle: "Let's build something useful.",
   contactSummary:
-    "Add preferred email, social links, or a contact form once you are ready to personalize the portfolio.",
-  contactEmail: "hello@example.com",
-  githubUrl: null,
+    "I'm looking for software engineering opportunities where I can contribute, learn fast, and build real products with strong technical foundations.",
+  contactEmail: "omerportnoy@gmail.com",
+  githubUrl: "https://github.com/P0RTNOY",
   linkedinUrl: null,
   resumeUrl: null,
 };
 
 const demoCourses = [
   {
-    title: "Example Certification Course",
-    slug: "example-certification-course",
-    provider: "Udemy",
-    courseUrl: "https://example.com/course",
+    title: "Draft Certification Learning Record",
+    slug: "draft-certification-learning-record",
+    provider: "Learning Platform",
+    courseUrl: "https://github.com/P0RTNOY",
     imageUrl: null,
     shortDescription:
-      "A placeholder course entry for testing the course layout and admin editing flow.",
+      "Demo learning record for testing the course layout and admin editing flow.",
     fullDescription:
-      "This is minimal demo course content. Replace it from the admin dashboard with a real course when you are ready.",
+      "This is demo course content. Replace it from the admin dashboard with a real course or certification when you are ready.",
     skills: JSON.stringify(["Security", "Foundations", "Certification Prep"]),
-    instructor: "Instructor placeholder",
-    status: "completed",
-    progress: 100,
+    instructor: null,
+    status: "planned",
+    progress: 0,
     certificateUrl: null,
     credentialUrl: null,
     startedAt: null,
     completedAt: null,
-    featured: true,
+    featured: false,
     displayOrder: 1,
   },
   {
-    title: "Example In-Progress Course",
-    slug: "example-in-progress-course",
+    title: "Draft In-Progress Learning Record",
+    slug: "draft-in-progress-learning-record",
     provider: "Learning Platform",
-    courseUrl: "https://example.com/in-progress-course",
+    courseUrl: "https://github.com/P0RTNOY",
     imageUrl: null,
     shortDescription:
-      "A placeholder course for showing in-progress learning with a progress bar.",
+      "Demo learning record for showing in-progress learning with a progress bar.",
     fullDescription:
       "Use this demo item to verify progress display and editing before adding real learning records.",
     skills: JSON.stringify(["Practice", "Labs", "Professional Growth"]),
@@ -137,6 +152,31 @@ const demoCourses = [
 ];
 
 async function main() {
+  await prisma.project.deleteMany({
+    where: {
+      OR: [
+        { slug: "example-web-app", title: "Example Web App" },
+        { slug: "example-api-project", title: "Example API Project" },
+        { slug: "example-automation-tool", title: "Example Automation Tool" },
+      ],
+    },
+  });
+
+  await prisma.course.deleteMany({
+    where: {
+      OR: [
+        {
+          slug: "example-certification-course",
+          title: "Example Certification Course",
+        },
+        {
+          slug: "example-in-progress-course",
+          title: "Example In-Progress Course",
+        },
+      ],
+    },
+  });
+
   await prisma.siteSettings.upsert({
     where: { id: demoSiteSettings.id },
     update: demoSiteSettings,

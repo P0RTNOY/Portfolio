@@ -28,12 +28,12 @@ export async function generateMetadata({
 
   if (!project) {
     return {
-      title: "Project not found | Generic Portfolio",
+      title: "Project not found | Omer Portnoy",
     };
   }
 
   return {
-    title: `${project.title} | Generic Portfolio`,
+    title: `${project.title} | Omer Portnoy`,
     description: project.shortDescription,
   };
 }
@@ -167,7 +167,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
               <div>
                 <p className="font-semibold text-zinc-950 dark:text-white">Role</p>
                 <p className="mt-1 text-zinc-600 dark:text-zinc-300">
-                  {project.role || "Role placeholder"}
+                  {project.role || "Role to be added"}
                 </p>
               </div>
               <div>

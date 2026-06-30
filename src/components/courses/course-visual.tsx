@@ -29,7 +29,7 @@ export function CourseVisual({ className, imageUrl, title }: CourseVisualProps) 
 
   return (
     <div
-      aria-label={`${title} course placeholder image`}
+      aria-label={`${title} course visual`}
       className={cn(
         "relative flex aspect-[16/10] items-center justify-center overflow-hidden rounded-md border border-zinc-200 bg-zinc-950 text-white dark:border-zinc-800",
         className,
@@ -44,4 +44,3 @@ export function CourseVisual({ className, imageUrl, title }: CourseVisualProps) 
     </div>
   );
 }
-

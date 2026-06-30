@@ -17,10 +17,10 @@ export async function generateMetadata({ params }: EditProjectPageProps): Promis
   const project = await getProjectById(id);
 
   if (!project) {
-    return { title: "Project Not Found | Admin | Generic Portfolio" };
+    return { title: "Project Not Found | Admin | Omer Portnoy" };
   }
 
-  return { title: `Edit ${project.title} | Admin | Generic Portfolio` };
+  return { title: `Edit ${project.title} | Admin | Omer Portnoy` };
 }
 
 export default async function EditProjectPage({ params }: EditProjectPageProps) {

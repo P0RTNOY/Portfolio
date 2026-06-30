@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Generic Portfolio",
-  description: "A reusable portfolio platform with dynamic project management.",
+  title: "Omer Portnoy | Software Engineer",
+  description:
+    "Omer Portnoy builds practical AI-powered software, automation tools, and full-stack systems.",
 };
 
 export default function RootLayout({

@@ -11,8 +11,9 @@ import { getSiteSettings } from "@/lib/site-settings";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "CV | Generic Portfolio",
-  description: "Read the embedded CV without leaving the portfolio.",
+  title: "CV | Omer Portnoy",
+  description:
+    "Read Omer Portnoy's CV and professional background inside the portfolio.",
 };
 
 export default async function CvPage() {
@@ -31,7 +32,7 @@ export default async function CvPage() {
           </Badge>
           <SectionHeading
             eyebrow="Resume"
-            title="Read the CV inside the portfolio."
+            title="CV and professional background."
             description="The latest uploaded PDF is embedded below, with options to open or download it."
           />
         </div>
@@ -43,4 +44,3 @@ export default async function CvPage() {
     </ProjectPageShell>
   );
 }
-

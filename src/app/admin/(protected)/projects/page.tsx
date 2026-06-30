@@ -7,7 +7,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { listProjects } from "@/lib/projects";
 
 export const metadata: Metadata = {
-  title: "Manage Projects | Admin | Generic Portfolio",
+  title: "Manage Projects | Admin | Omer Portnoy",
 };
 
 export default async function AdminProjectsPage() {

@@ -9,7 +9,7 @@ import { getAdminSession } from "@/lib/auth";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Admin Login | Generic Portfolio",
+  title: "Admin Login | Omer Portnoy",
   description: "Sign in to manage portfolio projects.",
 };
 

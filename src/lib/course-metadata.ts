@@ -221,7 +221,7 @@ export async function getCourseUrlMetadata(
       Accept:
         "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
       "User-Agent":
-        "Mozilla/5.0 (compatible; PortfolioCourseImporter/1.0; +https://example.com)",
+        "Mozilla/5.0 (compatible; PortfolioCourseImporter/1.0; +https://github.com/P0RTNOY/Portfolio)",
     },
     redirect: "follow",
   });

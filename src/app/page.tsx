@@ -1,10 +1,10 @@
 import {
   ArrowRight,
-  Database,
+  Bot,
+  Code2,
   Download,
   Eye,
-  GraduationCap,
-  Layers,
+  Rocket,
   ShieldCheck,
 } from "lucide-react";
 
@@ -35,6 +35,35 @@ export default async function Home() {
   const featuredCourses = courses.filter((course) => course.featured);
   const homepageCourses =
     featuredCourses.length > 0 ? featuredCourses : courses.slice(0, 3);
+  const snapshotCards = [
+    {
+      icon: ShieldCheck,
+      title: "Product-minded engineer",
+      text: "I care about turning ideas into usable products with clear flows, maintainable code, and practical UX.",
+    },
+    {
+      icon: Code2,
+      title: "Full-stack foundation",
+      text: "I work across frontend, backend, databases, APIs, authentication, and deployment workflows.",
+    },
+    {
+      icon: Bot,
+      title: "AI application focus",
+      text: "I'm learning and building with LLMs, AI agents, RAG concepts, OpenAI, Hugging Face, and automation pipelines.",
+    },
+    {
+      icon: Rocket,
+      title: "Always shipping",
+      text: "This portfolio itself is built as a database-backed product with an admin dashboard, content management, CV support, and AI-assisted tooling.",
+    },
+  ];
+  const currentFocus = [
+    "AI-powered products",
+    "Backend/full-stack systems",
+    "Automation tools",
+    "Cloud/deployment workflows",
+    "Interview-level CS fundamentals",
+  ];
 
   return (
     <div className="min-h-dvh">
@@ -54,7 +83,7 @@ export default async function Home() {
                 {settings.heroIntro}
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <ButtonLink href="/projects" size="lg">
+                <ButtonLink href="/#projects" size="lg">
                   {settings.primaryCtaLabel}
                   <ArrowRight aria-hidden="true" size={18} />
                 </ButtonLink>
@@ -66,32 +95,11 @@ export default async function Home() {
             <Card className="overflow-hidden">
               <CardHeader>
                 <p className="text-sm font-semibold uppercase text-zinc-500">
-                  Profile snapshot
+                  Builder snapshot
                 </p>
               </CardHeader>
               <CardContent className="space-y-4">
-                {[
-                  {
-                    icon: Database,
-                    title: "Selected work",
-                    text: `${projects.length} editable project entries are currently stored in the database.`,
-                  },
-                  {
-                    icon: ShieldCheck,
-                    title: "Clear presentation",
-                    text: "Each project can highlight context, role, links, and technologies.",
-                  },
-                  {
-                    icon: Layers,
-                    title: "Reusable structure",
-                    text: "The layout stays consistent as new content is added over time.",
-                  },
-                  {
-                    icon: GraduationCap,
-                    title: "Learning records",
-                    text: `${courses.length} course entries can show progress, certificates, and source links.`,
-                  },
-                ].map((item) => (
+                {snapshotCards.map((item) => (
                   <div
                     className="grid grid-cols-[44px_1fr] gap-4 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800"
                     key={item.title}
@@ -109,6 +117,16 @@ export default async function Home() {
                     </div>
                   </div>
                 ))}
+                <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+                  <h2 className="font-semibold text-zinc-950 dark:text-white">
+                    Currently focused on
+                  </h2>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {currentFocus.map((focus) => (
+                      <Badge key={focus}>{focus}</Badge>
+                    ))}
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -132,8 +150,8 @@ export default async function Home() {
           <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
             <SectionHeading
               eyebrow="Projects"
-              title="Selected projects."
-              description="Published work will appear here with descriptions, links, status, and technologies."
+              title="Projects are coming in as case studies."
+              description="This portfolio is designed to present each project as a real case study: the problem, my role, the architecture, technical challenges, screenshots, links, and what I learned."
             />
             <div className="mt-8">
               <ProjectsGrid projects={homepageProjects} />
@@ -153,8 +171,8 @@ export default async function Home() {
         >
           <SectionHeading
             eyebrow="Courses"
-            title="Learning records."
-            description="Completed and in-progress courses can be managed from the dashboard and imported from public course pages."
+            title="Learning timeline."
+            description="A focused record of the courses, certifications, and technical learning paths I'm using to sharpen my skills in AI, backend systems, security, cloud, and software engineering fundamentals."
           />
           <div className="mt-8">
             <CoursesGrid courses={homepageCourses} />
@@ -175,8 +193,8 @@ export default async function Home() {
             <div>
               <SectionHeading
                 eyebrow="CV"
-                title="Embedded CV reader."
-                description="The latest uploaded PDF can be viewed directly here, with a larger in-site reader available for focused reading."
+                title="CV and professional background."
+                description="A focused view of my experience, education, skills, and technical direction. Visitors can read it in the site or open the latest PDF version."
               />
               <div className="mt-8 flex flex-wrap gap-3">
                 {settings.resumeUrl ? (

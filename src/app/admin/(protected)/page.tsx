@@ -16,7 +16,7 @@ import { listCourses } from "@/lib/courses";
 import { listProjects } from "@/lib/projects";
 
 export const metadata: Metadata = {
-  title: "Admin Dashboard | Generic Portfolio",
+  title: "Admin Dashboard | Omer Portnoy",
 };
 
 export default async function AdminPage() {

@@ -7,7 +7,7 @@ import { ProjectForm } from "@/components/admin/project-form";
 import { Card, CardContent } from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "Create Project | Admin | Generic Portfolio",
+  title: "Create Project | Admin | Omer Portnoy",
 };
 
 export default function NewProjectPage() {

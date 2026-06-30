@@ -49,13 +49,62 @@ function cleanOptionalString(value: string | null | undefined) {
 }
 
 function toProject(project: PrismaProject): Project {
-  return {
+  const normalizedProject: Project = {
     ...project,
     highlights: parseStringArray(project.highlights),
     screenshots: parseStringArray(project.screenshots),
     status: projectStatusSchema.catch("planned").parse(project.status),
     techStack: parseStringArray(project.techStack),
   };
+
+  if (project.slug === "example-web-app" && project.title === "Example Web App") {
+    return {
+      ...normalizedProject,
+      title: "Draft Full-Stack Product Case Study",
+      shortDescription: "Demo project content for testing the case study layout.",
+      fullDescription:
+        "This is demo content for local layout testing. Replace it from the admin dashboard with a real project when you are ready.",
+      githubUrl: null,
+      liveUrl: null,
+      status: "planned",
+      featured: false,
+      role: "Role to be added",
+      problemSolved: "Problem statement to be added with the real case study.",
+      technicalChallenges: "Technical notes to be added with the real case study.",
+    };
+  }
+
+  if (
+    project.slug === "example-api-project" &&
+    project.title === "Example API Project"
+  ) {
+    return {
+      ...normalizedProject,
+      title: "Draft Backend API Case Study",
+      shortDescription: "Demo backend/API entry for checking portfolio layout states.",
+      githubUrl: null,
+      role: "Role to be added",
+      problemSolved: "Problem statement to be added with the real case study.",
+    };
+  }
+
+  if (
+    project.slug === "example-automation-tool" &&
+    project.title === "Example Automation Tool"
+  ) {
+    return {
+      ...normalizedProject,
+      title: "Draft Automation Workflow Case Study",
+      shortDescription: "Demo automation entry for testing planned project states.",
+      fullDescription:
+        "This draft entry can be deleted or edited from the admin dashboard later.",
+      githubUrl: null,
+      role: "Role to be added",
+      highlights: ["Workflow concept", "Integration notes to add"],
+    };
+  }
+
+  return normalizedProject;
 }
 
 function toProjectCreateData(input: ProjectCreateInput): Prisma.ProjectCreateInput {
