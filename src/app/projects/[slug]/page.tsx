@@ -45,6 +45,98 @@ function formatDate(date: Date) {
   }).format(date);
 }
 
+type CaseStudySection = {
+  body: string;
+  title: string;
+};
+
+function parseCaseStudyContent(description: string) {
+  const sections: CaseStudySection[] = [];
+  let current: CaseStudySection = { title: "Overview", body: "" };
+
+  for (const line of description.split("\n")) {
+    const heading = line.match(/^##\s+(.+)$/);
+    if (heading) {
+      if (current.body.trim()) {
+        sections.push({ ...current, body: current.body.trim() });
+      }
+      current = { title: heading[1].trim(), body: "" };
+      continue;
+    }
+
+    current.body = `${current.body}${current.body ? "\n" : ""}${line}`;
+  }
+
+  if (current.body.trim()) {
+    sections.push({ ...current, body: current.body.trim() });
+  }
+
+  const [overview, ...caseStudySections] =
+    sections.length > 0
+      ? sections
+      : [
+          {
+            title: "Overview",
+            body: "A detailed project description can be added from the admin dashboard.",
+          },
+        ];
+
+  return { caseStudySections, overview };
+}
+
+function CaseStudyBody({ body }: { body: string }) {
+  const blocks = body.split(/\n{2,}/).filter((block) => block.trim().length > 0);
+
+  return (
+    <div className="space-y-4 text-base leading-8 text-zinc-600 dark:text-zinc-300">
+      {blocks.map((block) => {
+        const lines = block
+          .split("\n")
+          .map((line) => line.trim())
+          .filter(Boolean);
+        const isList = lines.length > 0 && lines.every((line) => line.startsWith("- "));
+
+        if (isList) {
+          return (
+            <ul className="space-y-3" key={block}>
+              {lines.map((line) => (
+                <li className="flex gap-3" key={line}>
+                  <span
+                    aria-hidden="true"
+                    className="mt-3 size-1.5 shrink-0 rounded-full bg-teal-600 dark:bg-teal-300"
+                  />
+                  <span>{line.replace(/^- /, "")}</span>
+                </li>
+              ))}
+            </ul>
+          );
+        }
+
+        return (
+          <p className="whitespace-pre-line" key={block}>
+            {block}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
+function statusDescription(status: string) {
+  switch (status) {
+    case "completed":
+      return "The main implementation is complete and documented as a case study.";
+    case "in-progress":
+      return "Active work with a usable foundation and clear next improvements.";
+    case "planned":
+      return "Planned work that is being shaped before implementation.";
+    case "archived":
+      return "Archived work kept for reference.";
+    default:
+      return "Project status is tracked from the admin dashboard.";
+  }
+}
+
 export default async function ProjectDetailPage({ params }: ProjectDetailProps) {
   const { slug } = await params;
   const [project, settings] = await Promise.all([
@@ -55,6 +147,10 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
   if (!project) {
     notFound();
   }
+
+  const { caseStudySections, overview } = parseCaseStudyContent(
+    project.fullDescription,
+  );
 
   return (
     <ProjectPageShell siteName={settings.siteName}>
@@ -71,6 +167,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
               Back to projects
             </ButtonLink>
             <div className="flex flex-wrap gap-2">
+              <Badge>Case study</Badge>
               <StatusBadge status={project.status} />
               {project.featured ? (
                 <Badge className="border-teal-200 bg-teal-50 text-teal-800 dark:border-teal-900 dark:bg-teal-950 dark:text-teal-200">
@@ -118,38 +215,61 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
               </h2>
             </CardHeader>
             <CardContent>
-              <p className="whitespace-pre-line text-base leading-8 text-zinc-600 dark:text-zinc-300">
-                {project.fullDescription ||
-                  "A detailed project description can be added from the admin dashboard."}
-              </p>
+              <CaseStudyBody body={overview.body} />
             </CardContent>
           </Card>
+
+          {caseStudySections.map((section) => (
+            <Card key={section.title}>
+              <CardHeader>
+                <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
+                  {section.title}
+                </h2>
+              </CardHeader>
+              <CardContent>
+                <CaseStudyBody body={section.body} />
+              </CardContent>
+            </Card>
+          ))}
 
           {project.problemSolved ? (
             <Card>
               <CardHeader>
                 <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
                   Problem solved
-                </h2>
-              </CardHeader>
-              <CardContent>
-                <p className="text-base leading-8 text-zinc-600 dark:text-zinc-300">
-                  {project.problemSolved}
-                </p>
-              </CardContent>
-            </Card>
-          ) : null}
+              </h2>
+            </CardHeader>
+            <CardContent>
+                <CaseStudyBody body={project.problemSolved} />
+            </CardContent>
+          </Card>
+        ) : null}
 
           {project.technicalChallenges ? (
             <Card>
               <CardHeader>
                 <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
                   Technical challenges
+              </h2>
+            </CardHeader>
+            <CardContent>
+                <CaseStudyBody body={project.technicalChallenges} />
+            </CardContent>
+          </Card>
+        ) : null}
+
+          {project.screenshots.length === 0 ? (
+            <Card>
+              <CardHeader>
+                <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
+                  Screenshots and media
                 </h2>
               </CardHeader>
               <CardContent>
                 <p className="text-base leading-8 text-zinc-600 dark:text-zinc-300">
-                  {project.technicalChallenges}
+                  Screenshots and demo media will be added as the case study
+                  evolves. For now, the project is represented with the polished
+                  generated visual above and the source code link.
                 </p>
               </CardContent>
             </Card>
@@ -168,6 +288,14 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
                 <p className="font-semibold text-zinc-950 dark:text-white">Role</p>
                 <p className="mt-1 text-zinc-600 dark:text-zinc-300">
                   {project.role || "Role to be added"}
+                </p>
+              </div>
+              <div>
+                <p className="font-semibold text-zinc-950 dark:text-white">
+                  Status
+                </p>
+                <p className="mt-1 text-zinc-600 dark:text-zinc-300">
+                  {statusDescription(project.status)}
                 </p>
               </div>
               <div>
