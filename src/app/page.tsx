@@ -1,15 +1,15 @@
 import {
   ArrowRight,
-  Bot,
-  Code2,
   Download,
   Eye,
-  Rocket,
-  ShieldCheck,
 } from "lucide-react";
 
 import { CoursesGrid } from "@/components/courses/courses-grid";
 import { ProjectsGrid } from "@/components/projects/projects-grid";
+import {
+  PortfolioProofStrip,
+  type ProofItem,
+} from "@/components/site/portfolio-proof-strip";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { ResumeViewer } from "@/components/site/resume-viewer";
@@ -35,34 +35,27 @@ export default async function Home() {
   const featuredCourses = courses.filter((course) => course.featured);
   const homepageCourses =
     featuredCourses.length > 0 ? featuredCourses : courses.slice(0, 3);
-  const snapshotCards = [
+  const proofItems: ProofItem[] = [
     {
-      icon: ShieldCheck,
-      title: "Product-minded engineer",
-      text: "I care about turning ideas into usable products with clear flows, maintainable code, and practical UX.",
+      label: "Junior SWE focus",
+      value: "Full-stack / AI / automation",
+      href: "/#about",
     },
     {
-      icon: Code2,
-      title: "Full-stack foundation",
-      text: "I work across frontend, backend, databases, APIs, authentication, and deployment workflows.",
+      label: "Featured case studies",
+      value: `${homepageProjects.length} shipped projects`,
+      href: "/#projects",
     },
     {
-      icon: Bot,
-      title: "AI application focus",
-      text: "I'm learning and building with LLMs, AI agents, RAG concepts, OpenAI, Hugging Face, and automation pipelines.",
+      label: "Active learning tracks",
+      value: `${homepageCourses.length} in-progress courses`,
+      href: "/#courses",
     },
     {
-      icon: Rocket,
-      title: "Always shipping",
-      text: "This portfolio itself is built as a database-backed product with an admin dashboard, content management, CV support, and AI-assisted tooling.",
+      label: "CV available",
+      value: "Read online or download",
+      href: "/cv",
     },
-  ];
-  const currentFocus = [
-    "AI-powered products",
-    "Backend/full-stack systems",
-    "Automation tools",
-    "Cloud/deployment workflows",
-    "Interview-level CS fundamentals",
   ];
 
   return (
@@ -84,52 +77,59 @@ export default async function Home() {
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <ButtonLink href="/#projects" size="lg">
-                  {settings.primaryCtaLabel}
+                  See project evidence
                   <ArrowRight aria-hidden="true" size={18} />
                 </ButtonLink>
-                <ButtonLink href="/#contact" size="lg" variant="secondary">
-                  {settings.secondaryCtaLabel}
+                <ButtonLink href="/cv" size="lg" variant="secondary">
+                  Read CV
                 </ButtonLink>
               </div>
             </div>
             <Card className="overflow-hidden">
               <CardHeader>
                 <p className="text-sm font-semibold uppercase text-zinc-500">
-                  Builder snapshot
+                  Recruiter snapshot
                 </p>
               </CardHeader>
               <CardContent className="space-y-4">
-                {snapshotCards.map((item) => (
-                  <div
-                    className="grid grid-cols-[44px_1fr] gap-4 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800"
-                    key={item.title}
-                  >
-                    <div className="flex size-11 items-center justify-center rounded-md bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200">
-                      <item.icon aria-hidden="true" size={20} />
-                    </div>
-                    <div>
-                      <h2 className="font-semibold text-zinc-950 dark:text-white">
-                        {item.title}
-                      </h2>
-                      <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-                        {item.text}
-                      </p>
-                    </div>
+                <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                  Recruiters can scan this page like a candidate profile: the
+                  target role is clear, the work is shipped, and the learning
+                  momentum is visible.
+                </p>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700 dark:text-teal-300">
+                      Targeting
+                    </p>
+                    <p className="mt-2 text-sm font-semibold text-zinc-950 dark:text-white">
+                      Junior SWE roles
+                    </p>
                   </div>
-                ))}
-                <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
-                  <h2 className="font-semibold text-zinc-950 dark:text-white">
-                    Currently focused on
-                  </h2>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {currentFocus.map((focus) => (
-                      <Badge key={focus}>{focus}</Badge>
-                    ))}
+                  <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700 dark:text-teal-300">
+                      Building
+                    </p>
+                    <p className="mt-2 text-sm font-semibold text-zinc-950 dark:text-white">
+                      Full-stack, AI, and automation systems
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700 dark:text-teal-300">
+                      Signal
+                    </p>
+                    <p className="mt-2 text-sm font-semibold text-zinc-950 dark:text-white">
+                      Shipped work plus a ready CV
+                    </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
+        </section>
+
+        <section className="mx-auto w-full max-w-6xl px-4 pb-4 sm:px-6 lg:px-8">
+          <PortfolioProofStrip items={proofItems} />
         </section>
 
         <section
@@ -150,8 +150,8 @@ export default async function Home() {
           <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
             <SectionHeading
               eyebrow="Projects"
-              title="Projects are coming in as case studies."
-              description="This portfolio is designed to present each project as a real case study: the problem, my role, the architecture, technical challenges, screenshots, links, and what I learned."
+              title="Projects read as case studies, not gallery cards."
+              description="Each project is framed as evidence: the problem I tackled, the role I played, the architecture and tradeoffs, and the outcome that matters to a hiring team."
             />
             <div className="mt-8">
               <ProjectsGrid projects={homepageProjects} />
@@ -166,26 +166,6 @@ export default async function Home() {
         </section>
 
         <section
-          id="courses"
-          className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8"
-        >
-          <SectionHeading
-            eyebrow="Courses"
-            title="Learning timeline."
-            description="A focused record of the courses, certifications, and technical learning paths I'm using to sharpen my skills in AI, backend systems, security, cloud, and software engineering fundamentals."
-          />
-          <div className="mt-8">
-            <CoursesGrid courses={homepageCourses} />
-          </div>
-          <div className="mt-8">
-            <ButtonLink href="/courses" variant="secondary">
-              Browse all courses
-              <ArrowRight aria-hidden="true" size={16} />
-            </ButtonLink>
-          </div>
-        </section>
-
-        <section
           id="cv"
           className="border-y border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
         >
@@ -194,7 +174,7 @@ export default async function Home() {
               <SectionHeading
                 eyebrow="CV"
                 title="CV and professional background."
-                description="A focused view of my experience, education, skills, and technical direction. Visitors can read it in the site or open the latest PDF version."
+                description="A focused view of my experience, education, and technical direction. Visitors can read it in the site or open the latest PDF version."
               />
               <div className="mt-8 flex flex-wrap gap-3">
                 {settings.resumeUrl ? (
@@ -210,13 +190,13 @@ export default async function Home() {
                       variant="secondary"
                     >
                       <Download aria-hidden="true" size={18} />
-                      Download
+                      Download CV
                     </ButtonLink>
                   </>
                 ) : (
-                  <ButtonLink href="/admin/settings" variant="secondary">
-                    Add CV PDF
-                  </ButtonLink>
+                  <p className="text-sm font-semibold text-zinc-600 dark:text-zinc-400">
+                    The latest CV will be available here soon.
+                  </p>
                 )}
               </div>
             </div>
@@ -225,18 +205,22 @@ export default async function Home() {
         </section>
 
         <section
-          id="skills"
+          id="courses"
           className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8"
         >
           <SectionHeading
-            eyebrow="Skills"
-            title={settings.skillsTitle}
-            description={settings.skillsSummary}
+            eyebrow="Learning timeline"
+            title="Learning momentum stays visible."
+            description="This timeline shows the courses and self-study tracks I’m using to build junior-engineer momentum across AI, backend systems, security, cloud workflows, and core computer science fundamentals."
           />
-          <div className="mt-8 flex flex-wrap gap-3">
-            {settings.skills.map((skill) => (
-              <Badge key={skill}>{skill}</Badge>
-            ))}
+          <div className="mt-8">
+            <CoursesGrid courses={homepageCourses} />
+          </div>
+          <div className="mt-8">
+            <ButtonLink href="/courses" variant="secondary">
+              Browse all courses
+              <ArrowRight aria-hidden="true" size={16} />
+            </ButtonLink>
           </div>
         </section>
 
