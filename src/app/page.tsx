@@ -54,11 +54,15 @@ export default async function Home() {
       value: `${activeLearningTracks.length} in progress`,
       href: "/#courses",
     },
-    {
-      label: "CV available",
-      value: "Read online or download",
-      href: "/cv",
-    },
+    ...(settings.resumeUrl
+      ? [
+          {
+            label: "CV available",
+            value: "Read online or download",
+            href: "/cv",
+          },
+        ]
+      : []),
   ];
 
   return (
