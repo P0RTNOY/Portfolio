@@ -10,19 +10,19 @@ const SITE_SETTINGS_ID = "default";
 
 const defaultSiteSettingsInput: SiteSettingsInput = {
   siteName: "Omer Portnoy",
-  heroEyebrow: "Software Engineer · AI / Full-Stack / Automation",
+  heroEyebrow: "Junior Software Engineer · Full-Stack / AI / Automation",
   heroTitle:
-    "I build practical AI-powered software, full-stack products, and automation tools.",
+    "I build practical full-stack software, AI tools, and automation workflows.",
   heroIntro:
-    "I'm Omer Portnoy, a software engineering graduate focused on building real working products - from backend systems and admin dashboards to LLM-powered apps, developer tools, and automation workflows.",
+    "I'm Omer Portnoy, and this portfolio showcases real products, not templates. I focus on junior SWE readiness through shipped work, steady learning, and clear communication while building backend systems, admin dashboards, LLM-powered apps, developer tools, and automation workflows.",
   primaryCtaLabel: "Explore the platform",
   secondaryCtaLabel: "Contact me",
-  aboutTitle: "Software engineer with a builder mindset.",
+  aboutTitle: "Software engineer focused on shipping end-to-end products.",
   aboutSummary:
-    "I'm a software engineering graduate who likes building practical systems end-to-end: the frontend people use, the backend that powers it, the database that keeps it reliable, and the tooling that makes it easier to maintain. My current focus is AI-powered products, automation, backend/full-stack development, and learning how to ship software that feels useful, not just technically impressive.",
-  skillsTitle: "Technical focus areas.",
+    "I like taking products from idea to deployed software: planning the UI, wiring APIs, working with databases, adding authentication, and shipping something maintainable. I'm building the habits junior software engineering teams look for—clear communication, steady learning, and the discipline to keep improving with every project.",
+  skillsTitle: "Technical focus areas that support hiring decisions.",
   skillsSummary:
-    "The areas I'm actively building and improving across product engineering, backend systems, AI applications, cloud workflows, and software fundamentals.",
+    "A hiring-focused snapshot of the tools and fundamentals I use to turn ideas into shipped products: frontend and backend work, databases, APIs, authentication, deployment, and the learning habits that help me keep improving.",
   skills: [
     "Python",
     "TypeScript",
@@ -45,9 +45,9 @@ const defaultSiteSettingsInput: SiteSettingsInput = {
     "Data Structures",
     "Security Fundamentals",
   ],
-  contactTitle: "Let's build something useful.",
+  contactTitle: "Open to junior software engineering opportunities.",
   contactSummary:
-    "I'm looking for software engineering opportunities where I can contribute, learn fast, and build real products with strong technical foundations.",
+    "I'm open to junior software engineering opportunities and project conversations. This portfolio is set up so recruiters can quickly see shipped work, responsibilities, and the evidence behind each project.",
   contactEmail: "omerportnoy@gmail.com",
   githubUrl: "https://github.com/P0RTNOY",
   linkedinUrl: undefined,
@@ -89,49 +89,70 @@ function toSiteSettings(settings: PrismaSiteSettings): SiteSettings {
 }
 
 function replaceLegacyDefaultSettings(settings: SiteSettings): SiteSettings {
+  const isLegacy = (value: string, legacyValues: string[]) =>
+    legacyValues.includes(value);
+
   return {
     ...settings,
     siteName:
-      settings.siteName === "Portfolio"
+      isLegacy(settings.siteName, ["Portfolio"])
         ? defaultSiteSettingsInput.siteName
         : settings.siteName,
     heroEyebrow:
-      settings.heroEyebrow === "Generic portfolio"
+      isLegacy(settings.heroEyebrow, [
+        "Generic portfolio",
+        "Software Engineer · AI / Full-Stack / Automation",
+      ])
         ? defaultSiteSettingsInput.heroEyebrow
         : settings.heroEyebrow,
     heroTitle:
-      settings.heroTitle === "Your Name, professional title, and selected work."
+      isLegacy(settings.heroTitle, [
+        "Your Name, professional title, and selected work.",
+        "I build practical AI-powered software, full-stack products, and automation tools.",
+      ])
         ? defaultSiteSettingsInput.heroTitle
         : settings.heroTitle,
     heroIntro:
-      settings.heroIntro ===
-      "A concise introduction placeholder for the kind of work, outcomes, and collaborations this portfolio will represent."
+      isLegacy(settings.heroIntro, [
+        "A concise introduction placeholder for the kind of work, outcomes, and collaborations this portfolio will represent.",
+        "I'm Omer Portnoy, a software engineering graduate focused on building real working products - from backend systems and admin dashboards to LLM-powered apps, developer tools, and automation workflows.",
+      ])
         ? defaultSiteSettingsInput.heroIntro
         : settings.heroIntro,
     primaryCtaLabel:
-      settings.primaryCtaLabel === "View Projects"
+      isLegacy(settings.primaryCtaLabel, ["View Projects"])
         ? defaultSiteSettingsInput.primaryCtaLabel
         : settings.primaryCtaLabel,
     secondaryCtaLabel:
-      settings.secondaryCtaLabel === "Contact Me"
+      isLegacy(settings.secondaryCtaLabel, ["Contact Me"])
         ? defaultSiteSettingsInput.secondaryCtaLabel
         : settings.secondaryCtaLabel,
     aboutTitle:
-      settings.aboutTitle === "A concise professional summary will live here."
+      isLegacy(settings.aboutTitle, [
+        "A concise professional summary will live here.",
+        "Software engineer with a builder mindset.",
+      ])
         ? defaultSiteSettingsInput.aboutTitle
         : settings.aboutTitle,
     aboutSummary:
-      settings.aboutSummary ===
-      "Use this space for a short editable introduction. Keep it focused on the type of work, values, and outcomes you want the portfolio to communicate."
+      isLegacy(settings.aboutSummary, [
+        "Use this space for a short editable introduction. Keep it focused on the type of work, values, and outcomes you want the portfolio to communicate.",
+        "I'm a software engineering graduate who likes building practical systems end-to-end: the frontend people use, the backend that powers it, the database that keeps it reliable, and the tooling that makes it easier to maintain. My current focus is AI-powered products, automation, backend/full-stack development, and learning how to ship software that feels useful, not just technically impressive.",
+      ])
         ? defaultSiteSettingsInput.aboutSummary
         : settings.aboutSummary,
     skillsTitle:
-      settings.skillsTitle === "Editable skill categories."
+      isLegacy(settings.skillsTitle, [
+        "Editable skill categories.",
+        "Technical focus areas.",
+      ])
         ? defaultSiteSettingsInput.skillsTitle
         : settings.skillsTitle,
     skillsSummary:
-      settings.skillsSummary ===
-      "These categories are generic for now and can be edited from the admin dashboard."
+      isLegacy(settings.skillsSummary, [
+        "These categories are generic for now and can be edited from the admin dashboard.",
+        "The areas I'm actively building and improving across product engineering, backend systems, AI applications, cloud workflows, and software fundamentals.",
+      ])
         ? defaultSiteSettingsInput.skillsSummary
         : settings.skillsSummary,
     skills:
@@ -147,12 +168,17 @@ function replaceLegacyDefaultSettings(settings: SiteSettings): SiteSettings {
         ? defaultSiteSettingsInput.skills
         : settings.skills,
     contactTitle:
-      settings.contactTitle === "Generic contact details."
+      isLegacy(settings.contactTitle, [
+        "Generic contact details.",
+        "Let's build something useful.",
+      ])
         ? defaultSiteSettingsInput.contactTitle
         : settings.contactTitle,
     contactSummary:
-      settings.contactSummary ===
-      "Add preferred email, social links, or a contact form once you are ready to personalize the portfolio."
+      isLegacy(settings.contactSummary, [
+        "Add preferred email, social links, or a contact form once you are ready to personalize the portfolio.",
+        "I'm looking for software engineering opportunities where I can contribute, learn fast, and build real products with strong technical foundations.",
+      ])
         ? defaultSiteSettingsInput.contactSummary
         : settings.contactSummary,
     contactEmail:

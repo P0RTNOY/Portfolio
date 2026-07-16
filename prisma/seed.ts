@@ -111,19 +111,19 @@ const demoProjectFilters = [
 const demoSiteSettings = {
   id: "default",
   siteName: "Omer Portnoy",
-  heroEyebrow: "Software Engineer · AI / Full-Stack / Automation",
+  heroEyebrow: "Junior Software Engineer · Full-Stack / AI / Automation",
   heroTitle:
-    "I build practical AI-powered software, full-stack products, and automation tools.",
+    "I build practical full-stack software, AI tools, and automation workflows.",
   heroIntro:
-    "I'm Omer Portnoy, a software engineering graduate focused on building real working products - from backend systems and admin dashboards to LLM-powered apps, developer tools, and automation workflows.",
+    "I'm Omer Portnoy, and this portfolio showcases real products, not templates. I focus on junior SWE readiness through shipped work, steady learning, and clear communication while building backend systems, admin dashboards, LLM-powered apps, developer tools, and automation workflows.",
   primaryCtaLabel: "Explore the platform",
   secondaryCtaLabel: "Contact me",
-  aboutTitle: "Software engineer with a builder mindset.",
+  aboutTitle: "Software engineer focused on shipping end-to-end products.",
   aboutSummary:
-    "I'm a software engineering graduate who likes building practical systems end-to-end: the frontend people use, the backend that powers it, the database that keeps it reliable, and the tooling that makes it easier to maintain. My current focus is AI-powered products, automation, backend/full-stack development, and learning how to ship software that feels useful, not just technically impressive.",
-  skillsTitle: "Technical focus areas.",
+    "I like taking products from idea to deployed software: planning the UI, wiring APIs, working with databases, adding authentication, and shipping something maintainable. I'm building the habits junior software engineering teams look for—clear communication, steady learning, and the discipline to keep improving with every project.",
+  skillsTitle: "Technical focus areas that support hiring decisions.",
   skillsSummary:
-    "The areas I'm actively building and improving across product engineering, backend systems, AI applications, cloud workflows, and software fundamentals.",
+    "A hiring-focused snapshot of the tools and fundamentals I use to turn ideas into shipped products: frontend and backend work, databases, APIs, authentication, deployment, and the learning habits that help me keep improving.",
   skills: JSON.stringify([
     "Python",
     "TypeScript",
@@ -146,57 +146,110 @@ const demoSiteSettings = {
     "Data Structures",
     "Security Fundamentals",
   ]),
-  contactTitle: "Let's build something useful.",
+  contactTitle: "Open to junior software engineering opportunities.",
   contactSummary:
-    "I'm looking for software engineering opportunities where I can contribute, learn fast, and build real products with strong technical foundations.",
+    "I'm open to junior software engineering opportunities and project conversations. This portfolio is set up so recruiters can quickly see shipped work, responsibilities, and the evidence behind each project.",
   contactEmail: "omerportnoy@gmail.com",
   githubUrl: "https://github.com/P0RTNOY",
   linkedinUrl: null,
   resumeUrl: null,
 };
 
-const demoCourses = [
+const learningRecords = [
   {
-    title: "Draft Certification Learning Record",
-    slug: "draft-certification-learning-record",
-    provider: "Learning Platform",
-    courseUrl: "https://github.com/P0RTNOY",
+    title: "Become an LLM Engineer in 8 Weeks",
+    slug: "become-an-llm-engineer-in-8-weeks",
+    provider: "Udemy",
+    courseUrl: "https://lnkd.in/dY83N4wi",
     imageUrl: null,
     shortDescription:
-      "Demo learning record for testing the course layout and admin editing flow.",
+      "A practical LLM engineering course focused on building and deploying LLM apps while learning Generative AI, RAG, LoRA, agents, and modern AI product patterns.",
     fullDescription:
-      "This is demo course content. Replace it from the admin dashboard with a real course or certification when you are ready.",
-    skills: JSON.stringify(["Security", "Foundations", "Certification Prep"]),
-    instructor: null,
-    status: "planned",
-    progress: 0,
+      "I am taking this course to move beyond simply using ChatGPT and better understand how LLM-powered applications are built, deployed, evaluated, and improved. The course is structured as an 8-week practical journey through LLM apps, RAG, LoRA, AI agents, and product-oriented AI development.",
+    skills: JSON.stringify([
+      "LLMs",
+      "Generative AI",
+      "RAG",
+      "AI Agents",
+      "LoRA",
+      "OpenAI",
+      "Hugging Face",
+      "Python",
+      "Deployment",
+      "AI Products",
+    ]),
+    instructor: "Ed Donner",
+    status: "in-progress",
+    progress: 20,
     certificateUrl: null,
     credentialUrl: null,
     startedAt: null,
     completedAt: null,
-    featured: false,
+    featured: true,
     displayOrder: 1,
   },
   {
-    title: "Draft In-Progress Learning Record",
-    slug: "draft-in-progress-learning-record",
-    provider: "Learning Platform",
-    courseUrl: "https://github.com/P0RTNOY",
+    title: "CompTIA Security+ Preparation",
+    slug: "comptia-security-plus-preparation",
+    provider: "Udemy / Self-study",
+    courseUrl: "",
     imageUrl: null,
     shortDescription:
-      "Demo learning record for showing in-progress learning with a progress bar.",
+      "A security fundamentals learning track focused on networking, risk, identity, threats, vulnerabilities, and practical security awareness for software engineering.",
     fullDescription:
-      "Use this demo item to verify progress display and editing before adding real learning records.",
-    skills: JSON.stringify(["Practice", "Labs", "Professional Growth"]),
+      "This learning track supports my software engineering foundation by strengthening security awareness around authentication, infrastructure, networking, access control, vulnerabilities, and secure development practices.",
+    skills: JSON.stringify([
+      "Security Fundamentals",
+      "Networking",
+      "Risk Management",
+      "Identity and Access",
+      "Threats",
+      "Vulnerabilities",
+      "Secure Development",
+      "Cloud Security Basics",
+    ]),
     instructor: null,
     status: "in-progress",
-    progress: 45,
+    progress: 15,
     certificateUrl: null,
     credentialUrl: null,
     startedAt: null,
     completedAt: null,
     featured: false,
     displayOrder: 2,
+  },
+  {
+    title: "Data Structures & Algorithms Practice",
+    slug: "data-structures-and-algorithms-practice",
+    provider: "Self-study",
+    courseUrl: "",
+    imageUrl: null,
+    shortDescription:
+      "A continuous practice track for coding interviews and software engineering fundamentals, focused on Python problem solving, common patterns, and algorithmic thinking.",
+    fullDescription:
+      "This track helps me sharpen core computer science fundamentals and interview readiness through repeated practice with common problem-solving patterns such as hash maps, stacks, queues, two pointers, arrays, strings, and running-state algorithms.",
+    skills: JSON.stringify([
+      "Data Structures",
+      "Algorithms",
+      "Python",
+      "LeetCode",
+      "Hash Maps",
+      "Two Pointers",
+      "Stacks",
+      "Queues",
+      "Arrays",
+      "Strings",
+      "Problem Solving",
+    ]),
+    instructor: null,
+    status: "in-progress",
+    progress: 25,
+    certificateUrl: null,
+    credentialUrl: null,
+    startedAt: null,
+    completedAt: null,
+    featured: false,
+    displayOrder: 3,
   },
 ];
 
@@ -210,14 +263,10 @@ async function main() {
   await prisma.course.deleteMany({
     where: {
       OR: [
-        {
-          slug: "example-certification-course",
-          title: "Example Certification Course",
-        },
-        {
-          slug: "example-in-progress-course",
-          title: "Example In-Progress Course",
-        },
+        { slug: "example-certification-course" },
+        { slug: "example-in-progress-course" },
+        { slug: "draft-certification-learning-record" },
+        { slug: "draft-in-progress-learning-record" },
       ],
     },
   });
@@ -236,7 +285,7 @@ async function main() {
     });
   }
 
-  for (const course of demoCourses) {
+  for (const course of learningRecords) {
     await prisma.course.upsert({
       where: { slug: course.slug },
       update: course,

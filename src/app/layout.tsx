@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Omer Portnoy | Software Engineer",
+  title: "Omer Portnoy | Junior Software Engineer",
   description:
-    "Omer Portnoy builds practical AI-powered software, automation tools, and full-stack systems.",
+    "Omer Portnoy builds full-stack products, AI tools, automation workflows, and practical software systems.",
 };
 
 export default function RootLayout({
