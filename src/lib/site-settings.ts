@@ -47,7 +47,7 @@ const defaultSiteSettingsInput: SiteSettingsInput = {
   ],
   contactTitle: "Open to junior software engineering opportunities.",
   contactSummary:
-    "I'm open to junior software engineering opportunities and project conversations. This portfolio is set up so recruiters can quickly see shipped work, responsibilities, and the evidence behind each project.",
+    "I'm open to junior software engineering opportunities and project conversations. Review the case studies and learning timeline for current evidence; the CV page will show the latest resume once it is uploaded.",
   contactEmail: "omerportnoy@gmail.com",
   githubUrl: "https://github.com/P0RTNOY",
   linkedinUrl: undefined,

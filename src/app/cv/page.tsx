@@ -31,10 +31,26 @@ export default async function CvPage() {
             CV
           </Badge>
           <SectionHeading
-            eyebrow="Resume"
-            title="CV and professional background."
-            description="The latest uploaded PDF is embedded below, with options to open or download it."
+            eyebrow="Candidate overview"
+            title="The evidence behind the portfolio."
+            description="This CV brings the work shown across the site into one hiring-focused record: what I build, how I work, and how I keep learning."
           />
+          <ul className="mt-8 grid gap-3 text-sm font-semibold text-zinc-700 sm:grid-cols-2 lg:grid-cols-5 dark:text-zinc-300">
+            {[
+              "Full-stack work",
+              "AI tooling",
+              "Databases and APIs",
+              "Admin workflows",
+              "Learning discipline",
+            ].map((focusArea) => (
+              <li
+                className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900/60"
+                key={focusArea}
+              >
+                {focusArea}
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
