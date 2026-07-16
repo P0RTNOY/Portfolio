@@ -192,7 +192,7 @@ const learningRecords = [
     title: "CompTIA Security+ Preparation",
     slug: "comptia-security-plus-preparation",
     provider: "Udemy / Self-study",
-    courseUrl: "",
+    courseUrl: "https://www.comptia.org/certifications/security",
     imageUrl: null,
     shortDescription:
       "A security fundamentals learning track focused on networking, risk, identity, threats, vulnerabilities, and practical security awareness for software engineering.",
@@ -222,7 +222,7 @@ const learningRecords = [
     title: "Data Structures & Algorithms Practice",
     slug: "data-structures-and-algorithms-practice",
     provider: "Self-study",
-    courseUrl: "",
+    courseUrl: "https://leetcode.com/problemset/",
     imageUrl: null,
     shortDescription:
       "A continuous practice track for coding interviews and software engineering fundamentals, focused on Python problem solving, common patterns, and algorithmic thinking.",
