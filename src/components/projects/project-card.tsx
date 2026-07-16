@@ -62,7 +62,12 @@ export function ProjectCard({ project }: ProjectCardProps) {
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {stackPreview.map((tech) => (
-                <Badge key={tech}>{tech}</Badge>
+                <Badge
+                  className="min-w-0 max-w-full break-all whitespace-normal text-left"
+                  key={tech}
+                >
+                  {tech}
+                </Badge>
               ))}
             </div>
           </div>

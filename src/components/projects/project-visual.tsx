@@ -114,7 +114,7 @@ export function ProjectVisual({
             <div className="flex flex-wrap gap-2" aria-label="Technology stack">
               {stackPreview.map((tech) => (
                 <Badge
-                  className="border-white/10 bg-white/10 text-white"
+                  className="min-w-0 max-w-full break-all whitespace-normal border-white/10 bg-white/10 text-left text-white"
                   key={tech}
                 >
                   {tech}

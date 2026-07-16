@@ -101,7 +101,7 @@ export function buildCaseStudySections({
   description,
   problemSolved,
   technicalChallenges,
-}: CaseStudyContentInput): CaseStudySection[] {
+}: CaseStudyContentInput): [CaseStudySection, ...CaseStudySection[]] {
   const parsedSections = parseDescription(description);
   const grouped = (kind: SectionKind) =>
     parsedSections.filter((section) => sectionKind(section.title) === kind);
@@ -127,4 +127,12 @@ export function buildCaseStudySections({
     ...grouped("other"),
     ...grouped("lessons"),
   ];
+}
+
+export function getProjectEvidenceMessage(githubUrl?: string | null) {
+  if (githubUrl) {
+    return "Screenshots and demo media will be added as the case study evolves. For now, use the project snapshot, case-study details, and source-code link as the available evidence.";
+  }
+
+  return "Screenshots and demo media will be added as the case study evolves. For now, the project snapshot and case-study details are the available evidence.";
 }

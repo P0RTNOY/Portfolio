@@ -9,7 +9,10 @@ import { StatusBadge } from "@/components/projects/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { buildCaseStudySections } from "@/lib/case-study-content";
+import {
+  buildCaseStudySections,
+  getProjectEvidenceMessage,
+} from "@/lib/case-study-content";
 import { getProjectBySlug, getProjectStackPreview } from "@/lib/projects";
 import { getSiteSettings } from "@/lib/site-settings";
 
@@ -115,6 +118,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
     problemSolved: project.problemSolved,
     technicalChallenges: project.technicalChallenges,
   });
+  const [overviewSection, ...remainingCaseStudySections] = caseStudySections;
   const stackPreview = getProjectStackPreview(project.techStack, 6);
 
   return (
@@ -162,7 +166,12 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {stackPreview.map((tech) => (
-                    <Badge key={tech}>{tech}</Badge>
+                    <Badge
+                      className="min-w-0 max-w-full break-all whitespace-normal text-left"
+                      key={tech}
+                    >
+                      {tech}
+                    </Badge>
                   ))}
                 </div>
               </div>
@@ -194,11 +203,30 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
         </div>
       </section>
 
+      <section
+        aria-labelledby="project-overview-title"
+        className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8"
+      >
+        <Card>
+          <CardHeader>
+            <h2
+              className="text-xl font-bold text-zinc-950 dark:text-white"
+              id="project-overview-title"
+            >
+              {overviewSection.title}
+            </h2>
+          </CardHeader>
+          <CardContent>
+            <CaseStudyBody body={overviewSection.body} />
+          </CardContent>
+        </Card>
+      </section>
+
       <ProjectGallery images={project.screenshots} title={project.title} />
 
       <section className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_320px] lg:px-8">
         <div className="space-y-8">
-          {caseStudySections.map((section, index) => (
+          {remainingCaseStudySections.map((section, index) => (
             <Card key={`${section.title}-${index}`}>
               <CardHeader>
                 <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
@@ -220,9 +248,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
               </CardHeader>
               <CardContent>
                 <p className="text-base leading-8 text-zinc-600 dark:text-zinc-300">
-                  Screenshots and demo media will be added as the case study
-                  evolves. For now, the project is represented with the polished
-                  project snapshot above and the source code link.
+                  {getProjectEvidenceMessage(project.githubUrl)}
                 </p>
               </CardContent>
             </Card>
@@ -271,7 +297,14 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {project.techStack.length > 0 ? (
-                    project.techStack.map((tech) => <Badge key={tech}>{tech}</Badge>)
+                    project.techStack.map((tech) => (
+                      <Badge
+                        className="min-w-0 max-w-full break-all whitespace-normal text-left"
+                        key={tech}
+                      >
+                        {tech}
+                      </Badge>
+                    ))
                   ) : (
                     <span className="text-zinc-600 dark:text-zinc-300">
                       No technologies are listed for this project yet.
