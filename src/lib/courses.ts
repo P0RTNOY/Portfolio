@@ -90,16 +90,6 @@ function toCourse(course: PrismaCourse): Course {
   return normalizedCourse;
 }
 
-function withTerminalPunctuation(value: string) {
-  const normalized = value.trim();
-
-  if (!normalized) {
-    return "";
-  }
-
-  return /[.!?]$/.test(normalized) ? normalized : `${normalized}.`;
-}
-
 function formatAuthoredTopics(skills: string[]) {
   const topics = skills
     .map((skill) => skill.trim())
@@ -137,25 +127,19 @@ export function getCourseLearningImpact(
     return `Historical learning record focused on ${topics}.`;
   }
 
-  const description = withTerminalPunctuation(course.shortDescription);
-
-  if (!description) {
-    return "No learning focus has been recorded yet.";
-  }
-
   if (course.status === "planned") {
-    return `Intended focus: ${description}`;
+    return "Specific topics have not been recorded for this planned track.";
   }
 
   if (course.status === "in-progress") {
-    return `Current learning focus: ${description}`;
+    return "Specific topics have not yet been recorded for this in-progress track.";
   }
 
   if (course.status === "completed") {
-    return `Completed learning record: ${description}`;
+    return "Specific topics were not recorded for this completed track.";
   }
 
-  return `Historical learning record: ${description}`;
+  return "Specific topics were not recorded for this archived track.";
 }
 
 export function getCourseStageLabel(course: Pick<Course, "status" | "progress">) {

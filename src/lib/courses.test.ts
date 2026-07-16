@@ -78,16 +78,59 @@ test("keeps a narrow authored topic narrow", () => {
   assert.doesNotMatch(impact, /network|vulnerabilit|secure engineering/i);
 });
 
-test("falls back to the authored description when no skills are recorded", () => {
-  assert.equal(
-    getCourseLearningImpact(
+test("uses status-aware copy without repeating a description when skills are empty", () => {
+  const expectations: Array<
+    [LearningImpactInput["status"], string]
+  > = [
+    ["planned", "Specific topics have not been recorded for this planned track."],
+    [
+      "in-progress",
+      "Specific topics have not yet been recorded for this in-progress track.",
+    ],
+    [
+      "completed",
+      "Specific topics were not recorded for this completed track.",
+    ],
+    [
+      "archived",
+      "Specific topics were not recorded for this archived track.",
+    ],
+  ];
+
+  for (const [status, expected] of expectations) {
+    const impact = getCourseLearningImpact(
       course({
         shortDescription: "A focused introduction to command-line navigation.",
         skills: [],
-        status: "in-progress",
+        status,
       }),
+    );
+
+    assert.equal(impact, expected);
+    assert.doesNotMatch(impact, /command-line navigation/i);
+  }
+});
+
+test("uses a status-aware fallback when skills and description are empty", () => {
+  assert.equal(
+    getCourseLearningImpact(
+      course({ shortDescription: "", skills: [], status: "in-progress" }),
     ),
-    "Current learning focus: A focused introduction to command-line navigation.",
+    "Specific topics have not yet been recorded for this in-progress track.",
+  );
+});
+
+test("composed learning copy renders an authored description only once", () => {
+  const shortDescription = "A focused introduction to command-line navigation.";
+  const learningImpact = getCourseLearningImpact(
+    course({ shortDescription, skills: [], status: "completed" }),
+  );
+  const composedCopy = `${shortDescription} ${learningImpact}`;
+
+  assert.equal(
+    composedCopy.match(/focused introduction to command-line navigation/gi)
+      ?.length,
+    1,
   );
 });
 
