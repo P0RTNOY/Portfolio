@@ -83,7 +83,7 @@ export default async function Home() {
                   {settings.primaryCtaLabel}
                   <ArrowRight aria-hidden="true" size={18} />
                 </ButtonLink>
-                <ButtonLink href="/cv" size="lg" variant="secondary">
+                <ButtonLink href="/#contact" size="lg" variant="secondary">
                   {settings.secondaryCtaLabel}
                 </ButtonLink>
               </div>
