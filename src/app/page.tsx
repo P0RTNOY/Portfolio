@@ -35,6 +35,9 @@ export default async function Home() {
   const featuredCourses = courses.filter((course) => course.featured);
   const homepageCourses =
     featuredCourses.length > 0 ? featuredCourses : courses.slice(0, 3);
+  const activeLearningTracks = courses.filter(
+    (course) => course.status === "in-progress",
+  );
   const proofItems: ProofItem[] = [
     {
       label: "Junior SWE focus",
@@ -48,7 +51,7 @@ export default async function Home() {
     },
     {
       label: "Active learning tracks",
-      value: `${homepageCourses.length} in-progress courses`,
+      value: `${activeLearningTracks.length} in progress`,
       href: "/#courses",
     },
     {
@@ -77,11 +80,11 @@ export default async function Home() {
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <ButtonLink href="/#projects" size="lg">
-                  See project evidence
+                  {settings.primaryCtaLabel}
                   <ArrowRight aria-hidden="true" size={18} />
                 </ButtonLink>
                 <ButtonLink href="/cv" size="lg" variant="secondary">
-                  Read CV
+                  {settings.secondaryCtaLabel}
                 </ButtonLink>
               </div>
             </div>
