@@ -171,3 +171,7 @@ export async function deleteProject(id: string) {
   const prisma = getPrisma();
   await prisma.project.delete({ where: { id } });
 }
+
+export function getProjectStackPreview(techStack: string[], limit = 4) {
+  return techStack.slice(0, limit);
+}

@@ -9,7 +9,7 @@ import { StatusBadge } from "@/components/projects/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { getProjectBySlug } from "@/lib/projects";
+import { getProjectBySlug, getProjectStackPreview } from "@/lib/projects";
 import { getSiteSettings } from "@/lib/site-settings";
 
 export const dynamic = "force-dynamic";
@@ -151,6 +151,9 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
   const { caseStudySections, overview } = parseCaseStudyContent(
     project.fullDescription,
   );
+  const stackPreview = getProjectStackPreview(project.techStack, 6);
+  const implementationSection = caseStudySections[0];
+  const remainingSections = caseStudySections.slice(1);
 
   return (
     <ProjectPageShell siteName={settings.siteName}>
@@ -158,7 +161,12 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
         <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8">
           <ProjectVisual
             className="lg:order-2"
+            featured={project.featured}
             imageUrl={project.imageUrl}
+            role={project.role}
+            status={project.status}
+            summary={project.shortDescription}
+            techStack={stackPreview}
             title={project.title}
           />
           <div className="flex flex-col justify-center">
@@ -178,12 +186,29 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
             <h1 className="mt-5 max-w-3xl text-4xl font-bold tracking-tight text-zinc-950 dark:text-white sm:text-5xl">
               {project.title}
             </h1>
+            <p className="mt-4 text-base font-medium text-zinc-700 dark:text-zinc-200">
+              {project.role || "Role not listed"}
+            </p>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-300">
               {project.shortDescription}
             </p>
+            <div className="mt-8 space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-teal-700 dark:text-teal-300">
+                Stack
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {stackPreview.map((tech) => (
+                  <Badge key={tech}>{tech}</Badge>
+                ))}
+              </div>
+            </div>
             <div className="mt-8 flex flex-wrap gap-3">
               {project.githubUrl ? (
-                <ButtonLink href={project.githubUrl} rel="noreferrer" target="_blank">
+                <ButtonLink
+                  href={project.githubUrl}
+                  rel="noreferrer"
+                  target="_blank"
+                >
                   <GitBranch aria-hidden="true" size={18} />
                   GitHub
                 </ButtonLink>
@@ -219,7 +244,46 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
             </CardContent>
           </Card>
 
-          {caseStudySections.map((section) => (
+          {project.problemSolved ? (
+            <Card>
+              <CardHeader>
+                <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
+                  Problem solved
+                </h2>
+              </CardHeader>
+              <CardContent>
+                <CaseStudyBody body={project.problemSolved} />
+              </CardContent>
+            </Card>
+          ) : null}
+
+          {implementationSection ? (
+            <Card>
+              <CardHeader>
+                <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
+                  {implementationSection.title}
+                </h2>
+              </CardHeader>
+              <CardContent>
+                <CaseStudyBody body={implementationSection.body} />
+              </CardContent>
+            </Card>
+          ) : null}
+
+          {project.technicalChallenges ? (
+            <Card>
+              <CardHeader>
+                <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
+                  Technical challenges
+                </h2>
+              </CardHeader>
+              <CardContent>
+                <CaseStudyBody body={project.technicalChallenges} />
+              </CardContent>
+            </Card>
+          ) : null}
+
+          {remainingSections.map((section) => (
             <Card key={section.title}>
               <CardHeader>
                 <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
@@ -231,32 +295,6 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
               </CardContent>
             </Card>
           ))}
-
-          {project.problemSolved ? (
-            <Card>
-              <CardHeader>
-                <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
-                  Problem solved
-              </h2>
-            </CardHeader>
-            <CardContent>
-                <CaseStudyBody body={project.problemSolved} />
-            </CardContent>
-          </Card>
-        ) : null}
-
-          {project.technicalChallenges ? (
-            <Card>
-              <CardHeader>
-                <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
-                  Technical challenges
-              </h2>
-            </CardHeader>
-            <CardContent>
-                <CaseStudyBody body={project.technicalChallenges} />
-            </CardContent>
-          </Card>
-        ) : null}
 
           {project.screenshots.length === 0 ? (
             <Card>
@@ -284,6 +322,14 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
               </h2>
             </CardHeader>
             <CardContent className="space-y-5 text-sm">
+              <div>
+                <p className="font-semibold text-zinc-950 dark:text-white">
+                  Summary
+                </p>
+                <p className="mt-1 text-zinc-600 dark:text-zinc-300">
+                  {project.shortDescription}
+                </p>
+              </div>
               <div>
                 <p className="font-semibold text-zinc-950 dark:text-white">Role</p>
                 <p className="mt-1 text-zinc-600 dark:text-zinc-300">

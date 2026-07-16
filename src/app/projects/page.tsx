@@ -31,8 +31,8 @@ export default async function ProjectsPage() {
         <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
           <SectionHeading
             eyebrow="Projects"
-            title="Project case studies."
-            description="This library is designed for real project writeups with context, architecture, links, screenshots, and lessons learned."
+            title="Project case studies that answer hiring questions."
+            description="Start with the role, the problem, and the stack. Then open a project to see the architecture, tradeoffs, and evidence that the work was actually shipped."
           />
           <div className="mt-8 flex flex-wrap gap-3">
             <Badge>{projects.length} total</Badge>

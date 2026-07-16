@@ -7,9 +7,9 @@ const projectCaseStudies = [
     title: "Personal Portfolio Platform",
     slug: "personal-portfolio-platform",
     shortDescription:
-      "A full-stack, database-backed personal portfolio platform with project/course CRUD, admin content management, CV support, Supabase storage, and AI-assisted content tooling.",
+      "A full-stack portfolio product with protected admin workflows, database-backed content, CV uploads, and deployment discipline built in from the start.",
     fullDescription:
-      "This portfolio is built as a real full-stack product rather than a static collection of hardcoded cards.\n\nThe goal was to create a system that can grow with my work: public project and course pages are backed by Supabase Postgres, content is managed from a protected admin dashboard, CV uploads are handled through Supabase Storage, and server-side AI helper infrastructure supports content workflows without exposing secrets to the frontend.\n\nThe project is ongoing. It gives me a place to present real case studies while also showing how I think about product structure, content modeling, validation, admin workflows, and clean public presentation.\n\n## Architecture\nNext.js App Router public pages and admin routes connect to server-side data access through Prisma. Supabase Postgres stores projects, courses, and site settings, while Supabase Storage handles uploaded project assets and CV files. Protected admin routes manage content changes, and server-side AI helper routes use Hugging Face-backed services without exposing tokens to the browser.\n\n## What I learned\n- Treating a portfolio as a real product instead of a static page\n- Modeling content so projects and courses can grow over time\n- Building protected admin workflows with validation and clear editing states\n- Keeping secrets and AI provider calls server-side\n- Integrating Supabase database and storage into a Next.js app\n- Writing public-facing project pages that are easy to maintain\n\n## Next steps\n- Add real screenshots and thumbnails for each case study\n- Add more project case studies over time\n- Add architecture diagrams where they clarify the implementation\n- Add public filtering and search for projects and learning records\n- Add stronger tests around data access, forms, and protected routes\n- Polish deployment and migration workflows",
+      "This portfolio is built as a real product, not a static gallery of hardcoded cards.\n\n## Overview\nI designed it so the public site can grow with my work: projects and courses are stored in Supabase Postgres, content is edited through protected admin routes, CV files are uploaded through Supabase Storage, and the site can be updated without editing the public UI by hand.\n\n## Architecture\nThe public pages and admin dashboard run on the Next.js App Router. Prisma handles server-side data access, Supabase stores the project and course records, and the upload flow keeps project media and resume files in storage instead of baking them into the frontend. I also kept AI-assisted admin helpers server-side so secrets never reach the browser.\n\n## Lessons learned and next steps\n- Treating a portfolio like a product made the content model clearer and easier to extend\n- Reusable project and course records are better evidence for a junior SWE portfolio than one-off hardcoded cards\n- Protected admin workflows force better validation and make content edits safer\n- The next improvements are richer screenshots, stronger search and filtering, and more testing around forms and data access",
     techStack: JSON.stringify([
       "Next.js",
       "React",
@@ -32,27 +32,26 @@ const projectCaseStudies = [
     highlights: JSON.stringify([
       "Database-backed public portfolio",
       "Protected admin dashboard",
-      "Project CRUD",
-      "Course CRUD",
+      "Project and course CRUD",
       "Editable site settings",
-      "CV/resume support",
+      "CV/resume upload support",
       "Supabase Storage uploads",
-      "Server-side AI assistant foundation",
-      "Responsive and accessible UI",
+      "Server-side AI helper routes",
+      "Deployment-ready content workflow",
     ]),
     problemSolved:
-      "I did not want a static hardcoded portfolio. I wanted a portfolio that behaves like a real product: database-backed, editable from an admin dashboard, structured around projects, courses, CV, and flexible enough to grow with my work.",
+      "I needed a portfolio that could prove real engineering habits, not just show screenshots. The solution was a database-backed site with content editing, upload workflows, and a public presentation layer that can grow as I ship more work.",
     technicalChallenges:
-      "- Designing reusable project and course content models without overcomplicating the schema\n- Building protected admin flows for projects, courses, CV files, and site settings\n- Integrating Supabase Postgres through Prisma while keeping public reads clean\n- Handling Supabase Storage uploads for project images and CV files\n- Keeping public pages polished while content remains database-driven\n- Adding AI-assisted admin tooling without exposing secrets to the frontend\n- Reworking the original generic platform into a personal portfolio identity",
+      "- Designing reusable project and course models without overcomplicating the schema\n- Building protected admin flows for projects, courses, CV files, and site settings\n- Keeping Prisma reads clean while the data lives in Supabase Postgres\n- Handling Supabase Storage uploads for project images and resume files\n- Keeping the public pages polished while the content stays database-driven\n- Adding AI-assisted content tooling without exposing secrets to the frontend",
     displayOrder: 1,
   },
   {
     title: "AI Pictionary Game",
     slug: "ai-pictionary-game",
     shortDescription:
-      "A turn-based AI guessing game where one player writes a prompt, AI models generate SVG drawings, and the other player tries to guess the original prompt.",
+      "An AI product prototype where players write a prompt, the backend generates sanitized SVG clue rounds, and the game runs asynchronously while the guesser waits.",
     fullDescription:
-      "AI Pictionary Game is an early-stage prototype for a playful AI product: one player writes a funny or unusual situation, multiple AI artist tiers generate SVG clues, and the other player tries to guess the original prompt.\n\nThe project explores a game loop where model imperfections become part of the fun. Instead of treating messy AI output as a failure, the concept turns recognizable-but-imperfect SVG drawings into the core guessing mechanic.\n\nThe current implementation includes a FastAPI backend for creating rounds, polling generated sketches, and scoring guesses, plus an Expo React Native mobile app for the create/wait/guess/result loop. It is intentionally a prototype: the core flow, SVG generation pipeline, sanitizer, local scoring fallback, and mobile interface are present, while a production multiplayer account system and persistent database can be added later.\n\n## Architecture\nExpo / React Native mobile client calls a FastAPI backend. The backend exposes round creation, round polling, and guess submission endpoints. Round generation flows through OpenRouter when an API key is configured, or deterministic local mock artists during development. Generated SVG output is sanitized with defusedxml before it is returned to the mobile app, and guesses are scored through an OpenRouter judge model when configured or a local similarity fallback.\n\n## What I learned\n- Designing an AI product around model limitations instead of hiding them\n- Prompting LLMs for structured SVG-only output\n- Sanitizing AI-generated SVG before rendering it in a client\n- Building a simple game loop around rounds, guesses, and results\n- Separating prototype logic from future multiplayer and product concerns\n- Testing AI-adjacent flows with local mocks and deterministic fallbacks\n\n## Next steps\n- Add persistent multiplayer state\n- Improve scoring and guess comparison\n- Add authentication or lightweight user sessions\n- Add a generated SVG gallery per round\n- Add a model comparison UI that makes the different artist tiers clearer\n- Improve mobile UX around waiting, failures, and replaying rounds\n- Deploy the backend and create a mobile preview/demo when ready",
+      "AI Pictionary Game is an early-stage prototype for a playful AI product.\n\n## Overview\nOne player writes a funny or unusual prompt, the backend turns that prompt into SVG clue rounds, and the other player tries to guess the original idea before the round closes. The game is intentionally built around async waiting, because that makes the AI step feel like part of the experience instead of an implementation detail.\n\n## Architecture\nAn Expo React Native app calls a FastAPI backend for round creation, polling, and guess submission. When an OpenRouter key is available, the backend generates drawings and scores guesses through model calls; when it is not, the app falls back to deterministic local artists and similarity-based scoring so the prototype still works in development.\n\n## Lessons learned and next steps\n- AI output becomes more useful when the product is designed around its limitations\n- Sanitizing generated SVG before rendering it in the client is non-negotiable\n- Async round flow, polling, and fallback scoring make the prototype feel like a real game loop\n- The next step is persistent multiplayer state, clearer model comparison, and a smoother replay experience",
     techStack: JSON.stringify([
       "Python",
       "FastAPI",
@@ -75,20 +74,19 @@ const projectCaseStudies = [
     featured: true,
     role: "Product concept creator and prototype developer",
     highlights: JSON.stringify([
-      "Creative AI product concept",
+      "AI product prototype",
       "Multi-model SVG generation idea",
       "Turn-based guessing game mechanic",
       "Asynchronous two-player flow",
       "Prompt-to-SVG gameplay",
       "OpenRouter-backed model experiments",
       "SVG sanitization for untrusted AI output",
-      "Practical exploration of LLM limitations",
-      "Strong product and game-design angle",
+      "Local fallback scoring and mock artists",
     ]),
     problemSolved:
-      "Most AI demos are simple chat interfaces. This project explores a more playful product idea: using LLMs as visual generators inside a multiplayer guessing game. The goal is to turn model limitations and imperfect SVG generation into part of the gameplay.",
+      "Most AI demos stop at chat. This prototype explores a more useful product shape: letting an LLM generate visual clues inside a multiplayer guessing game, so model imperfections become part of the fun rather than a failure state.",
     technicalChallenges:
-      "- Generating clean SVG-only responses from LLMs\n- Creating prompts that produce recognizable drawings without revealing the full answer as text\n- Comparing low, mid, and high artist model outputs\n- Designing an asynchronous create/wait/guess/result flow\n- Preventing the original prompt from being revealed before the guess\n- Making the game fun even when AI output is imperfect\n- Sanitizing untrusted SVG before rendering it in the mobile app\n- Structuring rounds, prompts, guesses, and generated drawings cleanly in the backend and mobile app",
+      "- Generating clean SVG-only responses from LLMs\n- Creating prompts that stay recognizable without leaking the answer text\n- Comparing low, mid, and high artist outputs in a way players can feel\n- Designing an async create/wait/guess/result flow that does not break the round state\n- Preventing the original prompt from being revealed before the guess\n- Sanitizing untrusted SVG before rendering it in the mobile app\n- Structuring rounds, prompts, guesses, and generated drawings cleanly in the backend and client",
     displayOrder: 2,
   },
 ];

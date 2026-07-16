@@ -5,16 +5,29 @@ import { ProjectVisual } from "@/components/projects/project-visual";
 import { StatusBadge } from "@/components/projects/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import type { Project } from "@/lib/projects";
+import { getProjectStackPreview, type Project } from "@/lib/projects";
 
 type ProjectCardProps = {
   project: Project;
 };
 
 export function ProjectCard({ project }: ProjectCardProps) {
+  const stackPreview = getProjectStackPreview(project.techStack, 4);
+  const problemSolved =
+    project.problemSolved?.replace(/\s+/g, " ").trim() ||
+    project.shortDescription;
+
   return (
     <Card className="group flex h-full flex-col overflow-hidden transition-colors duration-200 hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-950/5 motion-safe:transition-transform motion-safe:hover:-translate-y-1 dark:hover:border-zinc-700 dark:hover:shadow-black/20">
-      <ProjectVisual title={project.title} imageUrl={project.imageUrl} />
+      <ProjectVisual
+        featured={project.featured}
+        imageUrl={project.imageUrl}
+        role={project.role}
+        status={project.status}
+        summary={project.shortDescription}
+        techStack={stackPreview}
+        title={project.title}
+      />
       <CardContent className="flex flex-1 flex-col gap-5 p-5">
         <div className="flex flex-wrap items-center gap-2">
           <StatusBadge status={project.status} />
@@ -34,15 +47,23 @@ export function ProjectCard({ project }: ProjectCardProps) {
               {project.title}
             </Link>
           </h3>
-          <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-            {project.shortDescription}
+          <p className="mt-2 text-sm font-medium text-zinc-700 dark:text-zinc-200">
+            {project.role || "Role not listed"}
+          </p>
+          <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-300 line-clamp-4">
+            {problemSolved}
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {project.techStack.slice(0, 5).map((tech) => (
-            <Badge key={tech}>{tech}</Badge>
-          ))}
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-teal-700 dark:text-teal-300">
+            Stack
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {stackPreview.map((tech) => (
+              <Badge key={tech}>{tech}</Badge>
+            ))}
+          </div>
         </div>
 
         <div className="mt-auto flex flex-wrap gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
@@ -50,7 +71,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
             className="inline-flex min-h-11 items-center gap-2 rounded-md text-sm font-semibold text-zinc-700 transition-colors hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500 dark:text-zinc-300 dark:hover:text-white"
             href={`/projects/${project.slug}`}
           >
-            Details
+            Read case study
             <ArrowUpRight aria-hidden="true" size={16} />
           </Link>
           {project.githubUrl ? (
