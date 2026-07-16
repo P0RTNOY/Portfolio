@@ -7,7 +7,11 @@ import { ProjectPageShell } from "@/components/projects/project-page-shell";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { getCourseBySlug } from "@/lib/courses";
+import {
+  getCourseBySlug,
+  getCourseLearningImpact,
+  getCourseStageLabel,
+} from "@/lib/courses";
 import { getSiteSettings } from "@/lib/site-settings";
 
 export const dynamic = "force-dynamic";
@@ -84,6 +88,8 @@ export default async function CourseDetailPage({ params }: CourseDetailProps) {
   }
 
   const credentialUrl = course.certificateUrl ?? course.credentialUrl;
+  const learningImpact = getCourseLearningImpact(course);
+  const stageLabel = getCourseStageLabel(course);
 
   return (
     <ProjectPageShell siteName={settings.siteName}>
@@ -91,7 +97,11 @@ export default async function CourseDetailPage({ params }: CourseDetailProps) {
         <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8">
           <CourseVisual
             className="lg:order-2"
+            featured={course.featured}
             imageUrl={course.imageUrl}
+            progress={course.progress}
+            stageLabel={stageLabel}
+            status={course.status}
             title={course.title}
           />
           <div className="flex flex-col justify-center">
@@ -116,6 +126,10 @@ export default async function CourseDetailPage({ params }: CourseDetailProps) {
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-300">
               {course.shortDescription}
+            </p>
+            <p className="mt-5 max-w-2xl rounded-2xl border border-teal-200 bg-teal-50/80 px-4 py-3 text-sm leading-7 text-teal-900 dark:border-teal-900 dark:bg-teal-950/50 dark:text-teal-100">
+              <span className="font-semibold">Why this matters: </span>
+              {learningImpact}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <ButtonLink
@@ -144,6 +158,19 @@ export default async function CourseDetailPage({ params }: CourseDetailProps) {
 
       <section className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_320px] lg:px-8">
         <div className="space-y-8">
+          <Card className="border-teal-200 bg-teal-50/70 dark:border-teal-900 dark:bg-teal-950/30">
+            <CardHeader>
+              <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
+                Why this matters
+              </h2>
+            </CardHeader>
+            <CardContent>
+              <p className="text-base leading-8 text-zinc-700 dark:text-zinc-200">
+                {learningImpact} It also gives recruiters a clear signal that
+                this portfolio is still active, structured, and job-relevant.
+              </p>
+            </CardContent>
+          </Card>
           <Card>
             <CardHeader>
               <h2 className="text-xl font-bold text-zinc-950 dark:text-white">

@@ -160,9 +160,9 @@ const learningRecords = [
     courseUrl: "https://lnkd.in/dY83N4wi",
     imageUrl: null,
     shortDescription:
-      "A practical LLM engineering course focused on building and deploying LLM apps while learning Generative AI, RAG, LoRA, agents, and modern AI product patterns.",
+      "An applied AI track for building, evaluating, and deploying LLM features with RAG, LoRA, agents, and product-focused delivery habits.",
     fullDescription:
-      "I am taking this course to move beyond simply using ChatGPT and better understand how LLM-powered applications are built, deployed, evaluated, and improved. The course is structured as an 8-week practical journey through LLM apps, RAG, LoRA, AI agents, and product-oriented AI development.",
+      "This track is my applied AI roadmap. I am using it to move from basic model usage to understanding how LLM-powered features are designed, evaluated, deployed, and improved in real products. The weekly focus covers LLM app patterns, RAG, LoRA, agents, and the tradeoffs that matter when shipping AI features as a junior engineer.",
     skills: JSON.stringify([
       "LLMs",
       "Generative AI",
@@ -192,9 +192,9 @@ const learningRecords = [
     courseUrl: "https://www.comptia.org/certifications/security",
     imageUrl: null,
     shortDescription:
-      "A security fundamentals learning track focused on networking, risk, identity, threats, vulnerabilities, and practical security awareness for software engineering.",
+      "A security fundamentals track for building safer engineering habits around authentication, networking, risk, identity, and common vulnerabilities.",
     fullDescription:
-      "This learning track supports my software engineering foundation by strengthening security awareness around authentication, infrastructure, networking, access control, vulnerabilities, and secure development practices.",
+      "This track reinforces the security habits I need as a junior software engineer. I am using it to build practical awareness around authentication, access control, networking basics, threat modeling, infrastructure risk, and secure development decisions that reduce avoidable mistakes in real projects.",
     skills: JSON.stringify([
       "Security Fundamentals",
       "Networking",
@@ -222,9 +222,9 @@ const learningRecords = [
     courseUrl: "https://leetcode.com/problemset/",
     imageUrl: null,
     shortDescription:
-      "A continuous practice track for coding interviews and software engineering fundamentals, focused on Python problem solving, common patterns, and algorithmic thinking.",
+      "A steady interview-prep track for strengthening problem solving, pattern recognition, and Python coding speed for junior SWE interviews.",
     fullDescription:
-      "This track helps me sharpen core computer science fundamentals and interview readiness through repeated practice with common problem-solving patterns such as hash maps, stacks, queues, two pointers, arrays, strings, and running-state algorithms.",
+      "This track is focused on interview readiness and core computer science repetition. I use it to practice common patterns such as hash maps, stacks, queues, two pointers, arrays, strings, and running-state algorithms so I can solve junior-level interview problems with more accuracy and less friction.",
     skills: JSON.stringify([
       "Data Structures",
       "Algorithms",

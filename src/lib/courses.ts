@@ -90,6 +90,66 @@ function toCourse(course: PrismaCourse): Course {
   return normalizedCourse;
 }
 
+function normalizeText(value: string) {
+  return value.toLowerCase();
+}
+
+export function getCourseLearningImpact(course: Pick<Course, "title" | "skills" | "status" | "progress">) {
+  const title = normalizeText(course.title);
+
+  if (title.includes("llm") || course.skills.some((skill) => normalizeText(skill).includes("llm"))) {
+    return "Builds applied AI shipping judgment, from model selection to evaluation and deployment.";
+  }
+
+  if (title.includes("security") || course.skills.some((skill) => normalizeText(skill).includes("security"))) {
+    return "Builds secure engineering habits across authentication, network risk, and vulnerability awareness.";
+  }
+
+  if (
+    title.includes("data structures") ||
+    title.includes("algorithms") ||
+    course.skills.some((skill) =>
+      ["data structures", "algorithms", "problem solving"].some((needle) =>
+        normalizeText(skill).includes(needle),
+      ),
+    )
+  ) {
+    return "Builds interview readiness and algorithmic problem-solving speed for junior SWE interviews.";
+  }
+
+  if (course.status === "in-progress") {
+    if (course.progress >= 75) {
+      return "Shows near-complete skill-building that is close to turning into project-ready output.";
+    }
+
+    if (course.progress >= 40) {
+      return "Shows active skill-building with progress that can be tied to current project work.";
+    }
+
+    return "Shows the portfolio is still actively growing through structured practice.";
+  }
+
+  return "Shows active skill-building that supports portfolio depth and interview readiness.";
+}
+
+export function getCourseStageLabel(course: Pick<Course, "status" | "progress">) {
+  if (course.status === "completed") {
+    return "Completed learning track";
+  }
+
+  if (course.status === "in-progress") {
+    if (course.progress >= 75) return "Near completion";
+    if (course.progress >= 40) return "Building momentum";
+    return "Early-stage growth";
+  }
+
+  if (course.status === "planned") {
+    return "Planned next step";
+  }
+
+  return "Archived learning track";
+}
+
 function toCourseCreateData(input: CourseCreateInput): Prisma.CourseCreateInput {
   return {
     title: input.title,

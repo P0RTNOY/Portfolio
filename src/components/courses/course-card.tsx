@@ -4,7 +4,11 @@ import Link from "next/link";
 import { CourseVisual } from "@/components/courses/course-visual";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import type { Course } from "@/lib/courses";
+import {
+  getCourseLearningImpact,
+  getCourseStageLabel,
+  type Course,
+} from "@/lib/courses";
 
 type CourseCardProps = {
   course: Course;
@@ -35,9 +39,19 @@ function ProgressBar({ progress }: { progress: number }) {
 }
 
 export function CourseCard({ course }: CourseCardProps) {
+  const learningImpact = getCourseLearningImpact(course);
+  const stageLabel = getCourseStageLabel(course);
+
   return (
     <Card className="group flex h-full flex-col overflow-hidden transition-colors duration-200 hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-950/5 motion-safe:transition-transform motion-safe:hover:-translate-y-1 dark:hover:border-zinc-700 dark:hover:shadow-black/20">
-      <CourseVisual imageUrl={course.imageUrl} title={course.title} />
+      <CourseVisual
+        featured={course.featured}
+        imageUrl={course.imageUrl}
+        progress={course.progress}
+        stageLabel={stageLabel}
+        status={course.status}
+        title={course.title}
+      />
       <CardContent className="flex flex-1 flex-col gap-5 p-5">
         <div className="flex flex-wrap items-center gap-2">
           <Badge>{statusLabels[course.status]}</Badge>
@@ -63,6 +77,12 @@ export function CourseCard({ course }: CourseCardProps) {
           </h3>
           <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
             {course.shortDescription}
+          </p>
+          <p className="mt-3 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm leading-6 text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-200">
+            <span className="font-semibold text-zinc-950 dark:text-white">
+              Capability built:
+            </span>{" "}
+            {learningImpact}
           </p>
         </div>
 
@@ -98,4 +118,3 @@ export function CourseCard({ course }: CourseCardProps) {
     </Card>
   );
 }
-
