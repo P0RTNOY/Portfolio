@@ -9,7 +9,6 @@ type CourseVisualProps = {
   progress?: number;
   stageLabel?: string;
   status?: "planned" | "in-progress" | "completed" | "archived";
-  title: string;
 };
 
 function safeBackgroundImage(url: string) {
@@ -33,19 +32,17 @@ export function CourseVisual({
   progress = 0,
   stageLabel,
   status = "planned",
-  title,
 }: CourseVisualProps) {
   const statusText = statusCopy[status];
 
   if (imageUrl) {
     return (
       <div
-        aria-label={`${title} course image`}
+        aria-hidden="true"
         className={cn(
           "relative aspect-[16/10] overflow-hidden rounded-md border border-zinc-200 bg-cover bg-center dark:border-zinc-800",
           className,
         )}
-        role="img"
         style={{ backgroundImage: safeBackgroundImage(imageUrl) }}
       >
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(9,9,11,0.08),rgba(9,9,11,0.65))]" />
@@ -77,12 +74,11 @@ export function CourseVisual({
 
   return (
     <div
-      aria-label={`${title} course visual`}
+      aria-hidden="true"
       className={cn(
         "relative flex aspect-[16/10] items-center justify-center overflow-hidden rounded-md border border-zinc-200 bg-zinc-950 text-white dark:border-zinc-800",
         className,
       )}
-      role="img"
     >
       <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(20,184,166,0.28),transparent_35%),linear-gradient(315deg,rgba(245,158,11,0.3),transparent_36%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.16)_1px,transparent_0)] [background-size:18px_18px]" />
@@ -108,7 +104,7 @@ export function CourseVisual({
           />
         </div>
       </div>
-      <div className="relative flex size-14 items-center justify-center rounded-lg border border-white/20 bg-white/10">
+      <div className="relative hidden size-14 items-center justify-center rounded-lg border border-white/20 bg-white/10 sm:flex">
         <GraduationCap aria-hidden="true" size={24} />
       </div>
     </div>

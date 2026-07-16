@@ -90,46 +90,72 @@ function toCourse(course: PrismaCourse): Course {
   return normalizedCourse;
 }
 
-function normalizeText(value: string) {
-  return value.toLowerCase();
+function withTerminalPunctuation(value: string) {
+  const normalized = value.trim();
+
+  if (!normalized) {
+    return "";
+  }
+
+  return /[.!?]$/.test(normalized) ? normalized : `${normalized}.`;
 }
 
-export function getCourseLearningImpact(course: Pick<Course, "title" | "skills" | "status" | "progress">) {
-  const title = normalizeText(course.title);
+function formatAuthoredTopics(skills: string[]) {
+  const topics = skills
+    .map((skill) => skill.trim())
+    .filter(Boolean)
+    .slice(0, 5);
 
-  if (title.includes("llm") || course.skills.some((skill) => normalizeText(skill).includes("llm"))) {
-    return "Builds applied AI shipping judgment, from model selection to evaluation and deployment.";
+  if (topics.length === 0) return null;
+  if (topics.length === 1) return topics[0];
+  if (topics.length === 2) return `${topics[0]} and ${topics[1]}`;
+
+  return `${topics.slice(0, -1).join(", ")}, and ${topics.at(-1)}`;
+}
+
+export function getCourseLearningImpact(
+  course: Pick<
+    Course,
+    "title" | "shortDescription" | "skills" | "status" | "progress"
+  >,
+) {
+  const topics = formatAuthoredTopics(course.skills);
+
+  if (topics) {
+    if (course.status === "planned") {
+      return `Intended focus: ${topics}.`;
+    }
+
+    if (course.status === "in-progress") {
+      return `Currently developing familiarity with ${topics}.`;
+    }
+
+    if (course.status === "completed") {
+      return `Completed learning focused on ${topics}.`;
+    }
+
+    return `Historical learning record focused on ${topics}.`;
   }
 
-  if (title.includes("security") || course.skills.some((skill) => normalizeText(skill).includes("security"))) {
-    return "Builds secure engineering habits across authentication, network risk, and vulnerability awareness.";
+  const description = withTerminalPunctuation(course.shortDescription);
+
+  if (!description) {
+    return "No learning focus has been recorded yet.";
   }
 
-  if (
-    title.includes("data structures") ||
-    title.includes("algorithms") ||
-    course.skills.some((skill) =>
-      ["data structures", "algorithms", "problem solving"].some((needle) =>
-        normalizeText(skill).includes(needle),
-      ),
-    )
-  ) {
-    return "Builds interview readiness and algorithmic problem-solving speed for junior SWE interviews.";
+  if (course.status === "planned") {
+    return `Intended focus: ${description}`;
   }
 
   if (course.status === "in-progress") {
-    if (course.progress >= 75) {
-      return "Shows near-complete skill-building that is close to turning into project-ready output.";
-    }
-
-    if (course.progress >= 40) {
-      return "Shows active skill-building with progress that can be tied to current project work.";
-    }
-
-    return "Shows the portfolio is still actively growing through structured practice.";
+    return `Current learning focus: ${description}`;
   }
 
-  return "Shows active skill-building that supports portfolio depth and interview readiness.";
+  if (course.status === "completed") {
+    return `Completed learning record: ${description}`;
+  }
+
+  return `Historical learning record: ${description}`;
 }
 
 export function getCourseStageLabel(course: Pick<Course, "status" | "progress">) {

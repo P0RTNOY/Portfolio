@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Learning | Omer Portnoy",
   description:
-    "A learning timeline for Omer Portnoy's AI, backend, cloud, security, and software engineering growth.",
+    "A transparent roadmap and progress log for learning relevant to junior software engineering.",
 };
 
 export default async function CoursesPage() {
@@ -33,13 +33,15 @@ export default async function CoursesPage() {
         <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
           <SectionHeading
             eyebrow="Courses"
-            title="Learning timeline as proof of growth."
-            description="These tracks are evidence of active learning, not filler content. They support applied AI, backend, cloud, security, and interview fundamentals that matter for a junior software engineer profile."
+            title="A transparent learning roadmap and progress log."
+            description="Each entry reports its authored focus, status, and progress. Together they document planned, current, completed, and historical learning relevant to junior software engineering without treating a course record as proof of proficiency."
           />
           <p className="mt-6 max-w-3xl text-base leading-7 text-zinc-600 dark:text-zinc-300">
-            The timeline below shows what I am learning now, what I am using to
-            sharpen interview readiness, and how the portfolio keeps growing
-            beyond the shipped projects.
+            For a junior software engineering review, the recorded topics show
+            the specific subject of each resource while status and progress
+            distinguish intended study from work underway or completed.
+            Certificates and credential links appear separately only when an
+            artifact is available.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Badge>{courses.length} total</Badge>

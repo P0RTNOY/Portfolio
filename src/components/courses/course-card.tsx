@@ -23,12 +23,21 @@ const statusLabels: Record<string, string> = {
 
 function ProgressBar({ progress }: { progress: number }) {
   return (
-    <div>
+    <div
+      aria-label="Course progress"
+      aria-valuemax={100}
+      aria-valuemin={0}
+      aria-valuenow={progress}
+      role="progressbar"
+    >
       <div className="flex items-center justify-between gap-3 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
         <span>Progress</span>
         <span>{progress}%</span>
       </div>
-      <div className="mt-2 h-2 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
+      <div
+        aria-hidden="true"
+        className="mt-2 h-2 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800"
+      >
         <div
           className="h-full rounded-full bg-teal-600 dark:bg-teal-400"
           style={{ width: `${progress}%` }}
@@ -50,7 +59,6 @@ export function CourseCard({ course }: CourseCardProps) {
         progress={course.progress}
         stageLabel={stageLabel}
         status={course.status}
-        title={course.title}
       />
       <CardContent className="flex flex-1 flex-col gap-5 p-5">
         <div className="flex flex-wrap items-center gap-2">
@@ -80,7 +88,7 @@ export function CourseCard({ course }: CourseCardProps) {
           </p>
           <p className="mt-3 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm leading-6 text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-200">
             <span className="font-semibold text-zinc-950 dark:text-white">
-              Capability built:
+              Learning focus:
             </span>{" "}
             {learningImpact}
           </p>

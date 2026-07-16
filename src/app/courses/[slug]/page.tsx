@@ -29,6 +29,17 @@ const statusLabels: Record<string, string> = {
   archived: "Archived",
 };
 
+const statusContext: Record<string, string> = {
+  planned:
+    "This record documents a future learning priority. The overview below defines the intended scope; it does not claim completed work.",
+  "in-progress":
+    "This record is a progress log for learning that is currently underway. The overview below explains the authored scope and its junior software engineering relevance.",
+  completed:
+    "This record documents a completed learning track. A certificate or credential is linked separately when one is available.",
+  archived:
+    "This historical record preserves earlier learning context and is not presented as current activity.",
+};
+
 export async function generateMetadata({
   params,
 }: CourseDetailProps): Promise<Metadata> {
@@ -61,12 +72,21 @@ function formatDate(date: Date | null) {
 
 function ProgressBar({ progress }: { progress: number }) {
   return (
-    <div>
+    <div
+      aria-label="Course progress"
+      aria-valuemax={100}
+      aria-valuemin={0}
+      aria-valuenow={progress}
+      role="progressbar"
+    >
       <div className="flex items-center justify-between gap-3 text-sm font-semibold text-zinc-600 dark:text-zinc-300">
         <span>Progress</span>
         <span>{progress}%</span>
       </div>
-      <div className="mt-2 h-3 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
+      <div
+        aria-hidden="true"
+        className="mt-2 h-3 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800"
+      >
         <div
           className="h-full rounded-full bg-teal-600 dark:bg-teal-400"
           style={{ width: `${progress}%` }}
@@ -102,7 +122,6 @@ export default async function CourseDetailPage({ params }: CourseDetailProps) {
             progress={course.progress}
             stageLabel={stageLabel}
             status={course.status}
-            title={course.title}
           />
           <div className="flex flex-col justify-center">
             <ButtonLink className="mb-6 w-fit" href="/courses" variant="ghost">
@@ -128,7 +147,7 @@ export default async function CourseDetailPage({ params }: CourseDetailProps) {
               {course.shortDescription}
             </p>
             <p className="mt-5 max-w-2xl rounded-2xl border border-teal-200 bg-teal-50/80 px-4 py-3 text-sm leading-7 text-teal-900 dark:border-teal-900 dark:bg-teal-950/50 dark:text-teal-100">
-              <span className="font-semibold">Why this matters: </span>
+              <span className="font-semibold">Learning focus: </span>
               {learningImpact}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -137,7 +156,7 @@ export default async function CourseDetailPage({ params }: CourseDetailProps) {
                 rel="noreferrer"
                 target="_blank"
               >
-                View course
+                View learning resource
                 <ArrowUpRight aria-hidden="true" size={18} />
               </ButtonLink>
               {credentialUrl ? (
@@ -161,13 +180,12 @@ export default async function CourseDetailPage({ params }: CourseDetailProps) {
           <Card className="border-teal-200 bg-teal-50/70 dark:border-teal-900 dark:bg-teal-950/30">
             <CardHeader>
               <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
-                Why this matters
+                How to read this record
               </h2>
             </CardHeader>
             <CardContent>
               <p className="text-base leading-8 text-zinc-700 dark:text-zinc-200">
-                {learningImpact} It also gives recruiters a clear signal that
-                this portfolio is still active, structured, and job-relevant.
+                {statusContext[course.status]}
               </p>
             </CardContent>
           </Card>
