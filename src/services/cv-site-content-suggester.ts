@@ -3,6 +3,10 @@ import "server-only";
 import { PDFParse } from "pdf-parse";
 
 import { generateHuggingFaceText } from "@/lib/huggingface";
+import {
+  fetchSafeRemotePdf,
+  SafeRemotePdfError,
+} from "@/lib/safe-remote-pdf";
 
 const MAX_RESUME_BYTES = 4 * 1024 * 1024;
 const MAX_RESUME_TEXT_CHARS = 14000;
@@ -220,34 +224,28 @@ function parseAiSuggestion(text: string, resumeText: string) {
 }
 
 async function extractPdfTextFromUrl(resumeUrl: string) {
-  const response = await fetch(resumeUrl, {
-    headers: {
-      Accept: "application/pdf,application/octet-stream,*/*",
-    },
-  });
+  let buffer: Buffer;
 
-  if (!response.ok) {
+  try {
+    const result = await fetchSafeRemotePdf(resumeUrl, {
+      maxBytes: MAX_RESUME_BYTES,
+    });
+    buffer = Buffer.from(result.bytes);
+  } catch (error) {
+    if (error instanceof SafeRemotePdfError && error.code === "TOO_LARGE") {
+      throw new CvImportError("Resume PDF is larger than 4 MB.", "CV_TOO_LARGE");
+    }
+
+    if (error instanceof SafeRemotePdfError && error.code === "NOT_PDF") {
+      throw new CvImportError(
+        "The remote document is not a PDF.",
+        "CV_INVALID_PDF",
+      );
+    }
+
     throw new CvImportError(
-      `Resume PDF could not be fetched. The server returned HTTP ${response.status}.`,
+      "Resume PDF could not be fetched from a safe public HTTPS address.",
       "CV_FETCH_FAILED",
-    );
-  }
-
-  const contentLength = response.headers.get("content-length");
-
-  if (contentLength && Number(contentLength) > MAX_RESUME_BYTES) {
-    throw new CvImportError(
-      "Resume PDF is larger than 4 MB.",
-      "CV_TOO_LARGE",
-    );
-  }
-
-  const buffer = Buffer.from(await response.arrayBuffer());
-
-  if (buffer.byteLength > MAX_RESUME_BYTES) {
-    throw new CvImportError(
-      "Resume PDF is larger than 4 MB.",
-      "CV_TOO_LARGE",
     );
   }
 

@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { listCourses } from "@/lib/courses";
+import { getHomepageCvCopy } from "@/lib/cv-copy";
 import { listProjects } from "@/lib/projects";
 import { getSiteSettings } from "@/lib/site-settings";
 
@@ -38,6 +39,7 @@ export default async function Home() {
   const activeLearningTracks = courses.filter(
     (course) => course.status === "in-progress",
   );
+  const homepageCvCopy = getHomepageCvCopy(Boolean(settings.resumeUrl));
   const proofItems: ProofItem[] = [
     {
       label: "Junior SWE focus",
@@ -181,7 +183,7 @@ export default async function Home() {
               <SectionHeading
                 eyebrow="CV"
                 title="CV and professional background."
-                description="A focused view of my experience, education, and technical direction. Visitors can read it in the site or open the latest PDF version."
+                description={homepageCvCopy.description}
               />
               <div className="mt-8 flex flex-wrap gap-3">
                 {settings.resumeUrl ? (
@@ -191,9 +193,7 @@ export default async function Home() {
                       Read CV
                     </ButtonLink>
                     <ButtonLink
-                      href={settings.resumeUrl}
-                      rel="noreferrer"
-                      target="_blank"
+                      href="/api/cv/download"
                       variant="secondary"
                     >
                       <Download aria-hidden="true" size={18} />
@@ -202,7 +202,7 @@ export default async function Home() {
                   </>
                 ) : (
                   <p className="text-sm font-semibold text-zinc-600 dark:text-zinc-400">
-                    The latest CV will be available here soon.
+                    {homepageCvCopy.availability}
                   </p>
                 )}
               </div>
@@ -271,9 +271,7 @@ export default async function Home() {
               ) : null}
               {settings.resumeUrl ? (
                 <ButtonLink
-                  href={settings.resumeUrl}
-                  rel="noreferrer"
-                  target="_blank"
+                  href="/cv"
                   variant="ghost"
                 >
                   Resume

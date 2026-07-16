@@ -1,5 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 
+import { DEFAULT_CONTACT_SUMMARY } from "../src/lib/cv-copy";
+import { buildSeedSiteSettingsUpdate } from "../src/lib/seed-site-settings";
+
 const prisma = new PrismaClient();
 
 const projectCaseStudies = [
@@ -144,8 +147,7 @@ const demoSiteSettings = {
     "Security Fundamentals",
   ]),
   contactTitle: "Open to junior software engineering opportunities.",
-  contactSummary:
-    "I'm open to junior software engineering opportunities and project conversations. Review the case studies and learning timeline for current evidence; the CV page will show the latest resume once it is uploaded.",
+  contactSummary: DEFAULT_CONTACT_SUMMARY,
   contactEmail: "omerportnoy@gmail.com",
   githubUrl: "https://github.com/P0RTNOY",
   linkedinUrl: null,
@@ -270,7 +272,7 @@ async function main() {
 
   await prisma.siteSettings.upsert({
     where: { id: demoSiteSettings.id },
-    update: demoSiteSettings,
+    update: buildSeedSiteSettingsUpdate(demoSiteSettings),
     create: demoSiteSettings,
   });
 

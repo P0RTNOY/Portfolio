@@ -1,10 +1,12 @@
 import type { Prisma, SiteSettings as PrismaSiteSettings } from "@prisma/client";
 
+import { DEFAULT_CONTACT_SUMMARY } from "@/lib/cv-copy";
 import { getPrisma } from "@/lib/prisma";
 import {
   siteSettingsSchema,
   type SiteSettingsInput,
 } from "@/lib/validations/site-settings";
+import { normalizeRemoteDocumentUrl } from "@/lib/validations/remote-document-url";
 
 const SITE_SETTINGS_ID = "default";
 
@@ -46,8 +48,7 @@ const defaultSiteSettingsInput: SiteSettingsInput = {
     "Security Fundamentals",
   ],
   contactTitle: "Open to junior software engineering opportunities.",
-  contactSummary:
-    "I'm open to junior software engineering opportunities and project conversations. Review the case studies and learning timeline for current evidence; the CV page will show the latest resume once it is uploaded.",
+  contactSummary: DEFAULT_CONTACT_SUMMARY,
   contactEmail: "omerportnoy@gmail.com",
   githubUrl: "https://github.com/P0RTNOY",
   linkedinUrl: undefined,
@@ -84,6 +85,7 @@ function cleanOptionalString(value: string | null | undefined) {
 function toSiteSettings(settings: PrismaSiteSettings): SiteSettings {
   return {
     ...settings,
+    resumeUrl: normalizeRemoteDocumentUrl(settings.resumeUrl),
     skills: parseStringArray(settings.skills),
   };
 }

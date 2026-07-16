@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { apiError, apiJson } from "@/lib/api/response";
 import { getAdminSessionFromRequest } from "@/lib/auth";
+import { remoteDocumentUrlSchema } from "@/lib/validations/remote-document-url";
 import {
   CvImportError,
   generateSiteContentFromCv,
@@ -11,9 +12,7 @@ import {
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-const requestSchema = z.object({
-  resumeUrl: z.string().trim().url("Enter a valid resume PDF URL.").max(1200),
-});
+const requestSchema = z.object({ resumeUrl: remoteDocumentUrlSchema });
 
 export async function POST(request: NextRequest) {
   const session = await getAdminSessionFromRequest(request);

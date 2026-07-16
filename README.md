@@ -42,6 +42,14 @@ The project is set up as a real portfolio product: homepage identity, learning t
 
 The current phase focuses on polishing these first two case studies before adding more projects.
 
+## Learning Records
+
+These are in-progress learning records and will be updated over time:
+
+- Become an LLM Engineer in 8 Weeks
+- CompTIA Security+ Preparation
+- Data Structures & Algorithms Practice
+
 ## Public Routes
 
 - `/` - Portfolio homepage with hero, about, projects, courses, CV, skills, and contact sections

@@ -48,32 +48,35 @@ export function ResumeViewer({
         <div className="min-w-0">
           <p className="text-sm font-bold">CV ready for review</p>
           <p className="mt-0.5 text-xs text-zinc-400">
-            Embedded PDF · open in a new tab or download a copy
+            {compact
+              ? "Embedded PDF preview"
+              : "Embedded PDF · open in a new tab or download a copy"}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <ButtonLink
-            className="border-white/15 bg-white/10 text-white hover:bg-white/15 dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
-            href={resumeUrl}
-            rel="noreferrer"
-            size="sm"
-            target="_blank"
-            variant="secondary"
-          >
-            <ExternalLink aria-hidden="true" size={16} />
-            Open CV in new tab
-          </ButtonLink>
-          <ButtonLink
-            className="border-white/15 bg-white/10 text-white hover:bg-white/15 dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
-            download
-            href={resumeUrl}
-            size="sm"
-            variant="secondary"
-          >
-            <Download aria-hidden="true" size={16} />
-            Download CV
-          </ButtonLink>
-        </div>
+        {compact ? null : (
+          <div className="flex flex-wrap gap-2">
+            <ButtonLink
+              className="border-white/15 bg-white/10 text-white hover:bg-white/15 dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
+              href={resumeUrl}
+              rel="noreferrer"
+              size="sm"
+              target="_blank"
+              variant="secondary"
+            >
+              <ExternalLink aria-hidden="true" size={16} />
+              Open CV in new tab
+            </ButtonLink>
+            <ButtonLink
+              className="border-white/15 bg-white/10 text-white hover:bg-white/15 dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
+              href="/api/cv/download"
+              size="sm"
+              variant="secondary"
+            >
+              <Download aria-hidden="true" size={16} />
+              Download CV
+            </ButtonLink>
+          </div>
+        )}
       </div>
 
       <div

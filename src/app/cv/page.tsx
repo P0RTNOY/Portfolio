@@ -6,18 +6,23 @@ import { ResumeViewer } from "@/components/site/resume-viewer";
 import { SectionHeading } from "@/components/site/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
+import {
+  CV_FOCUS_AREAS,
+  CV_METADATA_DESCRIPTION,
+  getCvPageCopy,
+} from "@/lib/cv-copy";
 import { getSiteSettings } from "@/lib/site-settings";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "CV | Omer Portnoy",
-  description:
-    "Read Omer Portnoy's CV and professional background inside the portfolio.",
+  description: CV_METADATA_DESCRIPTION,
 };
 
 export default async function CvPage() {
   const settings = await getSiteSettings();
+  const cvPageCopy = getCvPageCopy(Boolean(settings.resumeUrl));
 
   return (
     <ProjectPageShell siteName={settings.siteName}>
@@ -33,16 +38,10 @@ export default async function CvPage() {
           <SectionHeading
             eyebrow="Candidate overview"
             title="The evidence behind the portfolio."
-            description="This CV brings the work shown across the site into one hiring-focused record: what I build, how I work, and how I keep learning."
+            description={cvPageCopy.description}
           />
           <ul className="mt-8 grid gap-3 text-sm font-semibold text-zinc-700 sm:grid-cols-2 lg:grid-cols-5 dark:text-zinc-300">
-            {[
-              "Full-stack work",
-              "AI tooling",
-              "Databases and APIs",
-              "Admin workflows",
-              "Learning discipline",
-            ].map((focusArea) => (
+            {CV_FOCUS_AREAS.map((focusArea) => (
               <li
                 className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900/60"
                 key={focusArea}
