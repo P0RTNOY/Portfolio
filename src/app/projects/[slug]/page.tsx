@@ -152,8 +152,15 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
     project.fullDescription,
   );
   const stackPreview = getProjectStackPreview(project.techStack, 6);
-  const implementationSection = caseStudySections[0];
-  const remainingSections = caseStudySections.slice(1);
+  const implementationSection = caseStudySections.find((section) =>
+    /(architecture|implementation)/i.test(section.title),
+  );
+  const lessonsSection = caseStudySections.find((section) =>
+    /(lessons learned|next steps)/i.test(section.title),
+  );
+  const remainingSections = caseStudySections.filter(
+    (section) => section !== implementationSection && section !== lessonsSection,
+  );
 
   return (
     <ProjectPageShell siteName={settings.siteName}>
@@ -295,6 +302,19 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
               </CardContent>
             </Card>
           ))}
+
+          {lessonsSection ? (
+            <Card>
+              <CardHeader>
+                <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
+                  {lessonsSection.title}
+                </h2>
+              </CardHeader>
+              <CardContent>
+                <CaseStudyBody body={lessonsSection.body} />
+              </CardContent>
+            </Card>
+          ) : null}
 
           {project.screenshots.length === 0 ? (
             <Card>
