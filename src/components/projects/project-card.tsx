@@ -55,16 +55,18 @@ export function ProjectCard({ project }: ProjectCardProps) {
           </p>
         </div>
 
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-teal-700 dark:text-teal-300">
-            Stack
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {stackPreview.map((tech) => (
-              <Badge key={tech}>{tech}</Badge>
-            ))}
+        {stackPreview.length > 0 ? (
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-teal-700 dark:text-teal-300">
+              Stack
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {stackPreview.map((tech) => (
+                <Badge key={tech}>{tech}</Badge>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : null}
 
         <div className="mt-auto flex flex-wrap gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
           <Link

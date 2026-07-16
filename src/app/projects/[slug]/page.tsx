@@ -9,6 +9,7 @@ import { StatusBadge } from "@/components/projects/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { buildCaseStudySections } from "@/lib/case-study-content";
 import { getProjectBySlug, getProjectStackPreview } from "@/lib/projects";
 import { getSiteSettings } from "@/lib/site-settings";
 
@@ -43,45 +44,6 @@ function formatDate(date: Date) {
     month: "short",
     year: "numeric",
   }).format(date);
-}
-
-type CaseStudySection = {
-  body: string;
-  title: string;
-};
-
-function parseCaseStudyContent(description: string) {
-  const sections: CaseStudySection[] = [];
-  let current: CaseStudySection = { title: "Overview", body: "" };
-
-  for (const line of description.split("\n")) {
-    const heading = line.match(/^##\s+(.+)$/);
-    if (heading) {
-      if (current.body.trim()) {
-        sections.push({ ...current, body: current.body.trim() });
-      }
-      current = { title: heading[1].trim(), body: "" };
-      continue;
-    }
-
-    current.body = `${current.body}${current.body ? "\n" : ""}${line}`;
-  }
-
-  if (current.body.trim()) {
-    sections.push({ ...current, body: current.body.trim() });
-  }
-
-  const [overview, ...caseStudySections] =
-    sections.length > 0
-      ? sections
-      : [
-          {
-            title: "Overview",
-            body: "A detailed project description can be added from the admin dashboard.",
-          },
-        ];
-
-  return { caseStudySections, overview };
 }
 
 function CaseStudyBody({ body }: { body: string }) {
@@ -148,19 +110,12 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
     notFound();
   }
 
-  const { caseStudySections, overview } = parseCaseStudyContent(
-    project.fullDescription,
-  );
+  const caseStudySections = buildCaseStudySections({
+    description: project.fullDescription,
+    problemSolved: project.problemSolved,
+    technicalChallenges: project.technicalChallenges,
+  });
   const stackPreview = getProjectStackPreview(project.techStack, 6);
-  const implementationSection = caseStudySections.find((section) =>
-    /(architecture|implementation)/i.test(section.title),
-  );
-  const lessonsSection = caseStudySections.find((section) =>
-    /(lessons learned|next steps)/i.test(section.title),
-  );
-  const remainingSections = caseStudySections.filter(
-    (section) => section !== implementationSection && section !== lessonsSection,
-  );
 
   return (
     <ProjectPageShell siteName={settings.siteName}>
@@ -175,6 +130,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
             summary={project.shortDescription}
             techStack={stackPreview}
             title={project.title}
+            variant="detail"
           />
           <div className="flex flex-col justify-center">
             <ButtonLink className="mb-6 w-fit" href="/projects" variant="ghost">
@@ -199,16 +155,18 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
             <p className="mt-5 max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-300">
               {project.shortDescription}
             </p>
-            <div className="mt-8 space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-teal-700 dark:text-teal-300">
-                Stack
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {stackPreview.map((tech) => (
-                  <Badge key={tech}>{tech}</Badge>
-                ))}
+            {stackPreview.length > 0 ? (
+              <div className="mt-8 space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-teal-700 dark:text-teal-300">
+                  Stack
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {stackPreview.map((tech) => (
+                    <Badge key={tech}>{tech}</Badge>
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : null}
             <div className="mt-8 flex flex-wrap gap-3">
               {project.githubUrl ? (
                 <ButtonLink
@@ -240,58 +198,8 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
 
       <section className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_320px] lg:px-8">
         <div className="space-y-8">
-          <Card>
-            <CardHeader>
-              <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
-                Overview
-              </h2>
-            </CardHeader>
-            <CardContent>
-              <CaseStudyBody body={overview.body} />
-            </CardContent>
-          </Card>
-
-          {project.problemSolved ? (
-            <Card>
-              <CardHeader>
-                <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
-                  Problem solved
-                </h2>
-              </CardHeader>
-              <CardContent>
-                <CaseStudyBody body={project.problemSolved} />
-              </CardContent>
-            </Card>
-          ) : null}
-
-          {implementationSection ? (
-            <Card>
-              <CardHeader>
-                <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
-                  {implementationSection.title}
-                </h2>
-              </CardHeader>
-              <CardContent>
-                <CaseStudyBody body={implementationSection.body} />
-              </CardContent>
-            </Card>
-          ) : null}
-
-          {project.technicalChallenges ? (
-            <Card>
-              <CardHeader>
-                <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
-                  Technical challenges
-                </h2>
-              </CardHeader>
-              <CardContent>
-                <CaseStudyBody body={project.technicalChallenges} />
-              </CardContent>
-            </Card>
-          ) : null}
-
-          {remainingSections.map((section) => (
-            <Card key={section.title}>
+          {caseStudySections.map((section, index) => (
+            <Card key={`${section.title}-${index}`}>
               <CardHeader>
                 <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
                   {section.title}
@@ -302,19 +210,6 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
               </CardContent>
             </Card>
           ))}
-
-          {lessonsSection ? (
-            <Card>
-              <CardHeader>
-                <h2 className="text-xl font-bold text-zinc-950 dark:text-white">
-                  {lessonsSection.title}
-                </h2>
-              </CardHeader>
-              <CardContent>
-                <CaseStudyBody body={lessonsSection.body} />
-              </CardContent>
-            </Card>
-          ) : null}
 
           {project.screenshots.length === 0 ? (
             <Card>
@@ -327,7 +222,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
                 <p className="text-base leading-8 text-zinc-600 dark:text-zinc-300">
                   Screenshots and demo media will be added as the case study
                   evolves. For now, the project is represented with the polished
-                  generated visual above and the source code link.
+                  project snapshot above and the source code link.
                 </p>
               </CardContent>
             </Card>
@@ -379,7 +274,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
                     project.techStack.map((tech) => <Badge key={tech}>{tech}</Badge>)
                   ) : (
                     <span className="text-zinc-600 dark:text-zinc-300">
-                      Add technologies from the dashboard.
+                      No technologies are listed for this project yet.
                     </span>
                   )}
                 </div>

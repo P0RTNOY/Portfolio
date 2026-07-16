@@ -32,7 +32,7 @@ export default async function ProjectsPage() {
           <SectionHeading
             eyebrow="Projects"
             title="Project case studies that answer hiring questions."
-            description="Start with the role, the problem, and the stack. Then open a project to see the architecture, tradeoffs, and evidence that the work was actually shipped."
+            description="Start with the role, the problem, and the stack. Then open a project to see the architecture, tradeoffs, implementation decisions, and current evidence."
           />
           <div className="mt-8 flex flex-wrap gap-3">
             <Badge>{projects.length} total</Badge>
