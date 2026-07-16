@@ -126,7 +126,7 @@ export default async function Home() {
                       Signal
                     </p>
                     <p className="mt-2 text-sm font-semibold text-zinc-950 dark:text-white">
-                      Shipped work plus a ready CV
+                      Shipped work plus a clear CV path
                     </p>
                   </div>
                 </div>
