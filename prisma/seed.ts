@@ -111,19 +111,19 @@ const demoProjectFilters = [
 const demoSiteSettings = {
   id: "default",
   siteName: "Omer Portnoy",
-  heroEyebrow: "Junior Software Engineer · Full-Stack / AI / Automation",
+  heroEyebrow: "Software Engineer · Full-Stack / AI / Automation",
   heroTitle:
-    "I build practical full-stack software, AI tools, and automation workflows.",
+    "I engineer practical products where AI, backend systems, and thoughtful interfaces meet.",
   heroIntro:
-    "I'm Omer Portnoy, and this portfolio documents working software and prototypes, not templates. I focus on junior SWE readiness through implementation evidence, steady learning, and clear communication while building backend systems, admin dashboards, LLM-powered apps, developer tools, and automation workflows.",
-  primaryCtaLabel: "Explore the platform",
-  secondaryCtaLabel: "Contact me",
-  aboutTitle: "Software engineer focused on building end-to-end products.",
+    "I’m Omer Portnoy, a software engineer who turns product ideas into working systems—from database-backed web platforms and protected tools to AI product prototypes with clear safety and reliability boundaries.",
+  primaryCtaLabel: "Explore selected work",
+  secondaryCtaLabel: "Start a conversation",
+  aboutTitle: "End-to-end thinking, grounded in working software.",
   aboutSummary:
-    "I like taking products from idea to working software: planning the UI, wiring APIs, working with databases, adding authentication, and documenting what remains. I'm building the habits junior software engineering teams look for—clear communication, steady learning, and the discipline to keep improving with every project.",
-  skillsTitle: "Technical focus areas that support hiring decisions.",
+    "I care about the whole path from product intent to production behavior: shaping the interface, designing the data model, building the API, protecting privileged paths, and documenting the decisions that make the system maintainable.",
+  skillsTitle: "Capabilities built around real product outcomes.",
   skillsSummary:
-    "A hiring-focused snapshot of the tools and fundamentals I use to turn ideas into working products: frontend and backend work, databases, APIs, authentication, deployment practices, and the learning habits that help me keep improving.",
+    "My current toolkit spans product engineering, backend systems, applied AI, and the delivery practices that turn experiments into dependable software.",
   skills: JSON.stringify([
     "Python",
     "TypeScript",
@@ -146,7 +146,7 @@ const demoSiteSettings = {
     "Data Structures",
     "Security Fundamentals",
   ]),
-  contactTitle: "Open to junior software engineering opportunities.",
+  contactTitle: "Let's build something useful.",
   contactSummary: DEFAULT_CONTACT_SUMMARY,
   contactEmail: "omerportnoy@gmail.com",
   githubUrl: "https://github.com/P0RTNOY",

@@ -6,7 +6,7 @@
     "dev": "next dev --webpack",
     "build": "prisma generate && next build",
     "start": "next start",
-    "test": "node --import tsx --test src/lib/case-study-content.test.ts src/lib/courses.test.ts src/lib/validations/resume-url.test.ts src/lib/safe-remote-pdf.test.ts src/lib/cv-download.test.ts src/lib/cv-copy.test.ts src/lib/seed-site-settings.test.ts src/components/site/resume-viewer.test.tsx",
+    "test": "node --import tsx --test src/lib/case-study-content.test.ts src/lib/courses.test.ts src/lib/public-portfolio-content.test.ts src/lib/validations/resume-url.test.ts src/lib/safe-remote-pdf.test.ts src/lib/cv-download.test.ts src/lib/cv-copy.test.ts src/lib/seed-site-settings.test.ts src/components/site/homepage-sections.test.tsx src/components/site/resume-viewer.test.tsx src/components/site/site-header.test.tsx",
     "lint": "eslint",
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",

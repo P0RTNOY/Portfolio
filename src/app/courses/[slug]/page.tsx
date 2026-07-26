@@ -8,11 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
-  getCourseBySlug,
   getCourseLearningImpact,
   getCourseStageLabel,
 } from "@/lib/courses";
-import { getSiteSettings } from "@/lib/site-settings";
+import {
+  getPublicCourseBySlug,
+  getPublicPortfolioData,
+} from "@/lib/public-portfolio-content";
 
 export const dynamic = "force-dynamic";
 
@@ -44,7 +46,7 @@ export async function generateMetadata({
   params,
 }: CourseDetailProps): Promise<Metadata> {
   const { slug } = await params;
-  const course = await getCourseBySlug(slug);
+  const course = await getPublicCourseBySlug(slug);
 
   if (!course) {
     return {
@@ -53,7 +55,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${course.title} | Omer Portnoy`,
+    title: course.title,
     description: course.shortDescription,
   };
 }
@@ -98,9 +100,9 @@ function ProgressBar({ progress }: { progress: number }) {
 
 export default async function CourseDetailPage({ params }: CourseDetailProps) {
   const { slug } = await params;
-  const [course, settings] = await Promise.all([
-    getCourseBySlug(slug),
-    getSiteSettings(),
+  const [course, { settings }] = await Promise.all([
+    getPublicCourseBySlug(slug),
+    getPublicPortfolioData(),
   ]);
 
   if (!course) {
@@ -112,9 +114,14 @@ export default async function CourseDetailPage({ params }: CourseDetailProps) {
   const stageLabel = getCourseStageLabel(course);
 
   return (
-    <ProjectPageShell siteName={settings.siteName}>
-      <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8">
+    <ProjectPageShell
+      contactEmail={settings.contactEmail}
+      githubUrl={settings.githubUrl}
+      linkedinUrl={settings.linkedinUrl}
+      siteName={settings.siteName}
+    >
+      <section className="border-b border-ink/20 bg-paper">
+        <div className="page-shell grid gap-10 py-14 sm:py-20 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
           <CourseVisual
             className="lg:order-2"
             featured={course.featured}
@@ -131,22 +138,22 @@ export default async function CourseDetailPage({ params }: CourseDetailProps) {
             <div className="flex flex-wrap gap-2">
               <Badge>{statusLabels[course.status]}</Badge>
               {course.featured ? (
-                <Badge className="border-teal-200 bg-teal-50 text-teal-800 dark:border-teal-900 dark:bg-teal-950 dark:text-teal-200">
+                <Badge className="border-signal/25 bg-signal/8 text-signal-deep">
                   Featured
                 </Badge>
               ) : null}
             </div>
-            <p className="mt-5 text-sm font-semibold uppercase text-zinc-500 dark:text-zinc-400">
+            <p className="technical-label mt-5 text-muted">
               {course.provider}
               {course.instructor ? ` · ${course.instructor}` : ""}
             </p>
-            <h1 className="mt-3 max-w-3xl text-4xl font-bold tracking-tight text-zinc-950 dark:text-white sm:text-5xl">
+            <h1 className="text-balance mt-4 max-w-3xl text-4xl font-semibold leading-[1] tracking-[-0.055em] text-ink sm:text-6xl">
               {course.title}
             </h1>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-300">
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
               {course.shortDescription}
             </p>
-            <p className="mt-5 max-w-2xl rounded-2xl border border-teal-200 bg-teal-50/80 px-4 py-3 text-sm leading-7 text-teal-900 dark:border-teal-900 dark:bg-teal-950/50 dark:text-teal-100">
+            <p className="mt-5 max-w-2xl border-l border-signal/55 pl-4 text-sm leading-7 text-ink-soft">
               <span className="font-semibold">Learning focus: </span>
               {learningImpact}
             </p>
@@ -175,7 +182,7 @@ export default async function CourseDetailPage({ params }: CourseDetailProps) {
         </div>
       </section>
 
-      <section className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_320px] lg:px-8">
+      <section className="page-shell grid gap-8 py-16 sm:py-24 lg:grid-cols-[1fr_320px]">
         <div className="space-y-8">
           <Card className="border-teal-200 bg-teal-50/70 dark:border-teal-900 dark:bg-teal-950/30">
             <CardHeader>

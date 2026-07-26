@@ -10,7 +10,7 @@ export const CV_METADATA_DESCRIPTION =
   "Omer Portnoy's professional background and technical focus areas inside the portfolio.";
 
 export const DEFAULT_CONTACT_SUMMARY =
-  "I'm open to junior software engineering opportunities and project conversations. Review the case studies, learning timeline, and CV page for the current candidate overview.";
+  "I'm open to software engineering opportunities and project conversations. Review the case studies, learning timeline, and CV page for the current overview.";
 
 export function getHomepageCvCopy(hasResume: boolean) {
   return hasResume

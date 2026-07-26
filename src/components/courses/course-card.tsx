@@ -1,9 +1,6 @@
 import { ArrowUpRight, Award } from "lucide-react";
 import Link from "next/link";
 
-import { CourseVisual } from "@/components/courses/course-visual";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   getCourseLearningImpact,
   getCourseStageLabel,
@@ -14,115 +11,96 @@ type CourseCardProps = {
   course: Course;
 };
 
-const statusLabels: Record<string, string> = {
+const statusLabels: Record<Course["status"], string> = {
   planned: "Planned",
-  "in-progress": "In Progress",
+  "in-progress": "In progress",
   completed: "Completed",
   archived: "Archived",
 };
 
-function ProgressBar({ progress }: { progress: number }) {
-  return (
-    <div
-      aria-label="Course progress"
-      aria-valuemax={100}
-      aria-valuemin={0}
-      aria-valuenow={progress}
-      role="progressbar"
-    >
-      <div className="flex items-center justify-between gap-3 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
-        <span>Progress</span>
-        <span>{progress}%</span>
-      </div>
-      <div
-        aria-hidden="true"
-        className="mt-2 h-2 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800"
-      >
-        <div
-          className="h-full rounded-full bg-teal-600 dark:bg-teal-400"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-    </div>
-  );
-}
-
 export function CourseCard({ course }: CourseCardProps) {
   const learningImpact = getCourseLearningImpact(course);
   const stageLabel = getCourseStageLabel(course);
+  const credentialUrl = course.certificateUrl ?? course.credentialUrl;
 
   return (
-    <Card className="group flex h-full flex-col overflow-hidden transition-colors duration-200 hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-950/5 motion-safe:transition-transform motion-safe:hover:-translate-y-1 dark:hover:border-zinc-700 dark:hover:shadow-black/20">
-      <CourseVisual
-        featured={course.featured}
-        imageUrl={course.imageUrl}
-        progress={course.progress}
-        stageLabel={stageLabel}
-        status={course.status}
-      />
-      <CardContent className="flex flex-1 flex-col gap-5 p-5">
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge>{statusLabels[course.status]}</Badge>
-          {course.featured ? (
-            <Badge className="border-teal-200 bg-teal-50 text-teal-800 dark:border-teal-900 dark:bg-teal-950 dark:text-teal-200">
-              Featured
-            </Badge>
-          ) : null}
+    <article className="group flex h-full flex-col border border-ink/18 bg-paper p-6 transition-[border-color,transform,box-shadow] duration-300 hover:-translate-y-1 hover:border-signal/65 hover:shadow-[0_24px_60px_rgba(29,30,27,0.1)] sm:p-8">
+      <div className="flex items-center justify-between gap-4">
+        <span className="technical-label text-signal">{course.provider}</span>
+        <span className="border border-ink/15 px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-[0.12em] text-muted">
+          {statusLabels[course.status]}
+        </span>
+      </div>
+      <h2 className="mt-8 text-2xl font-semibold tracking-[-0.045em] text-ink sm:text-3xl">
+        <Link
+          className="transition-colors hover:text-signal"
+          href={`/courses/${course.slug}`}
+        >
+          {course.title}
+        </Link>
+      </h2>
+      <p className="mt-4 text-sm leading-7 text-muted">
+        {course.shortDescription}
+      </p>
+      <div className="mt-6 border-l border-signal/45 pl-4">
+        <p className="technical-label text-[0.58rem] text-muted">
+          Learning focus
+        </p>
+        <p className="mt-2 text-sm leading-6 text-ink-soft">{learningImpact}</p>
+      </div>
+      <div
+        aria-label={`${course.progress}% course progress`}
+        aria-valuemax={100}
+        aria-valuemin={0}
+        aria-valuenow={course.progress}
+        className="mt-7"
+        role="progressbar"
+      >
+        <div className="flex justify-between gap-4 text-xs font-semibold text-muted">
+          <span>{stageLabel}</span>
+          <span>{course.progress}%</span>
         </div>
-
-        <div>
-          <p className="text-xs font-semibold uppercase text-zinc-500 dark:text-zinc-400">
-            {course.provider}
-            {course.instructor ? ` · ${course.instructor}` : ""}
-          </p>
-          <h3 className="mt-2 text-lg font-bold text-zinc-950 dark:text-white">
-            <Link
-              className="outline-none focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-500"
-              href={`/courses/${course.slug}`}
-            >
-              {course.title}
-            </Link>
-          </h3>
-          <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-            {course.shortDescription}
-          </p>
-          <p className="mt-3 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm leading-6 text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-200">
-            <span className="font-semibold text-zinc-950 dark:text-white">
-              Learning focus:
-            </span>{" "}
-            {learningImpact}
-          </p>
+        <div aria-hidden="true" className="mt-2 h-1.5 bg-ink/10">
+          <div
+            className="h-full bg-signal"
+            style={{ width: `${course.progress}%` }}
+          />
         </div>
-
-        <ProgressBar progress={course.progress} />
-
-        <div className="flex flex-wrap gap-2">
-          {course.skills.slice(0, 5).map((skill) => (
-            <Badge key={skill}>{skill}</Badge>
-          ))}
-        </div>
-
-        <div className="mt-auto flex flex-wrap gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
-          <Link
-            className="inline-flex min-h-11 items-center gap-2 rounded-md text-sm font-semibold text-zinc-700 transition-colors hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500 dark:text-zinc-300 dark:hover:text-white"
-            href={`/courses/${course.slug}`}
+      </div>
+      <ul className="mt-6 flex flex-wrap gap-2">
+        {course.skills.slice(0, 5).map((skill) => (
+          <li
+            className="border border-ink/14 px-2.5 py-1.5 font-mono text-[0.64rem] text-muted"
+            key={skill}
           >
-            Details
-            <ArrowUpRight aria-hidden="true" size={16} />
-          </Link>
-          {course.certificateUrl ?? course.credentialUrl ? (
-            <a
-              className="inline-flex min-h-11 items-center gap-2 rounded-md text-sm font-semibold text-zinc-700 transition-colors hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500 dark:text-zinc-300 dark:hover:text-white"
-              href={course.certificateUrl ?? course.credentialUrl ?? ""}
-              rel="noreferrer"
-              target="_blank"
-            >
-              <Award aria-hidden="true" size={16} />
-              Credential
-            </a>
-          ) : null}
-        </div>
-      </CardContent>
-    </Card>
+            {skill}
+          </li>
+        ))}
+      </ul>
+      <div className="mt-auto flex flex-wrap gap-x-5 gap-y-2 border-t border-ink/14 pt-5">
+        <Link
+          className="group/link inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-ink transition-colors hover:text-signal"
+          href={`/courses/${course.slug}`}
+        >
+          Read record
+          <ArrowUpRight
+            aria-hidden="true"
+            className="transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5"
+            size={16}
+          />
+        </Link>
+        {credentialUrl ? (
+          <a
+            className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-muted transition-colors hover:text-ink"
+            href={credentialUrl}
+            rel="noreferrer"
+            target="_blank"
+          >
+            <Award aria-hidden="true" size={16} />
+            Credential
+          </a>
+        ) : null}
+      </div>
+    </article>
   );
 }

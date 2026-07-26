@@ -1,48 +1,71 @@
 import type { Metadata } from "next";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
-import { ProjectPageShell } from "@/components/projects/project-page-shell";
 import { ProjectsGrid } from "@/components/projects/projects-grid";
-import { SectionHeading } from "@/components/site/section-heading";
-import { Badge } from "@/components/ui/badge";
-import { listProjects } from "@/lib/projects";
-import { getSiteSettings } from "@/lib/site-settings";
+import { ProjectPageShell } from "@/components/projects/project-page-shell";
+import { getPublicPortfolioData } from "@/lib/public-portfolio-content";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Projects | Omer Portnoy",
+  title: "Projects",
   description:
-    "Project case studies for Omer Portnoy's AI, automation, and full-stack software work.",
+    "Engineering case studies covering full-stack products, backend systems, AI prototypes, and automation work by Omer Portnoy.",
 };
 
 export default async function ProjectsPage() {
-  const [projects, settings] = await Promise.all([
-    listProjects(),
-    getSiteSettings(),
-  ]);
-  const featuredCount = projects.filter((project) => project.featured).length;
+  const { projects, settings } = await getPublicPortfolioData();
   const completedCount = projects.filter(
     (project) => project.status === "completed",
   ).length;
+  const activeCount = projects.filter(
+    (project) => project.status === "in-progress",
+  ).length;
 
   return (
-    <ProjectPageShell siteName={settings.siteName}>
-      <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-          <SectionHeading
-            eyebrow="Projects"
-            title="Project case studies that answer hiring questions."
-            description="Start with the role, the problem, and the stack. Then open a project to see the architecture, tradeoffs, implementation decisions, and current evidence."
-          />
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Badge>{projects.length} total</Badge>
-            <Badge>{featuredCount} featured</Badge>
-            <Badge>{completedCount} completed</Badge>
+    <ProjectPageShell
+      contactEmail={settings.contactEmail}
+      githubUrl={settings.githubUrl}
+      linkedinUrl={settings.linkedinUrl}
+      siteName={settings.siteName}
+    >
+      <section className="border-b border-ink/20 bg-paper">
+        <div className="page-shell py-14 sm:py-20 lg:py-24">
+          <Link
+            className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-muted transition-colors hover:text-ink"
+            href="/#work"
+          >
+            <ArrowLeft aria-hidden="true" size={16} />
+            Back to portfolio
+          </Link>
+          <div className="mt-10 grid gap-8 lg:grid-cols-[0.65fr_1.35fr] lg:items-end">
+            <div>
+              <p className="technical-label text-signal">Project archive</p>
+              <div className="mt-6 flex flex-wrap gap-x-7 gap-y-2 text-sm text-muted">
+                <span>{projects.length} documented</span>
+                <span>{activeCount} active</span>
+                <span>{completedCount} completed</span>
+              </div>
+            </div>
+            <div>
+              <h1 className="text-balance text-5xl font-semibold leading-[0.98] tracking-[-0.065em] text-ink sm:text-7xl lg:text-[6.5rem]">
+                Engineering work,{" "}
+                <span className="display-serif italic text-signal">
+                  decision by decision.
+                </span>
+              </h1>
+              <p className="mt-7 max-w-2xl text-base leading-7 text-muted sm:text-lg sm:leading-8">
+                Each case study starts with a real product constraint, then shows
+                the role, architecture, implementation decisions, current
+                evidence, and what remains unfinished.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+      <section className="page-shell py-14 sm:py-20 lg:py-24">
         <ProjectsGrid projects={projects} />
       </section>
     </ProjectPageShell>

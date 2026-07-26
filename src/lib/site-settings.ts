@@ -12,19 +12,19 @@ const SITE_SETTINGS_ID = "default";
 
 const defaultSiteSettingsInput: SiteSettingsInput = {
   siteName: "Omer Portnoy",
-  heroEyebrow: "Junior Software Engineer · Full-Stack / AI / Automation",
+  heroEyebrow: "Software Engineer · Full-Stack / AI / Automation",
   heroTitle:
-    "I build practical full-stack software, AI tools, and automation workflows.",
+    "I engineer practical products where AI, backend systems, and thoughtful interfaces meet.",
   heroIntro:
-    "I'm Omer Portnoy, and this portfolio showcases real products, not templates. I focus on junior SWE readiness through shipped work, steady learning, and clear communication while building backend systems, admin dashboards, LLM-powered apps, developer tools, and automation workflows.",
-  primaryCtaLabel: "Explore the platform",
-  secondaryCtaLabel: "Contact me",
-  aboutTitle: "Software engineer focused on shipping end-to-end products.",
+    "I’m Omer Portnoy, a software engineer who turns product ideas into working systems—from database-backed web platforms and protected tools to AI product prototypes with clear safety and reliability boundaries.",
+  primaryCtaLabel: "Explore selected work",
+  secondaryCtaLabel: "Start a conversation",
+  aboutTitle: "End-to-end thinking, grounded in working software.",
   aboutSummary:
-    "I like taking products from idea to deployed software: planning the UI, wiring APIs, working with databases, adding authentication, and shipping something maintainable. I'm building the habits junior software engineering teams look for—clear communication, steady learning, and the discipline to keep improving with every project.",
-  skillsTitle: "Technical focus areas that support hiring decisions.",
+    "I care about the whole path from product intent to production behavior: shaping the interface, designing the data model, building the API, protecting privileged paths, and documenting the decisions that make the system maintainable.",
+  skillsTitle: "Capabilities built around real product outcomes.",
   skillsSummary:
-    "A hiring-focused snapshot of the tools and fundamentals I use to turn ideas into shipped products: frontend and backend work, databases, APIs, authentication, deployment, and the learning habits that help me keep improving.",
+    "My current toolkit spans product engineering, backend systems, applied AI, and the delivery practices that turn experiments into dependable software.",
   skills: [
     "Python",
     "TypeScript",
@@ -47,7 +47,7 @@ const defaultSiteSettingsInput: SiteSettingsInput = {
     "Data Structures",
     "Security Fundamentals",
   ],
-  contactTitle: "Open to junior software engineering opportunities.",
+  contactTitle: "Let's build something useful.",
   contactSummary: DEFAULT_CONTACT_SUMMARY,
   contactEmail: "omerportnoy@gmail.com",
   githubUrl: "https://github.com/P0RTNOY",
@@ -104,6 +104,7 @@ function replaceLegacyDefaultSettings(settings: SiteSettings): SiteSettings {
       isLegacy(settings.heroEyebrow, [
         "Generic portfolio",
         "Software Engineer · AI / Full-Stack / Automation",
+        "Junior Software Engineer · Full-Stack / AI / Automation",
       ])
         ? defaultSiteSettingsInput.heroEyebrow
         : settings.heroEyebrow,
@@ -111,6 +112,7 @@ function replaceLegacyDefaultSettings(settings: SiteSettings): SiteSettings {
       isLegacy(settings.heroTitle, [
         "Your Name, professional title, and selected work.",
         "I build practical AI-powered software, full-stack products, and automation tools.",
+        "I build practical full-stack software, AI tools, and automation workflows.",
       ])
         ? defaultSiteSettingsInput.heroTitle
         : settings.heroTitle,
@@ -118,21 +120,25 @@ function replaceLegacyDefaultSettings(settings: SiteSettings): SiteSettings {
       isLegacy(settings.heroIntro, [
         "A concise introduction placeholder for the kind of work, outcomes, and collaborations this portfolio will represent.",
         "I'm Omer Portnoy, a software engineering graduate focused on building real working products - from backend systems and admin dashboards to LLM-powered apps, developer tools, and automation workflows.",
+        "I'm Omer Portnoy, and this portfolio showcases real products, not templates. I focus on junior SWE readiness through shipped work, steady learning, and clear communication while building backend systems, admin dashboards, LLM-powered apps, developer tools, and automation workflows.",
+        "I'm Omer Portnoy, and this portfolio documents working software and prototypes, not templates. I focus on junior SWE readiness through implementation evidence, steady learning, and clear communication while building backend systems, admin dashboards, LLM-powered apps, developer tools, and automation workflows.",
       ])
         ? defaultSiteSettingsInput.heroIntro
         : settings.heroIntro,
     primaryCtaLabel:
-      isLegacy(settings.primaryCtaLabel, ["View Projects"])
+      isLegacy(settings.primaryCtaLabel, ["View Projects", "Explore the platform"])
         ? defaultSiteSettingsInput.primaryCtaLabel
         : settings.primaryCtaLabel,
     secondaryCtaLabel:
-      isLegacy(settings.secondaryCtaLabel, ["Contact Me"])
+      isLegacy(settings.secondaryCtaLabel, ["Contact Me", "Contact me"])
         ? defaultSiteSettingsInput.secondaryCtaLabel
         : settings.secondaryCtaLabel,
     aboutTitle:
       isLegacy(settings.aboutTitle, [
         "A concise professional summary will live here.",
         "Software engineer with a builder mindset.",
+        "Software engineer focused on shipping end-to-end products.",
+        "Software engineer focused on building end-to-end products.",
       ])
         ? defaultSiteSettingsInput.aboutTitle
         : settings.aboutTitle,
@@ -140,6 +146,8 @@ function replaceLegacyDefaultSettings(settings: SiteSettings): SiteSettings {
       isLegacy(settings.aboutSummary, [
         "Use this space for a short editable introduction. Keep it focused on the type of work, values, and outcomes you want the portfolio to communicate.",
         "I'm a software engineering graduate who likes building practical systems end-to-end: the frontend people use, the backend that powers it, the database that keeps it reliable, and the tooling that makes it easier to maintain. My current focus is AI-powered products, automation, backend/full-stack development, and learning how to ship software that feels useful, not just technically impressive.",
+        "I like taking products from idea to deployed software: planning the UI, wiring APIs, working with databases, adding authentication, and shipping something maintainable. I'm building the habits junior software engineering teams look for—clear communication, steady learning, and the discipline to keep improving with every project.",
+        "I like taking products from idea to working software: planning the UI, wiring APIs, working with databases, adding authentication, and documenting what remains. I'm building the habits junior software engineering teams look for—clear communication, steady learning, and the discipline to keep improving with every project.",
       ])
         ? defaultSiteSettingsInput.aboutSummary
         : settings.aboutSummary,
@@ -147,6 +155,7 @@ function replaceLegacyDefaultSettings(settings: SiteSettings): SiteSettings {
       isLegacy(settings.skillsTitle, [
         "Editable skill categories.",
         "Technical focus areas.",
+        "Technical focus areas that support hiring decisions.",
       ])
         ? defaultSiteSettingsInput.skillsTitle
         : settings.skillsTitle,
@@ -154,6 +163,8 @@ function replaceLegacyDefaultSettings(settings: SiteSettings): SiteSettings {
       isLegacy(settings.skillsSummary, [
         "These categories are generic for now and can be edited from the admin dashboard.",
         "The areas I'm actively building and improving across product engineering, backend systems, AI applications, cloud workflows, and software fundamentals.",
+        "A hiring-focused snapshot of the tools and fundamentals I use to turn ideas into working products: frontend and backend work, databases, APIs, authentication, deployment practices, and the learning habits that help me keep improving.",
+        "A hiring-focused snapshot of the tools and fundamentals I use to turn ideas into shipped products: frontend and backend work, databases, APIs, authentication, deployment, and the learning habits that help me keep improving.",
       ])
         ? defaultSiteSettingsInput.skillsSummary
         : settings.skillsSummary,
@@ -173,6 +184,7 @@ function replaceLegacyDefaultSettings(settings: SiteSettings): SiteSettings {
       isLegacy(settings.contactTitle, [
         "Generic contact details.",
         "Let's build something useful.",
+        "Open to junior software engineering opportunities.",
       ])
         ? defaultSiteSettingsInput.contactTitle
         : settings.contactTitle,
