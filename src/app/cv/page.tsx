@@ -1,44 +1,85 @@
 import type { Metadata } from "next";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Download } from "lucide-react";
+import Link from "next/link";
 
 import { ProjectPageShell } from "@/components/projects/project-page-shell";
 import { ResumeViewer } from "@/components/site/resume-viewer";
-import { SectionHeading } from "@/components/site/section-heading";
-import { Badge } from "@/components/ui/badge";
-import { ButtonLink } from "@/components/ui/button";
-import { getSiteSettings } from "@/lib/site-settings";
+import {
+  CV_FOCUS_AREAS,
+  CV_METADATA_DESCRIPTION,
+  getCvPageCopy,
+} from "@/lib/cv-copy";
+import { getPublicPortfolioData } from "@/lib/public-portfolio-content";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "CV | Omer Portnoy",
-  description:
-    "Read Omer Portnoy's CV and professional background inside the portfolio.",
+  title: "CV",
+  description: CV_METADATA_DESCRIPTION,
 };
 
 export default async function CvPage() {
-  const settings = await getSiteSettings();
+  const { settings } = await getPublicPortfolioData();
+  const cvPageCopy = getCvPageCopy(Boolean(settings.resumeUrl));
 
   return (
-    <ProjectPageShell siteName={settings.siteName}>
-      <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-          <ButtonLink className="mb-6 w-fit" href="/#cv" variant="ghost">
+    <ProjectPageShell
+      contactEmail={settings.contactEmail}
+      githubUrl={settings.githubUrl}
+      linkedinUrl={settings.linkedinUrl}
+      siteName={settings.siteName}
+    >
+      <section className="border-b border-ink/20 bg-paper">
+        <div className="page-shell py-14 sm:py-20 lg:py-24">
+          <Link
+            className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-muted transition-colors hover:text-ink"
+            href="/#experience"
+          >
             <ArrowLeft aria-hidden="true" size={16} />
             Back to portfolio
-          </ButtonLink>
-          <Badge className="mb-4 border-teal-200 bg-teal-50 text-teal-800 dark:border-teal-900 dark:bg-teal-950 dark:text-teal-200">
-            CV
-          </Badge>
-          <SectionHeading
-            eyebrow="Resume"
-            title="CV and professional background."
-            description="The latest uploaded PDF is embedded below, with options to open or download it."
-          />
+          </Link>
+          <div className="mt-10 grid gap-8 lg:grid-cols-[0.65fr_1.35fr] lg:items-end">
+            <div>
+              <p className="technical-label text-signal">Candidate overview</p>
+              {settings.resumeUrl ? (
+                <a
+                  className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-ink transition-colors hover:text-signal"
+                  href="/api/cv/download"
+                >
+                  <Download aria-hidden="true" size={16} />
+                  Download PDF
+                </a>
+              ) : null}
+            </div>
+            <div>
+              <h1 className="text-balance text-5xl font-semibold leading-[0.98] tracking-[-0.065em] text-ink sm:text-7xl lg:text-[6.5rem]">
+                The background behind{" "}
+                <span className="display-serif italic text-signal">
+                  the project work.
+                </span>
+              </h1>
+              <p className="mt-7 max-w-2xl text-base leading-7 text-muted sm:text-lg sm:leading-8">
+                {cvPageCopy.description}
+              </p>
+            </div>
+          </div>
+          <ul className="mt-12 grid border-y border-ink/20 sm:grid-cols-2 lg:grid-cols-5">
+            {CV_FOCUS_AREAS.map((focusArea, index) => (
+              <li
+                className="flex min-h-24 items-center gap-3 border-b border-ink/14 px-4 py-4 text-sm font-semibold text-ink sm:border-r lg:border-b-0"
+                key={focusArea}
+              >
+                <span className="technical-label text-signal">
+                  0{index + 1}
+                </span>
+                {focusArea}
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+      <section className="page-shell py-12 sm:py-18">
         <ResumeViewer resumeUrl={settings.resumeUrl} />
       </section>
     </ProjectPageShell>

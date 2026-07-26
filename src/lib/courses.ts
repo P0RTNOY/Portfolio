@@ -90,6 +90,76 @@ function toCourse(course: PrismaCourse): Course {
   return normalizedCourse;
 }
 
+function formatAuthoredTopics(skills: string[]) {
+  const topics = skills
+    .map((skill) => skill.trim())
+    .filter(Boolean)
+    .slice(0, 5);
+
+  if (topics.length === 0) return null;
+  if (topics.length === 1) return topics[0];
+  if (topics.length === 2) return `${topics[0]} and ${topics[1]}`;
+
+  return `${topics.slice(0, -1).join(", ")}, and ${topics.at(-1)}`;
+}
+
+export function getCourseLearningImpact(
+  course: Pick<
+    Course,
+    "title" | "shortDescription" | "skills" | "status" | "progress"
+  >,
+) {
+  const topics = formatAuthoredTopics(course.skills);
+
+  if (topics) {
+    if (course.status === "planned") {
+      return `Intended focus: ${topics}.`;
+    }
+
+    if (course.status === "in-progress") {
+      return `Currently developing familiarity with ${topics}.`;
+    }
+
+    if (course.status === "completed") {
+      return `Completed learning focused on ${topics}.`;
+    }
+
+    return `Historical learning record focused on ${topics}.`;
+  }
+
+  if (course.status === "planned") {
+    return "Specific topics have not been recorded for this planned track.";
+  }
+
+  if (course.status === "in-progress") {
+    return "Specific topics have not yet been recorded for this in-progress track.";
+  }
+
+  if (course.status === "completed") {
+    return "Specific topics were not recorded for this completed track.";
+  }
+
+  return "Specific topics were not recorded for this archived track.";
+}
+
+export function getCourseStageLabel(course: Pick<Course, "status" | "progress">) {
+  if (course.status === "completed") {
+    return "Completed learning track";
+  }
+
+  if (course.status === "in-progress") {
+    if (course.progress >= 75) return "Near completion";
+    if (course.progress >= 40) return "Building momentum";
+    return "Early-stage growth";
+  }
+
+  if (course.status === "planned") {
+    return "Planned next step";
+  }
+
+  return "Archived learning track";
+}
+
 function toCourseCreateData(input: CourseCreateInput): Prisma.CourseCreateInput {
   return {
     title: input.title,

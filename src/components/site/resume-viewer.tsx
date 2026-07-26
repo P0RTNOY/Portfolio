@@ -26,15 +26,13 @@ export function ResumeViewer({
           <FileText aria-hidden="true" size={24} />
         </div>
         <h3 className="mt-4 text-base font-bold text-zinc-950 dark:text-white">
-          CV preview is empty
+          CV not available
         </h3>
         <p className="mt-2 max-w-sm text-sm leading-6 text-zinc-500 dark:text-zinc-400">
-          Upload a PDF resume from the admin settings page to show it directly
-          inside the portfolio.
+          The latest CV will appear here once it has been uploaded. Until then,
+          the project case studies and learning timeline show the most current
+          evidence.
         </p>
-        <ButtonLink className="mt-6" href="/admin/settings" variant="secondary">
-          Add CV
-        </ButtonLink>
       </div>
     );
   }
@@ -48,34 +46,37 @@ export function ResumeViewer({
     >
       <div className="flex min-h-14 flex-col gap-3 border-b border-white/10 bg-zinc-950 px-4 py-3 text-white sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <p className="text-sm font-bold">CV Preview</p>
-          <p className="mt-0.5 truncate text-xs text-zinc-400">
-            Embedded PDF reader
+          <p className="text-sm font-bold">CV ready for review</p>
+          <p className="mt-0.5 text-xs text-zinc-400">
+            {compact
+              ? "Embedded PDF preview"
+              : "Embedded PDF · open in a new tab or download a copy"}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <ButtonLink
-            className="border-white/15 bg-white/10 text-white hover:bg-white/15 dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
-            href={resumeUrl}
-            rel="noreferrer"
-            size="sm"
-            target="_blank"
-            variant="secondary"
-          >
-            <ExternalLink aria-hidden="true" size={16} />
-            Open
-          </ButtonLink>
-          <ButtonLink
-            className="border-white/15 bg-white/10 text-white hover:bg-white/15 dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
-            download
-            href={resumeUrl}
-            size="sm"
-            variant="secondary"
-          >
-            <Download aria-hidden="true" size={16} />
-            Download
-          </ButtonLink>
-        </div>
+        {compact ? null : (
+          <div className="flex flex-wrap gap-2">
+            <ButtonLink
+              className="border-white/15 bg-white/10 text-white hover:bg-white/15 dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
+              href={resumeUrl}
+              rel="noreferrer"
+              size="sm"
+              target="_blank"
+              variant="secondary"
+            >
+              <ExternalLink aria-hidden="true" size={16} />
+              Open CV in new tab
+            </ButtonLink>
+            <ButtonLink
+              className="border-white/15 bg-white/10 text-white hover:bg-white/15 dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
+              href="/api/cv/download"
+              size="sm"
+              variant="secondary"
+            >
+              <Download aria-hidden="true" size={16} />
+              Download CV
+            </ButtonLink>
+          </div>
+        )}
       </div>
 
       <div
@@ -88,10 +89,9 @@ export function ResumeViewer({
           className="h-full w-full bg-white"
           loading="lazy"
           src={`${resumeUrl}#view=FitH`}
-          title="Embedded CV PDF"
+          title="Omer Portnoy CV PDF preview"
         />
       </div>
     </div>
   );
 }
-

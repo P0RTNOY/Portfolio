@@ -1,289 +1,411 @@
 import {
+  ArrowDown,
   ArrowRight,
+  ArrowUpRight,
+  BookOpen,
+  Contact,
   Download,
   Eye,
+  GitBranch,
+  Mail,
 } from "lucide-react";
+import Link from "next/link";
 
-import { CoursesGrid } from "@/components/courses/courses-grid";
-import { ProjectsGrid } from "@/components/projects/projects-grid";
-import {
-  PortfolioProofStrip,
-  type ProofItem,
-} from "@/components/site/portfolio-proof-strip";
+import { FeaturedProjects } from "@/components/projects/featured-projects";
+import { CapabilityGrid } from "@/components/site/capability-grid";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
-import { ResumeViewer } from "@/components/site/resume-viewer";
-import { SectionHeading } from "@/components/site/section-heading";
-import { Badge } from "@/components/ui/badge";
-import { ButtonLink } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { listCourses } from "@/lib/courses";
-import { listProjects } from "@/lib/projects";
-import { getSiteSettings } from "@/lib/site-settings";
+import { getPublicPortfolioData } from "@/lib/public-portfolio-content";
 
 export const dynamic = "force-dynamic";
 
+const specialties = [
+  {
+    label: "Full-stack systems",
+    detail: "Product UI, APIs, data, and protected workflows",
+  },
+  {
+    label: "AI product prototypes",
+    detail: "Model integrations with explicit safety boundaries",
+  },
+  {
+    label: "Automation",
+    detail: "Tools that remove repetitive operational work",
+  },
+];
+
 export default async function Home() {
-  const [projects, courses, settings] = await Promise.all([
-    listProjects(),
-    listCourses(),
-    getSiteSettings(),
-  ]);
+  const { projects, courses, settings } = await getPublicPortfolioData();
   const featuredProjects = projects.filter((project) => project.featured);
-  const homepageProjects =
-    featuredProjects.length > 0 ? featuredProjects : projects.slice(0, 3);
-  const featuredCourses = courses.filter((course) => course.featured);
-  const homepageCourses =
-    featuredCourses.length > 0 ? featuredCourses : courses.slice(0, 3);
+  const homepageProjects = (
+    featuredProjects.length > 0 ? featuredProjects : projects
+  ).slice(0, 2);
   const activeLearningTracks = courses.filter(
     (course) => course.status === "in-progress",
   );
-  const proofItems: ProofItem[] = [
-    {
-      label: "Junior SWE focus",
-      value: "Full-stack / AI / automation",
-      href: "/#about",
-    },
-    {
-      label: "Featured case studies",
-      value: `${homepageProjects.length} shipped projects`,
-      href: "/#projects",
-    },
-    {
-      label: "Active learning tracks",
-      value: `${activeLearningTracks.length} in progress`,
-      href: "/#courses",
-    },
-    ...(settings.resumeUrl
-      ? [
-          {
-            label: "CV available",
-            value: "Read online or download",
-            href: "/cv",
-          },
-        ]
-      : []),
-  ];
-
   return (
     <div className="min-h-dvh">
       <SiteHeader siteName={settings.siteName} />
       <main id="main-content">
-        <section className="relative overflow-hidden border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(20,184,166,0.08),transparent_50%),radial-gradient(ellipse_at_bottom_left,rgba(245,158,11,0.08),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_right,rgba(20,184,166,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_left,rgba(245,158,11,0.12),transparent_50%)]" />
-          <div className="relative mx-auto grid w-full max-w-6xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-28">
-            <div className="flex flex-col justify-center">
-              <Badge className="mb-6 w-fit border-teal-200 bg-teal-50 text-teal-800 dark:border-teal-900 dark:bg-teal-950 dark:text-teal-200">
-                {settings.heroEyebrow}
-              </Badge>
-              <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-zinc-950 dark:text-white sm:text-5xl lg:text-6xl">
-                {settings.heroTitle}
-              </h1>
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-300">
-                {settings.heroIntro}
-              </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <ButtonLink href="/#projects" size="lg">
-                  {settings.primaryCtaLabel}
-                  <ArrowRight aria-hidden="true" size={18} />
-                </ButtonLink>
-                <ButtonLink href="/#contact" size="lg" variant="secondary">
-                  {settings.secondaryCtaLabel}
-                </ButtonLink>
-              </div>
-            </div>
-            <Card className="overflow-hidden">
-              <CardHeader>
-                <p className="text-sm font-semibold uppercase text-zinc-500">
-                  Recruiter snapshot
+        <section
+          aria-labelledby="hero-title"
+          className="relative overflow-hidden border-b border-ink/20"
+        >
+          <div
+            aria-hidden="true"
+            className="absolute -right-24 top-10 size-[32rem] rounded-full bg-white/42 blur-3xl"
+          />
+          <div className="page-shell relative grid min-h-[calc(100dvh-var(--header-height))] grid-rows-[1fr_auto]">
+            <div className="grid gap-12 py-16 sm:py-20 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-center lg:gap-16 lg:py-24">
+              <div>
+                <p className="technical-label flex items-center gap-3 text-signal">
+                  <span className="size-2 rounded-full bg-signal shadow-[0_0_0_5px_rgba(201,79,40,0.1)]" />
+                  {settings.heroEyebrow}
                 </p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-                  Recruiters can scan this page like a candidate profile: the
-                  target role is clear, the work is shipped, and the learning
-                  momentum is visible.
-                </p>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700 dark:text-teal-300">
-                      Targeting
-                    </p>
-                    <p className="mt-2 text-sm font-semibold text-zinc-950 dark:text-white">
-                      Junior SWE roles
-                    </p>
-                  </div>
-                  <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700 dark:text-teal-300">
-                      Building
-                    </p>
-                    <p className="mt-2 text-sm font-semibold text-zinc-950 dark:text-white">
-                      Full-stack, AI, and automation systems
-                    </p>
-                  </div>
-                  <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700 dark:text-teal-300">
-                      Signal
-                    </p>
-                    <p className="mt-2 text-sm font-semibold text-zinc-950 dark:text-white">
-                      Shipped work plus a clear CV path
-                    </p>
+                <h1
+                  className="text-balance mt-7 max-w-5xl text-[clamp(3rem,7vw,7.25rem)] font-medium leading-[0.92] tracking-[-0.075em] text-ink"
+                  id="hero-title"
+                >
+                  {settings.heroTitle}
+                </h1>
+                <div className="mt-9 grid max-w-4xl gap-7 border-t border-ink/20 pt-7 md:grid-cols-[1fr_auto] md:items-start">
+                  <p className="text-pretty max-w-2xl text-base leading-7 text-muted sm:text-lg sm:leading-8">
+                    {settings.heroIntro}
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <Link
+                      className="group inline-flex min-h-12 items-center gap-2 bg-ink px-5 text-sm font-semibold text-night-text transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-signal active:translate-y-0"
+                      href="/#work"
+                    >
+                      {settings.primaryCtaLabel}
+                      <ArrowRight
+                        aria-hidden="true"
+                        className="transition-transform group-hover:translate-x-1"
+                        size={17}
+                      />
+                    </Link>
+                    <Link
+                      className="inline-flex min-h-12 items-center gap-2 border border-ink/25 bg-paper/55 px-5 text-sm font-semibold text-ink transition-[background-color,border-color] duration-200 hover:border-ink hover:bg-paper"
+                      href="/cv"
+                    >
+                      View CV
+                      <ArrowUpRight aria-hidden="true" size={16} />
+                    </Link>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+
+              <aside className="border-y border-ink/20 lg:border-y-0 lg:border-l lg:pl-9">
+                <p className="technical-label py-5 text-muted lg:pt-0">
+                  Engineering focus
+                </p>
+                <ol className="divide-y divide-ink/15 border-t border-ink/20">
+                  {specialties.map((specialty, index) => (
+                    <li className="group py-5" key={specialty.label}>
+                      <div className="flex items-start gap-4">
+                        <span className="technical-label mt-1 text-signal">
+                          0{index + 1}
+                        </span>
+                        <div>
+                          <p className="font-semibold tracking-[-0.02em] text-ink">
+                            {specialty.label}
+                          </p>
+                          <p className="mt-2 text-sm leading-6 text-muted">
+                            {specialty.detail}
+                          </p>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </aside>
+            </div>
+
+            <div className="grid gap-5 border-t border-ink/20 py-5 text-sm sm:grid-cols-[1fr_auto] sm:items-center">
+              <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
+                <span className="flex items-center gap-2 font-medium text-ink">
+                  <span className="size-2 rounded-full bg-emerald-600" />
+                  Open to software engineering opportunities
+                </span>
+                <span className="text-muted">Based in Israel · Available globally</span>
+              </div>
+              <Link
+                className="group flex min-h-11 w-fit items-center gap-2 font-semibold text-ink"
+                href="/#work"
+              >
+                Scroll to selected work
+                <ArrowDown
+                  aria-hidden="true"
+                  className="transition-transform group-hover:translate-y-1"
+                  size={16}
+                />
+              </Link>
+            </div>
           </div>
         </section>
 
-        <section className="mx-auto w-full max-w-6xl px-4 pb-4 sm:px-6 lg:px-8">
-          <PortfolioProofStrip items={proofItems} />
-        </section>
-
-        <section
-          id="about"
-          className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8"
-        >
-          <SectionHeading
-            eyebrow="About"
-            title={settings.aboutTitle}
-            description={settings.aboutSummary}
-          />
-        </section>
-
-        <section
-          id="projects"
-          className="border-y border-zinc-200 bg-zinc-100/70 dark:border-zinc-800 dark:bg-zinc-950/60"
-        >
-          <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-            <SectionHeading
-              eyebrow="Projects"
-              title="Projects read as case studies, not gallery cards."
-              description="Each project is framed as evidence: the problem I tackled, the role I played, the architecture and tradeoffs, and the outcome that matters to a hiring team."
-            />
-            <div className="mt-8">
-              <ProjectsGrid projects={homepageProjects} />
-            </div>
-            <div className="mt-8">
-              <ButtonLink href="/projects" variant="secondary">
-                Browse all projects
-                <ArrowRight aria-hidden="true" size={16} />
-              </ButtonLink>
-            </div>
-          </div>
-        </section>
-
-        <section
-          id="cv"
-          className="border-y border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
-        >
-          <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-start lg:px-8">
+        <section className="border-b border-ink/20 bg-paper" id="about">
+          <div className="page-shell grid gap-10 py-18 sm:py-24 lg:grid-cols-[0.6fr_1.4fr] lg:gap-16 lg:py-30">
             <div>
-              <SectionHeading
-                eyebrow="CV"
-                title="CV and professional background."
-                description="A focused view of my experience, education, and technical direction. Visitors can read it in the site or open the latest PDF version."
-              />
-              <div className="mt-8 flex flex-wrap gap-3">
-                {settings.resumeUrl ? (
-                  <>
-                    <ButtonLink href="/cv">
-                      <Eye aria-hidden="true" size={18} />
-                      Read CV
-                    </ButtonLink>
-                    <ButtonLink
-                      href={settings.resumeUrl}
-                      rel="noreferrer"
-                      target="_blank"
-                      variant="secondary"
-                    >
-                      <Download aria-hidden="true" size={18} />
-                      Download CV
-                    </ButtonLink>
-                  </>
-                ) : (
-                  <p className="text-sm font-semibold text-zinc-600 dark:text-zinc-400">
-                    The latest CV will be available here soon.
-                  </p>
-                )}
+              <p className="technical-label text-signal">01 / Approach</p>
+              <p className="mt-5 max-w-xs text-sm leading-6 text-muted">
+                Product thinking and engineering discipline belong in the same
+                conversation.
+              </p>
+            </div>
+            <div>
+              <h2 className="text-balance max-w-4xl text-3xl font-semibold leading-[1.05] tracking-[-0.055em] text-ink sm:text-5xl lg:text-6xl">
+                {settings.aboutTitle}
+              </h2>
+              <div className="mt-8 grid gap-7 border-t border-ink/20 pt-7 md:grid-cols-2">
+                <p className="text-pretty text-base leading-7 text-muted sm:text-lg sm:leading-8">
+                  {settings.aboutSummary}
+                </p>
+                <p className="text-pretty text-base leading-7 text-ink-soft sm:text-lg sm:leading-8">
+                  The goal is not novelty for its own sake. It is software that
+                  explains itself, handles real constraints, and leaves the next
+                  engineer with clear decisions instead of hidden assumptions.
+                </p>
               </div>
             </div>
-            <ResumeViewer compact resumeUrl={settings.resumeUrl} />
           </div>
         </section>
 
-        <section
-          id="courses"
-          className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8"
-        >
-          <SectionHeading
-            eyebrow="Learning timeline"
-            title="Learning momentum stays visible."
-            description="This timeline shows the courses and self-study tracks I’m using to build junior-engineer momentum across AI, backend systems, security, cloud workflows, and core computer science fundamentals."
-          />
-          <div className="mt-8">
-            <CoursesGrid courses={homepageCourses} />
-          </div>
-          <div className="mt-8">
-            <ButtonLink href="/courses" variant="secondary">
-              Browse all courses
-              <ArrowRight aria-hidden="true" size={16} />
-            </ButtonLink>
-          </div>
-        </section>
-
-        <section
-          id="contact"
-          className="border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
-        >
-          <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-16 sm:px-6 lg:flex-row lg:items-end lg:justify-between lg:px-8">
-            <SectionHeading
-              eyebrow="Contact"
-              title={settings.contactTitle}
-              description={settings.contactSummary}
-            />
-            <div className="flex flex-wrap gap-3">
-              <ButtonLink
-                href={`mailto:${settings.contactEmail}`}
-                size="lg"
-                variant="secondary"
+        <section className="bg-night py-18 text-night-text sm:py-24 lg:py-30" id="work">
+          <div className="page-shell">
+            <div className="grid gap-8 border-b border-white/14 pb-10 lg:grid-cols-[0.7fr_1.3fr] lg:items-end">
+              <div>
+                <p className="technical-label text-[#ef8b67]">02 / Selected work</p>
+                <p className="mt-5 text-sm leading-6 text-night-muted">
+                  Real systems, current evidence, honest tradeoffs.
+                </p>
+              </div>
+              <div>
+                <h2 className="text-balance text-4xl font-semibold leading-[1] tracking-[-0.055em] sm:text-5xl lg:text-7xl">
+                  Case studies, not{" "}
+                  <span className="display-serif italic text-[#ef8b67]">
+                    gallery cards.
+                  </span>
+                </h2>
+                <p className="mt-6 max-w-2xl text-base leading-7 text-night-muted sm:text-lg">
+                  Each project is framed around the problem, the engineering
+                  decisions, the evidence available today, and what still needs
+                  to improve.
+                </p>
+              </div>
+            </div>
+            <div className="mt-10 sm:mt-14">
+              <FeaturedProjects projects={homepageProjects} />
+            </div>
+            <div className="mt-9 flex justify-end">
+              <Link
+                className="group inline-flex min-h-12 items-center gap-3 border border-white/20 px-5 text-sm font-semibold transition-colors hover:border-[#ef8b67] hover:text-[#ef8b67]"
+                href="/projects"
               >
-                {settings.contactEmail}
-              </ButtonLink>
-              {settings.githubUrl ? (
-                <ButtonLink
-                  href={settings.githubUrl}
-                  rel="noreferrer"
-                  target="_blank"
-                  variant="ghost"
+                Explore every project
+                <ArrowUpRight
+                  aria-hidden="true"
+                  className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  size={17}
+                />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-b border-ink/20 bg-background" id="capabilities">
+          <div className="page-shell py-18 sm:py-24 lg:py-30">
+            <div className="grid gap-8 lg:grid-cols-[0.7fr_1.3fr] lg:items-end">
+              <div>
+                <p className="technical-label text-signal">03 / Capabilities</p>
+              </div>
+              <div>
+                <h2 className="text-balance max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.055em] text-ink sm:text-5xl lg:text-6xl">
+                  {settings.skillsTitle}
+                </h2>
+                <p className="mt-6 max-w-2xl text-base leading-7 text-muted sm:text-lg">
+                  {settings.skillsSummary}
+                </p>
+              </div>
+            </div>
+            <div className="mt-10 sm:mt-14">
+              <CapabilityGrid skills={settings.skills} />
+            </div>
+          </div>
+        </section>
+
+        <section className="border-b border-ink/20 bg-paper" id="experience">
+          <div className="page-shell py-18 sm:py-24 lg:py-30">
+            <div className="grid gap-10 lg:grid-cols-[0.66fr_1.34fr] lg:gap-16">
+              <div>
+                <p className="technical-label text-signal">04 / Background</p>
+                <p className="mt-5 max-w-sm text-sm leading-6 text-muted">
+                  A software engineering foundation shaped through formal study,
+                  self-directed product work, and active technical learning.
+                </p>
+              </div>
+              <div>
+                <h2 className="text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.055em] text-ink sm:text-5xl lg:text-6xl">
+                  Growing through{" "}
+                  <span className="display-serif italic text-signal">
+                    deliberate practice.
+                  </span>
+                </h2>
+                <div className="mt-10 divide-y divide-ink/15 border-y border-ink/20">
+                  <article className="grid gap-4 py-7 sm:grid-cols-[9rem_1fr]">
+                    <p className="technical-label text-muted">Foundation</p>
+                    <div>
+                      <h3 className="text-xl font-semibold tracking-[-0.03em]">
+                        Software engineering graduate
+                      </h3>
+                      <p className="mt-3 max-w-2xl text-sm leading-7 text-muted">
+                        Core computer science and software engineering concepts
+                        applied through full-stack product work, backend systems,
+                        and structured problem solving.
+                      </p>
+                    </div>
+                  </article>
+                  <article className="grid gap-4 py-7 sm:grid-cols-[9rem_1fr]">
+                    <p className="technical-label text-muted">Now building</p>
+                    <div>
+                      <h3 className="text-xl font-semibold tracking-[-0.03em]">
+                        Product systems with real operational boundaries
+                      </h3>
+                      <p className="mt-3 max-w-2xl text-sm leading-7 text-muted">
+                        Current work covers protected admin flows, database-backed
+                        content, safe file handling, applied AI prototypes, and
+                        the reliability decisions that make those systems usable.
+                      </p>
+                    </div>
+                  </article>
+                  <article className="grid gap-4 py-7 sm:grid-cols-[9rem_1fr]">
+                    <p className="technical-label text-muted">Current focus</p>
+                    <div>
+                      <h3 className="text-xl font-semibold tracking-[-0.03em]">
+                        {activeLearningTracks.length} active learning{" "}
+                        {activeLearningTracks.length === 1 ? "track" : "tracks"}
+                      </h3>
+                      <p className="mt-3 max-w-2xl text-sm leading-7 text-muted">
+                        Applied LLM engineering, security fundamentals, and
+                        data-structures practice—recorded as learning activity,
+                        not presented as substitute experience.
+                      </p>
+                    </div>
+                  </article>
+                </div>
+
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <Link
+                    className="inline-flex min-h-12 items-center gap-2 bg-ink px-5 text-sm font-semibold text-night-text transition-colors hover:bg-signal"
+                    href="/courses"
+                  >
+                    <BookOpen aria-hidden="true" size={17} />
+                    Learning timeline
+                  </Link>
+                  <Link
+                    className="inline-flex min-h-12 items-center gap-2 border border-ink/25 px-5 text-sm font-semibold text-ink transition-colors hover:border-ink"
+                    href="/cv"
+                  >
+                    <Eye aria-hidden="true" size={17} />
+                    {settings.resumeUrl ? "Read CV" : "CV overview"}
+                  </Link>
+                  {settings.resumeUrl ? (
+                    <a
+                      className="inline-flex min-h-12 items-center gap-2 px-4 text-sm font-semibold text-muted transition-colors hover:text-ink"
+                      href="/api/cv/download"
+                    >
+                      <Download aria-hidden="true" size={17} />
+                      Download
+                    </a>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="relative overflow-hidden bg-signal text-white" id="contact">
+          <div
+            aria-hidden="true"
+            className="absolute -right-40 -top-52 size-[38rem] rounded-full border border-white/20"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute -right-24 -top-36 size-[30rem] rounded-full border border-white/15"
+          />
+          <div className="page-shell relative py-18 sm:py-24 lg:py-30">
+            <p className="technical-label text-white/72">05 / Contact</p>
+            <div className="mt-8 grid gap-10 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
+              <div>
+                <h2 className="text-balance max-w-5xl text-5xl font-medium leading-[0.94] tracking-[-0.07em] sm:text-7xl lg:text-[7rem]">
+                  {settings.contactTitle}
+                </h2>
+                <p className="mt-7 max-w-2xl text-base leading-7 text-white/78 sm:text-lg sm:leading-8">
+                  {settings.contactSummary}
+                </p>
+              </div>
+              <div className="border-t border-white/30 pt-6 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
+                <a
+                  className="group flex min-h-14 items-center justify-between border-b border-white/28 py-3 text-base font-semibold"
+                  href={`mailto:${settings.contactEmail}`}
                 >
-                  GitHub
-                </ButtonLink>
-              ) : null}
-              {settings.linkedinUrl ? (
-                <ButtonLink
-                  href={settings.linkedinUrl}
-                  rel="noreferrer"
-                  target="_blank"
-                  variant="ghost"
-                >
-                  LinkedIn
-                </ButtonLink>
-              ) : null}
-              {settings.resumeUrl ? (
-                <ButtonLink
-                  href={settings.resumeUrl}
-                  rel="noreferrer"
-                  target="_blank"
-                  variant="ghost"
-                >
-                  Resume
-                </ButtonLink>
-              ) : null}
+                  <span className="flex items-center gap-3">
+                    <Mail aria-hidden="true" size={18} />
+                    Email me
+                  </span>
+                  <ArrowUpRight
+                    aria-hidden="true"
+                    className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
+                    size={20}
+                  />
+                </a>
+                {settings.githubUrl ? (
+                  <a
+                    className="group flex min-h-14 items-center justify-between border-b border-white/28 py-3 text-base font-semibold"
+                    href={settings.githubUrl}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    <span className="flex items-center gap-3">
+                      <GitBranch aria-hidden="true" size={18} />
+                      GitHub
+                    </span>
+                    <ArrowUpRight
+                      aria-hidden="true"
+                      className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
+                      size={20}
+                    />
+                  </a>
+                ) : null}
+                {settings.linkedinUrl ? (
+                  <a
+                    className="group flex min-h-14 items-center justify-between border-b border-white/28 py-3 text-base font-semibold"
+                    href={settings.linkedinUrl}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    <span className="flex items-center gap-3">
+                      <Contact aria-hidden="true" size={18} />
+                      LinkedIn
+                    </span>
+                    <ArrowUpRight
+                      aria-hidden="true"
+                      className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
+                      size={20}
+                    />
+                  </a>
+                ) : null}
+              </div>
             </div>
           </div>
         </section>
       </main>
-      <SiteFooter siteName={settings.siteName} />
+      <SiteFooter
+        contactEmail={settings.contactEmail}
+        githubUrl={settings.githubUrl}
+        linkedinUrl={settings.linkedinUrl}
+        siteName={settings.siteName}
+      />
     </div>
   );
 }

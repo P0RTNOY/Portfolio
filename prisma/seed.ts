@@ -1,5 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 
+import { DEFAULT_CONTACT_SUMMARY } from "../src/lib/cv-copy";
+import { buildSeedSiteSettingsUpdate } from "../src/lib/seed-site-settings";
+
 const prisma = new PrismaClient();
 
 const projectCaseStudies = [
@@ -7,9 +10,9 @@ const projectCaseStudies = [
     title: "Personal Portfolio Platform",
     slug: "personal-portfolio-platform",
     shortDescription:
-      "A full-stack portfolio product with protected admin workflows, database-backed content, CV uploads, and deployment discipline built in from the start.",
+      "A full-stack portfolio with protected admin workflows, database-backed content, file uploads, and server-side integrations.",
     fullDescription:
-      "This portfolio is built as a real product, not a static gallery of hardcoded cards.\n\n## Overview\nI designed it so the public site can grow with my work: projects and courses are stored in Supabase Postgres, content is edited through protected admin routes, CV files are uploaded through Supabase Storage, and the site can be updated without editing the public UI by hand.\n\n## Architecture\nThe public pages and admin dashboard run on the Next.js App Router. Prisma handles server-side data access, Supabase stores the project and course records, and the upload flow keeps project media and resume files in storage instead of baking them into the frontend. I also kept AI-assisted admin helpers server-side so secrets never reach the browser.\n\n## Lessons learned and next steps\n- Treating a portfolio like a product made the content model clearer and easier to extend\n- Reusable project and course records are better evidence for a junior SWE portfolio than one-off hardcoded cards\n- Protected admin workflows force better validation and make content edits safer\n- The next improvements are richer screenshots, stronger search and filtering, and more testing around forms and data access",
+      "This portfolio is a working full-stack application rather than a static gallery of hardcoded cards.\n\nProjects, courses, site settings, and uploaded files are managed as data, so the public pages can change without rewriting their components.\n\n## Architecture / implementation\nDecision: keep the public site and protected content tools in one Next.js App Router application, use Prisma for typed server-side data access, and use Supabase Postgres and Storage for records and files.\n\nWhy: one content model reduces duplicated page logic, while server-only provider calls keep credentials out of the browser.\n\nResult: project and course records, site copy, and uploaded assets can be changed through admin workflows instead of hardcoded UI edits. The tradeoff is greater reliance on database, storage, validation, and error-state behavior than a static portfolio would require.\n\n## Lessons learned and next steps\n- Separating content from presentation made the project and course pages easier to extend\n- Protected write paths need validation and explicit loading and error states\n- Server-side integrations are easier to reason about when provider credentials never enter client components\n- Next steps are richer project media and focused tests around forms, permissions, and data access",
     techStack: JSON.stringify([
       "Next.js",
       "React",
@@ -20,7 +23,6 @@ const projectCaseStudies = [
       "PostgreSQL",
       "Zod",
       "Hugging Face",
-      "Vercel-ready architecture",
     ]),
     githubUrl: "https://github.com/P0RTNOY/Portfolio",
     liveUrl: null,
@@ -37,10 +39,10 @@ const projectCaseStudies = [
       "CV/resume upload support",
       "Supabase Storage uploads",
       "Server-side AI helper routes",
-      "Deployment-ready content workflow",
+      "Validated admin content workflows",
     ]),
     problemSolved:
-      "I needed a portfolio that could prove real engineering habits, not just show screenshots. The solution was a database-backed site with content editing, upload workflows, and a public presentation layer that can grow as I ship more work.",
+      "Static project cards would make every content change a code change. I separated content from presentation so project records, learning records, site copy, and uploaded files can be maintained through protected workflows while the public UI reads the same structured data.",
     technicalChallenges:
       "- Designing reusable project and course models without overcomplicating the schema\n- Building protected admin flows for projects, courses, CV files, and site settings\n- Keeping Prisma reads clean while the data lives in Supabase Postgres\n- Handling Supabase Storage uploads for project images and resume files\n- Keeping the public pages polished while the content stays database-driven\n- Adding AI-assisted content tooling without exposing secrets to the frontend",
     displayOrder: 1,
@@ -51,7 +53,7 @@ const projectCaseStudies = [
     shortDescription:
       "An AI product prototype where players write a prompt, the backend generates sanitized SVG clue rounds, and the game runs asynchronously while the guesser waits.",
     fullDescription:
-      "AI Pictionary Game is an early-stage prototype for a playful AI product.\n\n## Overview\nOne player writes a funny or unusual prompt, the backend turns that prompt into SVG clue rounds, and the other player tries to guess the original idea before the round closes. The game is intentionally built around async waiting, because that makes the AI step feel like part of the experience instead of an implementation detail.\n\n## Architecture\nAn Expo React Native app calls a FastAPI backend for round creation, polling, and guess submission. When an OpenRouter key is available, the backend generates drawings and scores guesses through model calls; when it is not, the app falls back to deterministic local artists and similarity-based scoring so the prototype still works in development.\n\n## Lessons learned and next steps\n- AI output becomes more useful when the product is designed around its limitations\n- Sanitizing generated SVG before rendering it in the client is non-negotiable\n- Async round flow, polling, and fallback scoring make the prototype feel like a real game loop\n- The next step is persistent multiplayer state, clearer model comparison, and a smoother replay experience",
+      "AI Pictionary Game is an early-stage prototype for testing a playful AI interaction beyond a chat interface.\n\nOne player writes a prompt, the backend produces SVG clue rounds, and another player submits a guess after waiting for generation to finish.\n\n## Architecture / implementation\nDecision: split the prototype into an Expo React Native client and a FastAPI round API, then treat model output as untrusted input before rendering it.\n\nWhy: the client can focus on the create, wait, guess, and result states while the backend owns model calls, SVG sanitization, and scoring.\n\nResult: the same round flow can use OpenRouter-backed generation when configured or deterministic local artists and similarity scoring during development. That fallback improves repeatability, but it does not reproduce every failure mode of a live model.\n\n## Lessons learned and next steps\n- Product flow matters as much as model output in an AI prototype\n- Generated SVG needs sanitization before it reaches the mobile renderer\n- Deterministic fallbacks make the round flow testable without provider access\n- Next steps are persistent multiplayer state, clearer model comparison, and a smoother replay experience",
     techStack: JSON.stringify([
       "Python",
       "FastAPI",
@@ -84,7 +86,7 @@ const projectCaseStudies = [
       "Local fallback scoring and mock artists",
     ]),
     problemSolved:
-      "Most AI demos stop at chat. This prototype explores a more useful product shape: letting an LLM generate visual clues inside a multiplayer guessing game, so model imperfections become part of the fun rather than a failure state.",
+      "A chat-style demo would not test async generation, untrusted visual output, or a multi-step game loop. I used a guessing game to make those constraints visible: generation becomes a waiting state, sanitized SVG becomes the clue, and scoring closes the round.",
     technicalChallenges:
       "- Generating clean SVG-only responses from LLMs\n- Creating prompts that stay recognizable without leaking the answer text\n- Comparing low, mid, and high artist outputs in a way players can feel\n- Designing an async create/wait/guess/result flow that does not break the round state\n- Preventing the original prompt from being revealed before the guess\n- Sanitizing untrusted SVG before rendering it in the mobile app\n- Structuring rounds, prompts, guesses, and generated drawings cleanly in the backend and client",
     displayOrder: 2,
@@ -109,19 +111,19 @@ const demoProjectFilters = [
 const demoSiteSettings = {
   id: "default",
   siteName: "Omer Portnoy",
-  heroEyebrow: "Junior Software Engineer · Full-Stack / AI / Automation",
+  heroEyebrow: "Software Engineer · Full-Stack / AI / Automation",
   heroTitle:
-    "I build practical full-stack software, AI tools, and automation workflows.",
+    "I engineer practical products where AI, backend systems, and thoughtful interfaces meet.",
   heroIntro:
-    "I'm Omer Portnoy, and this portfolio showcases real products, not templates. I focus on junior SWE readiness through shipped work, steady learning, and clear communication while building backend systems, admin dashboards, LLM-powered apps, developer tools, and automation workflows.",
-  primaryCtaLabel: "Explore the platform",
-  secondaryCtaLabel: "Contact me",
-  aboutTitle: "Software engineer focused on shipping end-to-end products.",
+    "I’m Omer Portnoy, a software engineer who turns product ideas into working systems—from database-backed web platforms and protected tools to AI product prototypes with clear safety and reliability boundaries.",
+  primaryCtaLabel: "Explore selected work",
+  secondaryCtaLabel: "Start a conversation",
+  aboutTitle: "End-to-end thinking, grounded in working software.",
   aboutSummary:
-    "I like taking products from idea to deployed software: planning the UI, wiring APIs, working with databases, adding authentication, and shipping something maintainable. I'm building the habits junior software engineering teams look for—clear communication, steady learning, and the discipline to keep improving with every project.",
-  skillsTitle: "Technical focus areas that support hiring decisions.",
+    "I care about the whole path from product intent to production behavior: shaping the interface, designing the data model, building the API, protecting privileged paths, and documenting the decisions that make the system maintainable.",
+  skillsTitle: "Capabilities built around real product outcomes.",
   skillsSummary:
-    "A hiring-focused snapshot of the tools and fundamentals I use to turn ideas into shipped products: frontend and backend work, databases, APIs, authentication, deployment, and the learning habits that help me keep improving.",
+    "My current toolkit spans product engineering, backend systems, applied AI, and the delivery practices that turn experiments into dependable software.",
   skills: JSON.stringify([
     "Python",
     "TypeScript",
@@ -144,9 +146,8 @@ const demoSiteSettings = {
     "Data Structures",
     "Security Fundamentals",
   ]),
-  contactTitle: "Open to junior software engineering opportunities.",
-  contactSummary:
-    "I'm open to junior software engineering opportunities and project conversations. This portfolio is set up so recruiters can quickly see shipped work, responsibilities, and the evidence behind each project.",
+  contactTitle: "Let's build something useful.",
+  contactSummary: DEFAULT_CONTACT_SUMMARY,
   contactEmail: "omerportnoy@gmail.com",
   githubUrl: "https://github.com/P0RTNOY",
   linkedinUrl: null,
@@ -161,9 +162,9 @@ const learningRecords = [
     courseUrl: "https://lnkd.in/dY83N4wi",
     imageUrl: null,
     shortDescription:
-      "A practical LLM engineering course focused on building and deploying LLM apps while learning Generative AI, RAG, LoRA, agents, and modern AI product patterns.",
+      "An applied AI track for building, evaluating, and deploying LLM features with RAG, LoRA, agents, and product-focused delivery habits.",
     fullDescription:
-      "I am taking this course to move beyond simply using ChatGPT and better understand how LLM-powered applications are built, deployed, evaluated, and improved. The course is structured as an 8-week practical journey through LLM apps, RAG, LoRA, AI agents, and product-oriented AI development.",
+      "This track is my applied AI roadmap. I am using it to move from basic model usage to understanding how LLM-powered features are designed, evaluated, deployed, and improved in real products. The weekly focus covers LLM app patterns, RAG, LoRA, agents, and the tradeoffs that matter when shipping AI features as a junior engineer.",
     skills: JSON.stringify([
       "LLMs",
       "Generative AI",
@@ -193,9 +194,9 @@ const learningRecords = [
     courseUrl: "https://www.comptia.org/certifications/security",
     imageUrl: null,
     shortDescription:
-      "A security fundamentals learning track focused on networking, risk, identity, threats, vulnerabilities, and practical security awareness for software engineering.",
+      "A security fundamentals track for building safer engineering habits around authentication, networking, risk, identity, and common vulnerabilities.",
     fullDescription:
-      "This learning track supports my software engineering foundation by strengthening security awareness around authentication, infrastructure, networking, access control, vulnerabilities, and secure development practices.",
+      "This track reinforces the security habits I need as a junior software engineer. I am using it to build practical awareness around authentication, access control, networking basics, threat modeling, infrastructure risk, and secure development decisions that reduce avoidable mistakes in real projects.",
     skills: JSON.stringify([
       "Security Fundamentals",
       "Networking",
@@ -223,9 +224,9 @@ const learningRecords = [
     courseUrl: "https://leetcode.com/problemset/",
     imageUrl: null,
     shortDescription:
-      "A continuous practice track for coding interviews and software engineering fundamentals, focused on Python problem solving, common patterns, and algorithmic thinking.",
+      "A steady interview-prep track for strengthening problem solving, pattern recognition, and Python coding speed for junior SWE interviews.",
     fullDescription:
-      "This track helps me sharpen core computer science fundamentals and interview readiness through repeated practice with common problem-solving patterns such as hash maps, stacks, queues, two pointers, arrays, strings, and running-state algorithms.",
+      "This track is focused on interview readiness and core computer science repetition. I use it to practice common patterns such as hash maps, stacks, queues, two pointers, arrays, strings, and running-state algorithms so I can solve junior-level interview problems with more accuracy and less friction.",
     skills: JSON.stringify([
       "Data Structures",
       "Algorithms",
@@ -271,7 +272,7 @@ async function main() {
 
   await prisma.siteSettings.upsert({
     where: { id: demoSiteSettings.id },
-    update: demoSiteSettings,
+    update: buildSeedSiteSettingsUpdate(demoSiteSettings),
     create: demoSiteSettings,
   });
 

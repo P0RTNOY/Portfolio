@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { optionalRemoteDocumentUrlSchema } from "./remote-document-url";
+
 const optionalUrlSchema = z
   .string()
   .trim()
@@ -57,7 +59,7 @@ export const siteSettingsSchema = z.object({
     .max(160),
   githubUrl: optionalUrlSchema,
   linkedinUrl: optionalUrlSchema,
-  resumeUrl: optionalUrlSchema,
+  resumeUrl: optionalRemoteDocumentUrlSchema,
 });
 
 export type SiteSettingsInput = z.infer<typeof siteSettingsSchema>;
